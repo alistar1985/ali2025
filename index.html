@@ -165,6 +165,8 @@
         .input-wrap { grid-column: 1 / -1; }
         @media (min-width: 480px) { .input-wrap { grid-column: span 1; } }
 
+        .photo-label { display: block; font-size: 0.9rem; font-weight: 700; color: var(--primary); margin-bottom: 8px; }
+        .photo-input { padding: 10px; font-family: 'Cairo'; font-size: 0.9rem; }
         #duplicateWarning {
             color: var(--error);
             font-weight: 700;
@@ -356,7 +358,6 @@
         <div class="header">
             <h2>منظومة جرد حي القائم الأول</h2>
             <p class="sub">المختار أحمد هاني</p>
-            <a href="dashboard.html" class="link-dash">لوحة التحكم ←</a>
         </div>
 
         <form class="form-body" id="censusForm">
@@ -378,6 +379,10 @@
                 <input type="text" id="job" placeholder="المهنة">
                 <input type="text" id="workLocation" placeholder="موقع العمل الحالي">
                 <input type="tel" id="phone" placeholder="رقم الهاتف" required>
+                <div class="input-wrap">
+                    <label for="photoInput" class="photo-label">📷 صورة رب الأسرة (اختياري)</label>
+                    <input type="file" id="photoInput" accept="image/jpeg,image/png,image/webp" class="photo-input">
+                </div>
             </div>
 
             <div class="section-head">🏠 تفاصيل السكن</div>
@@ -394,6 +399,11 @@
             <div id="membersContainer"></div>
             <button type="button" class="btn-add" onclick="addMember()">+ إضافة فرد جديد للعائلة</button>
 
+            <div class="section-head">📝 الملاحظات</div>
+            <div class="input-wrap">
+                <textarea id="notes" placeholder="ملاحظات (اختياري)" rows="3" style="width:100%; padding:12px; border:2px solid var(--border); border-radius:var(--radius); font-family:Cairo; font-size:1rem; box-sizing:border-box;"></textarea>
+            </div>
+
             <button type="button" id="previewBtn" class="btn-submit" onclick="showPreview()" style="margin-top:24px;">معاينة كافة البيانات</button>
         </form>
     </div>
@@ -408,7 +418,7 @@
 </div>
 
 <script>
-    const scriptURL = "https://script.google.com/macros/s/AKfycbzIkbcB9mzpCP2dMO2P5UN5WE1Zo3TrZ5xd6wYAZejfVQcRwiQTqc9W2oiNmJFR_I9s2g/exec"; 
+    const scriptURL = "https://script.google.com/macros/s/AKfycbwvjt0DpIsaeAZI_Ygn4AdJ7wYIg5i_kugD3cR3eEMpUkdriu4rBR6GNA9Tz4TnFtbQMg/exec"; 
     const SECRET_TOKEN = "AL_QAIM_MUKHTAR_2026";
     let cachedNames = [];
 
@@ -508,31 +518,71 @@
             family += (i + 1) + sep + n.replace(/\t/g, " ") + sep + birth + sep + job + sep + edu + sep + social + sep + rel + "\n";
         });
 
-        const formData = new URLSearchParams();
-        formData.append("token", SECRET_TOKEN);
-        formData.append("serialId", sId);
-        formData.append("name", document.getElementById('name').value);
-        formData.append("nationalId", document.getElementById('nationalId').value);
-        formData.append("cardId", document.getElementById('cardId').value);
-        formData.append("birth", document.getElementById('birth').value);
-        formData.append("education", document.getElementById('education').value);
-        formData.append("job", document.getElementById('job').value);
-        formData.append("workLocation", document.getElementById('workLocation').value);
-        formData.append("phone", document.getElementById('phone').value);
-        formData.append("homeType", document.getElementById('homeType').value);
-        formData.append("address", document.getElementById('address').value);
-        formData.append("prevAddress", document.getElementById('prevAddress').value);
-        formData.append("moveDate", document.getElementById('moveDate').value);
-        formData.append("taboo", document.getElementById('taboo').value);
-        formData.append("homeNum", document.getElementById('homeNum').value);
-        formData.append("familyMembers", family);
+        const photoInput = document.getElementById('photoInput');
+        const hasPhoto = photoInput.files && photoInput.files[0];
 
-        fetch(scriptURL, { method: 'POST', body: formData, mode: 'no-cors' });
-        
-        closeModal();
-        document.getElementById('formSection').style.display = 'none';
-        document.getElementById('successScreen').style.display = 'block';
-        document.getElementById('serialDisplay').innerText = "رقم المعاملة: " + sId;
+        function doSubmit(photoIdOrNull) {
+            var formData = new URLSearchParams();
+            formData.append("token", SECRET_TOKEN);
+            formData.append("serialId", sId);
+            formData.append("name", document.getElementById('name').value);
+            formData.append("nationalId", document.getElementById('nationalId').value);
+            formData.append("cardId", document.getElementById('cardId').value);
+            formData.append("birth", document.getElementById('birth').value);
+            formData.append("education", document.getElementById('education').value);
+            formData.append("job", document.getElementById('job').value);
+            formData.append("workLocation", document.getElementById('workLocation').value);
+            formData.append("phone", document.getElementById('phone').value);
+            formData.append("homeType", document.getElementById('homeType').value);
+            formData.append("address", document.getElementById('address').value);
+            formData.append("prevAddress", document.getElementById('prevAddress').value);
+            formData.append("moveDate", document.getElementById('moveDate').value);
+            formData.append("taboo", document.getElementById('taboo').value);
+            formData.append("homeNum", document.getElementById('homeNum').value);
+            formData.append("familyMembers", family);
+            formData.append("notes", document.getElementById('notes').value || "");
+
+            fetch(scriptURL, { method: 'POST', body: formData, mode: 'no-cors' });
+            closeModal();
+            document.getElementById('formSection').style.display = 'none';
+            document.getElementById('successScreen').style.display = 'block';
+            document.getElementById('serialDisplay').innerText = "رقم المعاملة: " + sId;
+        }
+
+        if (hasPhoto) {
+            var reader = new FileReader();
+            reader.onload = function() {
+                var payload = {
+                    token: SECRET_TOKEN,
+                    serialId: sId,
+                    name: document.getElementById('name').value,
+                    nationalId: document.getElementById('nationalId').value,
+                    cardId: document.getElementById('cardId').value,
+                    birth: document.getElementById('birth').value,
+                    education: document.getElementById('education').value,
+                    job: document.getElementById('job').value,
+                    workLocation: document.getElementById('workLocation').value,
+                    phone: document.getElementById('phone').value,
+                    homeType: document.getElementById('homeType').value,
+                    address: document.getElementById('address').value,
+                    prevAddress: document.getElementById('prevAddress').value,
+                    moveDate: document.getElementById('moveDate').value,
+                    taboo: document.getElementById('taboo').value,
+                    homeNum: document.getElementById('homeNum').value,
+                    familyMembers: family,
+                    notes: document.getElementById('notes').value || "",
+                    photoBase64: reader.result
+                };
+                fetch(scriptURL, { method: 'POST', body: JSON.stringify(payload), headers: { 'Content-Type': 'application/json' }, mode: 'no-cors' });
+                closeModal();
+                document.getElementById('formSection').style.display = 'none';
+                document.getElementById('successScreen').style.display = 'block';
+                document.getElementById('serialDisplay').innerText = "رقم المعاملة: " + sId;
+            };
+            reader.readAsDataURL(photoInput.files[0]);
+        } else {
+            doSubmit("");
+        }
     }
 
     window.onload = () => { addMember(); loadDatabase(); };
