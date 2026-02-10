@@ -3,235 +3,213 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>قاعدة بيانات حي القائم الأول</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+    <title>منظومة جرد حي القائم الأول - المختار أحمد هاني</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Cairo', sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            min-height: 100vh;
-            /* خلفية متدرجة عالمية هادئة */
-            background: linear-gradient(180deg, #dce9f4 0%, #b8c6e9 100%);
-            background-attachment: fixed;
-            position: relative;
-            overflow-x: hidden;
+        :root { --primary: #1a2a6c; --accent: #b21f1f; --bg: #f4f7f9; --success: #2e7d32; }
+        body { 
+            font-family: 'Cairo', sans-serif; 
+            background: var(--bg); 
+            margin: 0; 
+            padding: 10px; 
+            /* حماية: منع تحديد النصوص في الصفحة */
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        
+        /* استثناء حقول الإدخال لتسهيل الكتابة للمستخدم */
+        input, select, textarea {
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            -ms-user-select: text;
+            user-select: text;
         }
 
-        /* نمط المربعات التقنية في الخلفية */
-        body::before {
-            content: "";
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-image: 
-                linear-gradient(rgba(255,255,255,0.15) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255,255,255,0.15) 1px, transparent 1px);
-            background-size: 40px 40px;
-            z-index: -1;
-        }
+        .app-container { max-width: 800px; margin: auto; background: white; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); overflow: hidden; border-top: 8px solid var(--primary); }
+        .header { background: linear-gradient(135deg, var(--primary), var(--accent)); color: white; padding: 25px; text-align: center; }
+        .form-body { padding: 20px; }
+        .section-head { background: #e3f2fd; color: var(--primary); padding: 10px 15px; border-radius: 10px; font-weight: bold; margin: 20px 0 10px; border-right: 5px solid var(--accent); }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 15px; }
+        input, select { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 10px; box-sizing: border-box; font-family: 'Cairo'; }
+        
+        .member-card { background: #f9f9f9; border: 1px solid #eee; padding: 15px; border-radius: 15px; margin-bottom: 15px; border-right: 4px solid var(--success); }
+        .btn-add { background: var(--success); color: white; border: none; padding: 12px; border-radius: 10px; width: 100%; cursor: pointer; font-weight: bold; margin-bottom: 20px; }
+        .btn-submit { background: var(--primary); color: white; border: none; padding: 18px; width: 100%; border-radius: 12px; font-size: 18px; font-weight: bold; cursor: pointer; }
 
-        .app-container {
-            width: 100%;
-            max-width: 450px;
-            padding: 40px 20px;
-            text-align: center;
-        }
+        #reviewModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 2000; overflow-y: auto; padding: 15px; }
+        .modal-content { background: white; max-width: 650px; margin: 5px auto; border-radius: 15px; padding: 20px; }
+        .preview-box { background: #f8f9fa; border-radius: 10px; padding: 10px; margin-bottom: 20px; border: 1px solid #ddd; }
+        .preview-group-title { background: #eee; padding: 5px 10px; font-weight: bold; margin-top: 10px; border-radius: 5px; color: var(--primary); }
+        .preview-item { border-bottom: 1px solid #e0e0e0; padding: 6px 5px; display: flex; justify-content: space-between; font-size: 13px; }
+        .preview-val { font-weight: bold; color: #000; }
 
-        .header-title {
-            color: #1a2a4d;
-            font-size: 20px; /* حجم مصغر ومنسق */
-            font-weight: 900;
-            margin-bottom: 35px;
-            line-height: 1.4;
-            letter-spacing: -0.5px;
-        }
-
-        /* شبكة البطاقات 2×2 */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 25px;
-        }
-
-        .stat-card {
-            background: rgba(255, 255, 255, 0.92);
-            border-radius: 25px;
-            padding: 25px 5px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.04);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            border-bottom: 6px solid transparent;
-            transition: transform 0.3s ease;
-        }
-
-        .stat-card:active {
-            transform: scale(0.95);
-        }
-
-        .stat-card .number {
-            font-size: 30px;
-            font-weight: 900;
-            color: #1a2a4d;
-            margin-bottom: 3px;
-        }
-
-        .stat-card .label {
-            font-size: 13px;
-            color: #5d6d8a;
-            font-weight: 700;
-        }
-
-        /* الألوان السفلية للبطاقات */
-        .card-total { border-bottom-color: #3b82f6; }
-        .card-owned { border-bottom-color: #10b981; }
-        .card-random { border-bottom-color: #ef4444; }
-        .card-rent { border-bottom-color: #f59e0b; }
-
-        /* صندوق البحث المتميز */
-        .search-container {
-            background: rgba(255, 255, 255, 0.8);
-            border: 2px solid #ffffff;
-            border-radius: 50px;
-            padding: 12px 20px;
-            display: flex;
-            align-items: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.03);
-            backdrop-filter: blur(8px);
-        }
-
-        .search-container input {
-            background: transparent;
-            border: none;
-            outline: none;
-            width: 100%;
-            font-family: 'Cairo';
-            font-size: 15px;
-            color: #1a2a4d;
-            text-align: center;
-        }
-
-        .search-container input::placeholder {
-            color: #94a3b8;
-        }
-
-        /* لودر البحث */
-        .search-loader {
-            width: 18px;
-            height: 18px;
-            border: 2px solid #e2e8f0;
-            border-top: 2px solid #3b82f6;
-            border-radius: 50%;
-            margin-left: 10px;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin { 100% { transform: rotate(360deg); } }
-
-        /* منطقة النتائج */
-        #resultsArea { margin-top: 25px; }
-
-        .result-item {
-            background: white;
-            border-radius: 20px;
-            padding: 15px;
-            margin-bottom: 12px;
-            text-align: right;
-            border-right: 5px solid #1a2a4d;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-            animation: slideUp 0.3s ease;
-        }
-
-        @keyframes slideUp { from { opacity:0; transform: translateY(10px); } to { opacity:1; transform: translateY(0); } }
-
+        #successScreen { display: none; text-align: center; padding: 50px 20px; }
+        .success-icon { font-size: 70px; color: var(--success); }
     </style>
 </head>
-<body>
-
-<div class="app-container">
-    <div class="header-title">
-        قاعدة بيانات <br> حي القائم الأول
-    </div>
-
-    <div class="stats-grid">
-        <div class="stat-card card-total">
-            <div class="number" id="count-total">0</div>
-            <div class="label">إجمالي العوائل</div>
-        </div>
-        <div class="stat-card card-owned">
-            <div class="number" id="count-ملك">0</div>
-            <div class="label">سكن ملك</div>
-        </div>
-        <div class="stat-card card-random">
-            <div class="number" id="count-عشوائيات">0</div>
-            <div class="label">عشوائيات</div>
-        </div>
-        <div class="stat-card card-rent">
-            <div class="number" id="count-إيجار">0</div>
-            <div class="label">سكن إيجار</div>
+<body oncontextmenu="return false;"> <div id="reviewModal">
+    <div class="modal-content">
+        <h3 style="text-align:center; color: var(--accent); margin-top:0;">📋 مراجعة البيانات كاملة</h3>
+        <div id="previewData" class="preview-box"></div>
+        <div style="display: flex; gap: 10px;">
+            <button onclick="finalSend()" style="background: var(--success); color: white; flex: 2; padding: 15px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer;">تأكيد وإرسال ✅</button>
+            <button onclick="closeModal()" style="background: #757575; color: white; flex: 1; padding: 15px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer;">تعديل ✏️</button>
         </div>
     </div>
+</div>
 
-    <div class="search-container">
-        <div class="search-loader"></div>
-        <input type="text" id="searchInput" onkeyup="liveSearch()" placeholder="ابحث بالاسم، الهاتف، أو اسم الفرد...">
+<div class="app-container" id="mainWrapper">
+    <div id="formSection">
+        <div class="header">
+            <h2 style="margin:0">منظومة جرد حي القائم الأول</h2>
+            <p style="margin:5px 0 0; opacity:0.9; font-size:16px">المختار أحمد هاني</p>
+        </div>
+
+        <form class="form-body" id="censusForm">
+            <div class="section-head">👤 بيانات رب الأسرة</div>
+            <div class="grid">
+                <input type="text" id="name" placeholder="الاسم الرباعي واللقب" required>
+                <input type="text" id="nationalId" placeholder="رقم البطاقة الموحدة">
+                <input type="text" id="cardId" placeholder="رقم البطاقة التموينية">
+                <input type="number" id="birth" placeholder="سنة التولد">
+                <select id="education">
+                    <option value="">التحصيل الدراسي</option>
+                    <option>أمي</option><option>ابتدائية</option><option>متوسطة</option><option>إعدادية</option><option>دبلوم</option><option>بكالوريوس</option><option>دراسات عليا</option>
+                </select>
+                <input type="text" id="job" placeholder="المهنة">
+                <input type="text" id="workLocation" placeholder="موقع العمل الحالي">
+                <input type="tel" id="phone" placeholder="رقم الهاتف" required>
+            </div>
+
+            <div class="section-head">🏠 تفاصيل السكن</div>
+            <div class="grid">
+                <select id="homeType"><option>ملك</option><option>إيجار</option><option>عشوائيات</option></select>
+                <input type="text" id="prevAddress" placeholder="عنوان السكن السابق">
+                <input type="text" id="address" placeholder="العنوان الحالي">
+                <input type="text" id="moveDate" placeholder="تاريخ السكن">
+                <input type="text" id="taboo" placeholder="رقم الطابو">
+                <input type="text" id="homeNum" placeholder="رقم الدار">
+            </div>
+
+            <div class="section-head">👨‍👩‍👧‍👦 أفراد الأسرة</div>
+            <div id="membersContainer"></div>
+            <button type="button" class="btn-add" onclick="addMember()">+ إضافة فرد جديد للعائلة</button>
+
+            <button type="button" class="btn-submit" onclick="showPreview()" style="margin-top:20px; background: var(--accent);">مراجعة كافة البيانات</button>
+        </form>
     </div>
 
-    <div id="resultsArea"></div>
+    <div id="successScreen">
+        <div class="success-icon">✔️</div>
+        <h2 style="color: var(--success)">تم الإرسال بنجاح!</h2>
+        <p>تم حفظ البيانات في السجل الرقمي لحي القائم - مكتب المختار أحمد هاني.</p>
+        <div id="serialDisplay" style="margin:20px; font-weight:bold; color:var(--primary); font-size:18px;"></div>
+        <button class="btn-submit" onclick="resetFormForNewEntry()">إدخال استمارة جديدة</button>
+    </div>
 </div>
 
 <script>
-    // ضع رابط الـ Web App الخاص بك هنا
+    // الحماية البرمجية لمنع الاختصارات
+    document.onkeydown = function(e) {
+        if(event.keyCode == 123) { return false; } // F12
+        if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) { return false; } // Inspect
+        if(e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) { return false; } // Element
+        if(e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) { return false; } // Console
+        if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) { return false; } // Source Code
+    };
+
     const scriptURL = "https://script.google.com/macros/s/AKfycbx5cb0Xd17zx_aK9wKYIqJY2jJHvh7W79Dxi4JZERKC6TYb_7JN6iW85Pfw_pExiwpX2g/exec";
-    let database = [];
 
-    async function init() {
-        try {
-            const response = await fetch(scriptURL);
-            database = await response.json();
-            updateStats();
-        } catch (e) { console.error("Error fetching data"); }
+    function addMember() {
+        const container = document.getElementById("membersContainer");
+        const div = document.createElement("div");
+        div.className = "member-card";
+        div.innerHTML = `
+            <button type="button" onclick="this.parentElement.remove()" style="float:left; border:none; background:none; color:red; cursor:pointer; font-weight:bold;">✕ حذف</button>
+            <div class="grid">
+                <input type="text" class="m-name" placeholder="الاسم الثلاثي">
+                <select class="m-rel"><option>زوجة</option><option>ابن</option><option>ابنة</option><option>أخرى</option></select>
+                <input type="number" class="m-birth" placeholder="سنة التولد">
+                <input type="text" class="m-job" placeholder="المهنة">
+                <select class="m-edu"><option value="">الدراسة</option><option>ابتدائية</option><option>متوسطة</option><option>إعدادية</option><option>دبلوم</option><option>بكالوريوس</option></select>
+                <select class="m-social"><option>أعزب/باكر</option><option>متزوج/ة</option><option>مطلق/ة</option><option>أرمل/ة</option></select>
+            </div>`;
+        container.appendChild(div);
     }
+    window.onload = addMember;
 
-    function updateStats() {
-        const stats = { total: database.length, ملك: 0, إيجار: 0, عشوائيات: 0 };
-        database.forEach(item => {
-            if(item.homeType === "ملك") stats.ملك++;
-            else if(item.homeType === "إيجار") stats.إيجار++;
-            else if(item.homeType === "عشوائيات") stats.عشوائيات++;
+    function showPreview() {
+        const name = document.getElementById('name').value;
+        if(!name) { alert("يرجى ملء اسم رب الأسرة"); return; }
+        
+        let familyHtml = "";
+        document.querySelectorAll(".member-card").forEach((card, index) => {
+            const n = card.querySelector(".m-name").value;
+            if(n) familyHtml += `<div style="padding:5px; border-bottom:1px dashed #ccc;"><b>${index+1}. ${n}</b> (${card.querySelector(".m-rel").value})</div>`;
         });
-        document.getElementById('count-total').innerText = stats.total;
-        document.getElementById('count-ملك').innerText = stats.ملك;
-        document.getElementById('count-إيجار').innerText = stats.إيجار;
-        document.getElementById('count-عشوائيات').innerText = stats.عشوائيات;
+
+        document.getElementById('previewData').innerHTML = `
+            <div class="preview-group-title">بيانات شخصية</div>
+            <div class="preview-item"><span>الاسم:</span> <span class="preview-val">${name}</span></div>
+            <div class="preview-item"><span>الموحدة:</span> <span class="preview-val">${document.getElementById('nationalId').value || '---'}</span></div>
+            <div class="preview-item"><span>الهاتف:</span> <span class="preview-val">${document.getElementById('phone').value}</span></div>
+            <div class="preview-group-title">بيانات السكن</div>
+            <div class="preview-item"><span>نوع السكن:</span> <span class="preview-val">${document.getElementById('homeType').value}</span></div>
+            <div class="preview-item"><span>العنوان:</span> <span class="preview-val">${document.getElementById('address').value || '---'}</span></div>
+            <div class="preview-item"><span>رقم الدار:</span> <span class="preview-val">${document.getElementById('homeNum').value || '---'}</span></div>
+            <div class="preview-group-title">أفراد العائلة</div>
+            <div style="font-size:12px; padding:10px;">${familyHtml || 'لا يوجد'}</div>
+        `;
+        document.getElementById('reviewModal').style.display = 'block';
     }
 
-    function liveSearch() {
-        const term = document.getElementById('searchInput').value.trim().toLowerCase();
-        const resultsArea = document.getElementById('resultsArea');
-        resultsArea.innerHTML = "";
-        if (!term) return;
+    function closeModal() { document.getElementById('reviewModal').style.display = 'none'; }
 
-        const filtered = database.filter(f => 
-            f.name.toLowerCase().includes(term) || 
-            f.phone.includes(term) ||
-            (f.familyMembers && f.familyMembers.toLowerCase().includes(term))
-        );
-
-        filtered.forEach(item => {
-            const div = document.createElement('div');
-            div.className = 'result-item';
-            div.innerHTML = `<strong>${item.name}</strong><br><span style="font-size:12px; color:#666;">الهاتف: ${item.phone} | الدار: ${item.homeNum}</span>`;
-            resultsArea.appendChild(div);
+    function finalSend() {
+        const sId = "QA-" + Math.floor(Math.random()*900000+100000);
+        let family = "";
+        document.querySelectorAll(".member-card").forEach((card, i) => {
+            const n = card.querySelector(".m-name").value;
+            if(n) family += `${i+1}- الاسم: ${n}, الصلة: ${card.querySelector(".m-rel").value}, التولد: ${card.querySelector(".m-birth").value}, المهنة: ${card.querySelector(".m-job").value}, الدراسة: ${card.querySelector(".m-edu").value}, الحالة: ${card.querySelector(".m-social").value}\n`;
         });
+
+        const payload = {
+            serialId: sId,
+            name: document.getElementById('name').value,
+            nationalId: document.getElementById('nationalId').value,
+            cardId: document.getElementById('cardId').value,
+            birth: document.getElementById('birth').value,
+            education: document.getElementById('education').value,
+            job: document.getElementById('job').value,
+            workLocation: document.getElementById('workLocation').value,
+            phone: document.getElementById('phone').value,
+            homeType: document.getElementById('homeType').value,
+            moveDate: document.getElementById('moveDate').value,
+            address: document.getElementById('address').value,
+            prevAddress: document.getElementById('prevAddress').value,
+            taboo: document.getElementById('taboo').value,
+            homeNum: document.getElementById('homeNum').value,
+            familyMembers: family
+        };
+
+        fetch(scriptURL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
+        
+        closeModal();
+        document.getElementById('formSection').style.display = 'none';
+        document.getElementById('successScreen').style.display = 'block';
+        document.getElementById('serialDisplay').innerText = "رقم المعاملة: " + sId;
     }
 
-    window.onload = init;
+    function resetFormForNewEntry() {
+        document.getElementById('censusForm').reset();
+        document.getElementById('membersContainer').innerHTML = "";
+        addMember();
+        document.getElementById('successScreen').style.display = 'none';
+        document.getElementById('formSection').style.display = 'block';
+        window.scrollTo(0, 0);
+    }
 </script>
-
 </body>
 </html>
