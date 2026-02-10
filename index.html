@@ -3,11 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منظومة جرد حي القائم الأول</title>
+    <title>منظومة جرد حي القائم الأول - المختار أحمد هاني</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root { --primary: #1a2a6c; --accent: #b21f1f; --bg: #f4f7f9; --success: #2e7d32; }
-        body { font-family: 'Cairo', sans-serif; background: var(--bg); margin: 0; padding: 10px; }
+        body { 
+            font-family: 'Cairo', sans-serif; 
+            background: var(--bg); 
+            margin: 0; 
+            padding: 10px; 
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        
+        input, select, textarea {
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            -ms-user-select: text;
+            user-select: text;
+        }
+
         .app-container { max-width: 800px; margin: auto; background: white; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); overflow: hidden; border-top: 8px solid var(--primary); }
         .header { background: linear-gradient(135deg, var(--primary), var(--accent)); color: white; padding: 25px; text-align: center; }
         .form-body { padding: 20px; }
@@ -30,9 +47,7 @@
         .success-icon { font-size: 70px; color: var(--success); }
     </style>
 </head>
-<body>
-
-<div id="reviewModal">
+<body oncontextmenu="return false;"> <div id="reviewModal">
     <div class="modal-content">
         <h3 style="text-align:center; color: var(--accent); margin-top:0;">📋 مراجعة البيانات كاملة</h3>
         <div id="previewData" class="preview-box"></div>
@@ -47,33 +62,36 @@
     <div id="formSection">
         <div class="header">
             <h2 style="margin:0">منظومة جرد حي القائم الأول</h2>
-            <p style="margin:5px 0 0; opacity:0.9; font-size:14px">التسجيل الرقمي الشامل</p>
+            <p style="margin:5px 0 0; opacity:0.9; font-size:16px">المختار أحمد هاني</p>
         </div>
 
         <form class="form-body" id="censusForm">
             <div class="section-head">👤 بيانات رب الأسرة</div>
             <div class="grid">
                 <input type="text" id="name" placeholder="الاسم الرباعي واللقب" required>
-                <input type="text" id="nationalId" placeholder="رقم البطاقة الموحدة">
-                <input type="text" id="cardId" placeholder="رقم البطاقة التموينية">
-                <input type="number" id="birth" placeholder="سنة التولد">
-                <select id="education">
+                <input type="text" id="nationalId" placeholder="رقم البطاقة الموحدة" required>
+                <input type="text" id="cardId" placeholder="رقم البطاقة التموينية" required>
+                <input type="number" id="birth" placeholder="سنة التولد" required>
+                <select id="education" required>
                     <option value="">التحصيل الدراسي</option>
                     <option>أمي</option><option>ابتدائية</option><option>متوسطة</option><option>إعدادية</option><option>دبلوم</option><option>بكالوريوس</option><option>دراسات عليا</option>
                 </select>
-                <input type="text" id="job" placeholder="المهنة">
-                <input type="text" id="workLocation" placeholder="موقع العمل الحالي">
+                <input type="text" id="job" placeholder="المهنة" required>
+                <input type="text" id="workLocation" placeholder="موقع العمل الحالي" required>
                 <input type="tel" id="phone" placeholder="رقم الهاتف" required>
             </div>
 
             <div class="section-head">🏠 تفاصيل السكن</div>
             <div class="grid">
-                <select id="homeType"><option>ملك</option><option>إيجار</option><option>عشوائيات</option></select>
-                <input type="text" id="prevAddress" placeholder="عنوان السكن السابق">
-                <input type="text" id="address" placeholder="العنوان الحالي">
-                <input type="text" id="moveDate" placeholder="تاريخ السكن">
-                <input type="text" id="taboo" placeholder="رقم الطابو">
-                <input type="text" id="homeNum" placeholder="رقم الدار">
+                <select id="homeType" required>
+                    <option value="">نوع السكن</option>
+                    <option>ملك</option><option>إيجار</option><option>عشوائيات</option>
+                </select>
+                <input type="text" id="prevAddress" placeholder="عنوان السكن السابق" required>
+                <input type="text" id="address" placeholder="العنوان الحالي" required>
+                <input type="text" id="moveDate" placeholder="تاريخ السكن" required>
+                <input type="text" id="taboo" placeholder="رقم الطابو" required>
+                <input type="text" id="homeNum" placeholder="رقم الدار" required>
             </div>
 
             <div class="section-head">👨‍👩‍👧‍👦 أفراد الأسرة</div>
@@ -87,13 +105,21 @@
     <div id="successScreen">
         <div class="success-icon">✔️</div>
         <h2 style="color: var(--success)">تم الإرسال بنجاح!</h2>
-        <p>تم حفظ البيانات في السجل الرقمي لحي القائم.</p>
+        <p>تم حفظ البيانات في السجل الرقمي لحي القائم - مكتب المختار أحمد هاني.</p>
         <div id="serialDisplay" style="margin:20px; font-weight:bold; color:var(--primary); font-size:18px;"></div>
         <button class="btn-submit" onclick="resetFormForNewEntry()">إدخال استمارة جديدة</button>
     </div>
 </div>
 
 <script>
+    document.onkeydown = function(e) {
+        if(event.keyCode == 123) { return false; }
+        if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) { return false; }
+        if(e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) { return false; }
+        if(e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) { return false; }
+        if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) { return false; }
+    };
+
     const scriptURL = "https://script.google.com/macros/s/AKfycbx5cb0Xd17zx_aK9wKYIqJY2jJHvh7W79Dxi4JZERKC6TYb_7JN6iW85Pfw_pExiwpX2g/exec";
 
     function addMember() {
@@ -103,21 +129,25 @@
         div.innerHTML = `
             <button type="button" onclick="this.parentElement.remove()" style="float:left; border:none; background:none; color:red; cursor:pointer; font-weight:bold;">✕ حذف</button>
             <div class="grid">
-                <input type="text" class="m-name" placeholder="الاسم الثلاثي">
-                <select class="m-rel"><option>زوجة</option><option>ابن</option><option>ابنة</option><option>أخرى</option></select>
-                <input type="number" class="m-birth" placeholder="سنة التولد">
-                <input type="text" class="m-job" placeholder="المهنة">
-                <select class="m-edu"><option value="">الدراسة</option><option>ابتدائية</option><option>متوسطة</option><option>إعدادية</option><option>دبلوم</option><option>بكالوريوس</option></select>
-                <select class="m-social"><option>أعزب/باكر</option><option>متزوج/ة</option><option>مطلق/ة</option><option>أرمل/ة</option></select>
+                <input type="text" class="m-name" placeholder="الاسم الثلاثي" required>
+                <select class="m-rel" required><option value="">صلة القرابة</option><option>زوجة</option><option>ابن</option><option>ابنة</option><option>أخرى</option></select>
+                <input type="number" class="m-birth" placeholder="سنة التولد" required>
+                <input type="text" class="m-job" placeholder="المهنة" required>
+                <select class="m-edu" required><option value="">الدراسة</option><option>ابتدائية</option><option>متوسطة</option><option>إعدادية</option><option>دبلوم</option><option>بكالوريوس</option></select>
+                <select class="m-social" required><option value="">الحالة الاجتماعية</option><option>أعزب/باكر</option><option>متزوج/ة</option><option>مطلق/ة</option><option>أرمل/ة</option></select>
             </div>`;
         container.appendChild(div);
     }
     window.onload = addMember;
 
     function showPreview() {
-        const name = document.getElementById('name').value;
-        if(!name) { alert("يرجى ملء اسم رب الأسرة"); return; }
+        const form = document.getElementById('censusForm');
+        if (!form.reportValidity()) {
+            alert("يرجى ملء جميع الحقول المطلوبة قبل المراجعة");
+            return;
+        }
         
+        const name = document.getElementById('name').value;
         let familyHtml = "";
         document.querySelectorAll(".member-card").forEach((card, index) => {
             const n = card.querySelector(".m-name").value;
@@ -127,12 +157,12 @@
         document.getElementById('previewData').innerHTML = `
             <div class="preview-group-title">بيانات شخصية</div>
             <div class="preview-item"><span>الاسم:</span> <span class="preview-val">${name}</span></div>
-            <div class="preview-item"><span>الموحدة:</span> <span class="preview-val">${document.getElementById('nationalId').value || '---'}</span></div>
+            <div class="preview-item"><span>الموحدة:</span> <span class="preview-val">${document.getElementById('nationalId').value}</span></div>
             <div class="preview-item"><span>الهاتف:</span> <span class="preview-val">${document.getElementById('phone').value}</span></div>
             <div class="preview-group-title">بيانات السكن</div>
             <div class="preview-item"><span>نوع السكن:</span> <span class="preview-val">${document.getElementById('homeType').value}</span></div>
-            <div class="preview-item"><span>العنوان:</span> <span class="preview-val">${document.getElementById('address').value || '---'}</span></div>
-            <div class="preview-item"><span>رقم الدار:</span> <span class="preview-val">${document.getElementById('homeNum').value || '---'}</span></div>
+            <div class="preview-item"><span>العنوان:</span> <span class="preview-val">${document.getElementById('address').value}</span></div>
+            <div class="preview-item"><span>رقم الدار:</span> <span class="preview-val">${document.getElementById('homeNum').value}</span></div>
             <div class="preview-group-title">أفراد العائلة</div>
             <div style="font-size:12px; padding:10px;">${familyHtml || 'لا يوجد'}</div>
         `;
@@ -176,11 +206,10 @@
         document.getElementById('serialDisplay').innerText = "رقم المعاملة: " + sId;
     }
 
-    // الحل النهائي لمشكلة الصفحة البيضاء: تصفير الاستمارة يدوياً
     function resetFormForNewEntry() {
         document.getElementById('censusForm').reset();
         document.getElementById('membersContainer').innerHTML = "";
-        addMember(); // إضافة حقل فرد واحد تلقائياً
+        addMember();
         document.getElementById('successScreen').style.display = 'none';
         document.getElementById('formSection').style.display = 'block';
         window.scrollTo(0, 0);
