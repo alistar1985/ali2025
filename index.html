@@ -4,150 +4,215 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>منظومة جرد حي القائم الأول - المختار أحمد هاني</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root { --primary: #1a2a6c; --accent: #b21f1f; --bg: #f4f7f9; --success: #2e7d32; }
         body { 
             font-family: 'Cairo', sans-serif; 
-            background: linear-gradient(180deg, #dce9f4 0%, #b8c6e9 100%);
-            background-attachment: fixed;
-            margin: 0; padding: 0;
+            background: var(--bg); 
+            margin: 0; 
+            padding: 10px; 
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        
+        input, select, textarea {
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            -ms-user-select: text;
+            user-select: text;
         }
 
-        /* نظام التبويبات */
-        .tabs { display: flex; background: var(--primary); position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
-        .tab-btn { flex: 1; padding: 15px; color: white; border: none; background: none; font-family: 'Cairo'; font-weight: bold; cursor: pointer; transition: 0.3s; border-bottom: 4px solid transparent; }
-        .tab-btn.active { background: rgba(255,255,255,0.1); border-bottom-color: var(--accent); }
-
-        .container { max-width: 600px; margin: 20px auto; padding: 10px; }
-        .page { display: none; animation: fadeIn 0.4s ease; }
-        .page.active { display: block; }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* ستايل البطاقات والإحصائيات */
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-        .stat-card { background: white; padding: 15px; border-radius: 15px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .stat-card .num { font-size: 24px; font-weight: 900; color: var(--primary); display: block; }
-        
-        /* ستايل الاستمارة */
-        .card { background: white; padding: 20px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
-        .form-group { margin-bottom: 15px; }
+        .app-container { max-width: 800px; margin: auto; background: white; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); overflow: hidden; border-top: 8px solid var(--primary); }
+        .header { background: linear-gradient(135deg, var(--primary), var(--accent)); color: white; padding: 25px; text-align: center; }
+        .form-body { padding: 20px; }
+        .section-head { background: #e3f2fd; color: var(--primary); padding: 10px 15px; border-radius: 10px; font-weight: bold; margin: 20px 0 10px; border-right: 5px solid var(--accent); }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 15px; }
         input, select { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 10px; box-sizing: border-box; font-family: 'Cairo'; }
-        .btn-submit { background: var(--primary); color: white; border: none; padding: 15px; width: 100%; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 10px; }
         
-        /* تنبيه التكرار */
-        .duplicate-alert { color: #b21f1f; font-size: 12px; font-weight: bold; display: none; margin-top: 5px; }
-        
-        .result-item { background: white; padding: 15px; border-radius: 12px; margin-bottom: 10px; border-right: 5px solid var(--primary); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .member-card { background: #f9f9f9; border: 1px solid #eee; padding: 15px; border-radius: 15px; margin-bottom: 15px; border-right: 4px solid var(--success); }
+        .btn-add { background: var(--success); color: white; border: none; padding: 12px; border-radius: 10px; width: 100%; cursor: pointer; font-weight: bold; margin-bottom: 20px; }
+        .btn-submit { background: var(--primary); color: white; border: none; padding: 18px; width: 100%; border-radius: 12px; font-size: 18px; font-weight: bold; cursor: pointer; }
+
+        #reviewModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 2000; overflow-y: auto; padding: 15px; }
+        .modal-content { background: white; max-width: 650px; margin: 5px auto; border-radius: 15px; padding: 20px; }
+        .preview-box { background: #f8f9fa; border-radius: 10px; padding: 10px; margin-bottom: 20px; border: 1px solid #ddd; }
+        .preview-group-title { background: #eee; padding: 5px 10px; font-weight: bold; margin-top: 10px; border-radius: 5px; color: var(--primary); }
+        .preview-item { border-bottom: 1px solid #e0e0e0; padding: 6px 5px; display: flex; justify-content: space-between; font-size: 13px; }
+        .preview-val { font-weight: bold; color: #000; }
+
+        #successScreen { display: none; text-align: center; padding: 50px 20px; }
+        .success-icon { font-size: 70px; color: var(--success); }
     </style>
 </head>
-<body>
-
-<div class="tabs">
-    <button class="tab-btn active" onclick="showPage('addPage', this)">➕ إدخال جديد</button>
-    <button class="tab-btn" onclick="showPage('searchPage', this); initDashboard();">🔍 بحث وإحصائيات</button>
+<body oncontextmenu="return false;"> <div id="reviewModal">
+    <div class="modal-content">
+        <h3 style="text-align:center; color: var(--accent); margin-top:0;">📋 مراجعة البيانات كاملة</h3>
+        <div id="previewData" class="preview-box"></div>
+        <div style="display: flex; gap: 10px;">
+            <button onclick="finalSend()" style="background: var(--success); color: white; flex: 2; padding: 15px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer;">تأكيد وإرسال ✅</button>
+            <button onclick="closeModal()" style="background: #757575; color: white; flex: 1; padding: 15px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer;">تعديل ✏️</button>
+        </div>
+    </div>
 </div>
 
-<div class="container">
-    <div id="addPage" class="page active">
-        <div class="card">
-            <h3 style="text-align:center; color: var(--primary);">تسجيل عائلة جديدة</h3>
-            <div class="form-group">
-                <input type="text" id="name" placeholder="الاسم الرباعي واللقب" onblur="checkDuplicate(this.value)">
-                <div id="nameAlert" class="duplicate-alert">⚠️ هذا الاسم مسجل مسبقاً في النظام!</div>
+<div class="app-container" id="mainWrapper">
+    <div id="formSection">
+        <div class="header">
+            <h2 style="margin:0">منظومة جرد حي القائم الأول</h2>
+            <p style="margin:5px 0 0; opacity:0.9; font-size:16px">المختار أحمد هاني</p>
+        </div>
+
+        <form class="form-body" id="censusForm">
+            <div class="section-head">👤 بيانات رب الأسرة</div>
+            <div class="grid">
+                <input type="text" id="name" placeholder="الاسم الرباعي واللقب" required>
+                <input type="text" id="nationalId" placeholder="رقم البطاقة الموحدة" required>
+                <input type="text" id="cardId" placeholder="رقم البطاقة التموينية" required>
+                <input type="number" id="birth" placeholder="سنة التولد" required>
+                <select id="education" required>
+                    <option value="">التحصيل الدراسي</option>
+                    <option>أمي</option><option>ابتدائية</option><option>متوسطة</option><option>إعدادية</option><option>دبلوم</option><option>بكالوريوس</option><option>دراسات عليا</option>
+                </select>
+                <input type="text" id="job" placeholder="المهنة" required>
+                <input type="text" id="workLocation" placeholder="موقع العمل الحالي" required>
+                <input type="tel" id="phone" placeholder="رقم الهاتف" required>
             </div>
-            <div class="form-group">
-                <input type="tel" id="phone" placeholder="رقم الهاتف">
-            </div>
-            <div class="form-group">
-                <select id="homeType">
+
+            <div class="section-head">🏠 تفاصيل السكن</div>
+            <div class="grid">
+                <select id="homeType" required>
                     <option value="">نوع السكن</option>
                     <option>ملك</option><option>إيجار</option><option>عشوائيات</option>
                 </select>
+                <input type="text" id="prevAddress" placeholder="عنوان السكن السابق" required>
+                <input type="text" id="address" placeholder="العنوان الحالي" required>
+                <input type="text" id="moveDate" placeholder="تاريخ السكن" required>
+                <input type="text" id="taboo" placeholder="رقم الطابو" required>
+                <input type="text" id="homeNum" placeholder="رقم الدار" required>
             </div>
-            <div class="form-group">
-                <input type="text" id="homeNum" placeholder="رقم الدار">
-            </div>
-            <button class="btn-submit" onclick="submitData()">تأكيد وإرسال للديوان</button>
-        </div>
+
+            <div class="section-head">👨‍👩‍👧‍👦 أفراد الأسرة</div>
+            <div id="membersContainer"></div>
+            <button type="button" class="btn-add" onclick="addMember()">+ إضافة فرد جديد للعائلة</button>
+
+            <button type="button" class="btn-submit" onclick="showPreview()" style="margin-top:20px; background: var(--accent);">مراجعة كافة البيانات</button>
+        </form>
     </div>
 
-    <div id="searchPage" class="page">
-        <div class="stats-grid">
-            <div class="stat-card"><span class="num" id="stat-total">0</span><span>إجمالي العوائل</span></div>
-            <div class="stat-card"><span class="num" id="stat-owned">0</span><span>ملك</span></div>
-        </div>
-        <div class="form-group">
-            <input type="text" id="searchInput" placeholder="ابحث بالاسم أو الهاتف..." onkeyup="liveSearch(this.value)">
-        </div>
-        <div id="searchResults"></div>
+    <div id="successScreen">
+        <div class="success-icon">✔️</div>
+        <h2 style="color: var(--success)">تم الإرسال بنجاح!</h2>
+        <p>تم حفظ البيانات في السجل الرقمي لحي القائم - مكتب المختار أحمد هاني.</p>
+        <div id="serialDisplay" style="margin:20px; font-weight:bold; color:var(--primary); font-size:18px;"></div>
+        <button class="btn-submit" onclick="resetFormForNewEntry()">إدخال استمارة جديدة</button>
     </div>
 </div>
 
 <script>
+    document.onkeydown = function(e) {
+        if(event.keyCode == 123) { return false; }
+        if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) { return false; }
+        if(e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) { return false; }
+        if(e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) { return false; }
+        if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) { return false; }
+    };
+
     const scriptURL = "https://script.google.com/macros/s/AKfycbx5cb0Xd17zx_aK9wKYIqJY2jJHvh7W79Dxi4JZERKC6TYb_7JN6iW85Pfw_pExiwpX2g/exec";
-    const SECRET_TOKEN = "AL_QAIM_MUKHTAR_2026";
-    let db = [];
 
-    // التنقل بين الصفحات
-    function showPage(pageId, btn) {
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById(pageId).classList.add('active');
-        btn.classList.add('active');
+    function addMember() {
+        const container = document.getElementById("membersContainer");
+        const div = document.createElement("div");
+        div.className = "member-card";
+        div.innerHTML = `
+            <button type="button" onclick="this.parentElement.remove()" style="float:left; border:none; background:none; color:red; cursor:pointer; font-weight:bold;">✕ حذف</button>
+            <div class="grid">
+                <input type="text" class="m-name" placeholder="الاسم الثلاثي" required>
+                <select class="m-rel" required><option value="">صلة القرابة</option><option>زوجة</option><option>ابن</option><option>ابنة</option><option>أخرى</option></select>
+                <input type="number" class="m-birth" placeholder="سنة التولد" required>
+                <input type="text" class="m-job" placeholder="المهنة" required>
+                <select class="m-edu" required><option value="">الدراسة</option><option>ابتدائية</option><option>متوسطة</option><option>إعدادية</option><option>دبلوم</option><option>بكالوريوس</option></select>
+                <select class="m-social" required><option value="">الحالة الاجتماعية</option><option>أعزب/باكر</option><option>متزوج/ة</option><option>مطلق/ة</option><option>أرمل/ة</option></select>
+            </div>`;
+        container.appendChild(div);
     }
+    window.onload = addMember;
 
-    // التحقق الفوري من التكرار من الإكسل
-    async function checkDuplicate(name) {
-        if (name.length < 4) return;
-        const res = await fetch(`${scriptURL}?token=${SECRET_TOKEN}&checkName=${encodeURIComponent(name)}`);
-        const data = await res.json();
-        const alertBox = document.getElementById('nameAlert');
-        if (data.exists) {
-            alertBox.style.display = 'block';
-            document.getElementById('name').style.borderColor = 'red';
-        } else {
-            alertBox.style.display = 'none';
-            document.getElementById('name').style.borderColor = '#ccc';
+    function showPreview() {
+        const form = document.getElementById('censusForm');
+        if (!form.reportValidity()) {
+            alert("يرجى ملء جميع الحقول المطلوبة قبل المراجعة");
+            return;
         }
+        
+        const name = document.getElementById('name').value;
+        let familyHtml = "";
+        document.querySelectorAll(".member-card").forEach((card, index) => {
+            const n = card.querySelector(".m-name").value;
+            if(n) familyHtml += `<div style="padding:5px; border-bottom:1px dashed #ccc;"><b>${index+1}. ${n}</b> (${card.querySelector(".m-rel").value})</div>`;
+        });
+
+        document.getElementById('previewData').innerHTML = `
+            <div class="preview-group-title">بيانات شخصية</div>
+            <div class="preview-item"><span>الاسم:</span> <span class="preview-val">${name}</span></div>
+            <div class="preview-item"><span>الموحدة:</span> <span class="preview-val">${document.getElementById('nationalId').value}</span></div>
+            <div class="preview-item"><span>الهاتف:</span> <span class="preview-val">${document.getElementById('phone').value}</span></div>
+            <div class="preview-group-title">بيانات السكن</div>
+            <div class="preview-item"><span>نوع السكن:</span> <span class="preview-val">${document.getElementById('homeType').value}</span></div>
+            <div class="preview-item"><span>العنوان:</span> <span class="preview-val">${document.getElementById('address').value}</span></div>
+            <div class="preview-item"><span>رقم الدار:</span> <span class="preview-val">${document.getElementById('homeNum').value}</span></div>
+            <div class="preview-group-title">أفراد العائلة</div>
+            <div style="font-size:12px; padding:10px;">${familyHtml || 'لا يوجد'}</div>
+        `;
+        document.getElementById('reviewModal').style.display = 'block';
     }
 
-    // إرسال البيانات
-    async function submitData() {
+    function closeModal() { document.getElementById('reviewModal').style.display = 'none'; }
+
+    function finalSend() {
+        const sId = "QA-" + Math.floor(Math.random()*900000+100000);
+        let family = "";
+        document.querySelectorAll(".member-card").forEach((card, i) => {
+            const n = card.querySelector(".m-name").value;
+            if(n) family += `${i+1}- الاسم: ${n}, الصلة: ${card.querySelector(".m-rel").value}, التولد: ${card.querySelector(".m-birth").value}, المهنة: ${card.querySelector(".m-job").value}, الدراسة: ${card.querySelector(".m-edu").value}, الحالة: ${card.querySelector(".m-social").value}\n`;
+        });
+
         const payload = {
-            token: SECRET_TOKEN,
-            serialId: "QA-" + Math.floor(Math.random()*9000),
+            serialId: sId,
             name: document.getElementById('name').value,
+            nationalId: document.getElementById('nationalId').value,
+            cardId: document.getElementById('cardId').value,
+            birth: document.getElementById('birth').value,
+            education: document.getElementById('education').value,
+            job: document.getElementById('job').value,
+            workLocation: document.getElementById('workLocation').value,
             phone: document.getElementById('phone').value,
             homeType: document.getElementById('homeType').value,
-            homeNum: document.getElementById('homeNum').value
+            moveDate: document.getElementById('moveDate').value,
+            address: document.getElementById('address').value,
+            prevAddress: document.getElementById('prevAddress').value,
+            taboo: document.getElementById('taboo').value,
+            homeNum: document.getElementById('homeNum').value,
+            familyMembers: family
         };
 
-        if(!payload.name || !payload.phone) return alert("يرجى ملء البيانات الأساسية");
-
-        fetch(scriptURL, { method: 'POST', body: JSON.stringify(payload) });
-        alert("تم الحفظ بنجاح!");
-        location.reload();
-    }
-
-    // جلب بيانات الإحصائيات
-    async function initDashboard() {
-        const res = await fetch(`${scriptURL}?token=${SECRET_TOKEN}`);
-        db = await res.json();
-        document.getElementById('stat-total').innerText = db.length;
-        document.getElementById('stat-owned').innerText = db.filter(i => i.homeType === "ملك").length;
-    }
-
-    // البحث المباشر
-    function liveSearch(term) {
-        const results = document.getElementById('searchResults');
-        results.innerHTML = "";
-        if(!term) return;
+        fetch(scriptURL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
         
-        db.filter(i => i.name.includes(term) || i.phone.includes(term)).forEach(item => {
-            results.innerHTML += `<div class="result-item"><strong>${item.name}</strong><br><small>الهاتف: ${item.phone} | السكن: ${item.homeType}</small></div>`;
-        });
+        closeModal();
+        document.getElementById('formSection').style.display = 'none';
+        document.getElementById('successScreen').style.display = 'block';
+        document.getElementById('serialDisplay').innerText = "رقم المعاملة: " + sId;
+    }
+
+    function resetFormForNewEntry() {
+        document.getElementById('censusForm').reset();
+        document.getElementById('membersContainer').innerHTML = "";
+        addMember();
+        document.getElementById('successScreen').style.display = 'none';
+        document.getElementById('formSection').style.display = 'block';
+        window.scrollTo(0, 0);
     }
 </script>
 </body>
