@@ -1,138 +1,190 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>📱 تطبيق الوكيل – إدارة ذكية لاشتراكاتك وديون المشتركين</title>
-  <meta name="description" content="موقع هبوط احترافي لتطبيق الوكيل: اتصال آمن وسريع، زر تحميل مباشر وتحويل إلى قناة التلغرام." />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منظومة جرد حي القائم الأول</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary: #1a2a6c; --accent: #b21f1f; --bg: #f4f7f9; --success: #2e7d32; }
+        body { font-family: 'Cairo', sans-serif; background: var(--bg); margin: 0; padding: 10px; }
+        .app-container { max-width: 800px; margin: auto; background: white; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); overflow: hidden; border-top: 8px solid var(--primary); }
+        .header { background: linear-gradient(135deg, var(--primary), var(--accent)); color: white; padding: 25px; text-align: center; }
+        .form-body { padding: 20px; }
+        .section-head { background: #e3f2fd; color: var(--primary); padding: 10px 15px; border-radius: 10px; font-weight: bold; margin: 20px 0 10px; border-right: 5px solid var(--accent); }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 15px; }
+        input, select { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 10px; box-sizing: border-box; font-family: 'Cairo'; }
+        
+        .member-card { background: #f9f9f9; border: 1px solid #eee; padding: 15px; border-radius: 15px; margin-bottom: 15px; border-right: 4px solid var(--success); }
+        .btn-add { background: var(--success); color: white; border: none; padding: 12px; border-radius: 10px; width: 100%; cursor: pointer; font-weight: bold; margin-bottom: 20px; }
+        .btn-submit { background: var(--primary); color: white; border: none; padding: 18px; width: 100%; border-radius: 12px; font-size: 18px; font-weight: bold; cursor: pointer; }
 
-  <!-- Fonts & Icons -->
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+        #reviewModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 2000; overflow-y: auto; padding: 15px; }
+        .modal-content { background: white; max-width: 650px; margin: 5px auto; border-radius: 15px; padding: 20px; }
+        .preview-box { background: #f8f9fa; border-radius: 10px; padding: 10px; margin-bottom: 20px; border: 1px solid #ddd; }
+        .preview-group-title { background: #eee; padding: 5px 10px; font-weight: bold; margin-top: 10px; border-radius: 5px; color: var(--primary); }
+        .preview-item { border-bottom: 1px solid #e0e0e0; padding: 6px 5px; display: flex; justify-content: space-between; font-size: 13px; }
+        .preview-val { font-weight: bold; color: #000; }
 
-  <style>
-    body {margin:0; font-family:'Cairo',sans-serif; background:#f0f4f8; color:#333;}
-    a {text-decoration:none;}
-    header {background: linear-gradient(135deg,#1e3c72,#2a5298); color:#fff; padding:50px 20px; text-align:center;}
-    header h1 {font-size:2.5rem; margin-bottom:15px;}
-    header p {font-size:1.2rem; max-width:700px; margin:auto;}
-
-    .cta a {display:inline-block; margin:10px; padding:14px 28px; border-radius:50px; font-weight:bold; color:#fff; transition:0.3s;}
-    .btn-primary {background:#ff6600;}
-    .btn-primary:hover {background:#e65c00;}
-    .btn-ghost {background:rgba(30,60,114,0.8);}
-    .btn-ghost:hover {background:rgba(30,60,114,1);}
-
-    section.features {padding:60px 20px; max-width:1200px; margin:auto;}
-    .features-grid {display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:20px;}
-    .feature-card {background:#fff; padding:25px; border-radius:15px; text-align:center; box-shadow:0 4px 12px rgba(0,0,0,0.1); transition:0.3s;}
-    .feature-card:hover {transform:translateY(-5px);}
-    .feature-card i {font-size:2rem; margin-bottom:12px; color:#ff9800;}
-
-    section.screenshots {padding:60px 20px; max-width:1200px; margin:auto;}
-    .screens-grid {display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:20px;}
-    .screens-grid img {width:100%; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.1);}
-
-    section.download {padding:60px 20px; text-align:center;}
-
-    footer {background:#1e3c72; color:#fff; padding:25px; text-align:center; font-size:0.9rem;}
-    @media(max-width:600px){header h1{font-size:2rem;} header p{font-size:1rem;}}
-  </style>
+        #successScreen { display: none; text-align: center; padding: 50px 20px; }
+        .success-icon { font-size: 70px; color: var(--success); }
+    </style>
 </head>
 <body>
 
-  <!-- Header -->
-  <header>
-    <h1>تطبيق الوكيل</h1>
-    <p>📱 تطبيق الوكيل – إدارة ذكية لاشتراكاتك وديون المشتركين</p>
-  </header>
-
-  <!-- Features -->
-  <section class="features" id="features">
-    <h2 style="text-align:center; margin-bottom:40px;">✨ مميزات التطبيق</h2>
-    <div class="features-grid">
-      <div class="feature-card">
-        <i class="fa-solid fa-user-check"></i>
-        <h3>إدارة المشتركين</h3>
-        <p>إضافة وتحديث ديون المشتركين بسهولة وفعالية.</p>
-      </div>
-      <div class="feature-card">
-        <i class="fa-brands fa-whatsapp"></i>
-        <h3>رسائل واتساب</h3>
-        <p>إرسال إشعارات مباشرة لكل مشترك بضغطة زر.</p>
-      </div>
-      <div class="feature-card">
-        <i class="fa-solid fa-chart-line"></i>
-        <h3>تتبع الأرباح</h3>
-        <p>عرض ومتابعة الأرباح أولًا بأول مع تقارير دقيقة.</p>
-      </div>
-      <div class="feature-card">
-        <i class="fa-solid fa-print"></i>
-        <h3>طباعة حرارية</h3>
-        <p>طباعة وصولات فورية وسريعة بضغطة زر واحدة.</p>
-      </div>
-      <div class="feature-card">
-        <i class="fa-solid fa-lock"></i>
-        <h3>أمان وسرعة</h3>
-        <p>تسجيل دخول آمن على جميع الأجهزة.</p>
-      </div>
-      <div class="feature-card">
-        <i class="fa-solid fa-calculator"></i>
-        <h3>حساب التفعيلات والإيرادات والمستحقات</h3>
-        <p>بطاقة لحساب جميع التفعيلات والإيرادات والمستحقات بكل سهولة.</p>
-      </div>
-      <div class="feature-card">
-        <i class="fa-solid fa-wallet"></i>
-        <h3>المصروفات الشهرية واليومية والأسبوعية</h3>
-        <p>عرض ومتابعة جميع المصروفات بشكل مرتب وواضح.</p>
-      </div>
-      <div class="feature-card">
-        <i class="fa-solid fa-bank"></i>
-        <h3>فحص البنك بدقة</h3>
-        <p>فحص البنك بدقة وعرض نتيجة الحسابات بكل وضوح.</p>
-      </div>
+<div id="reviewModal">
+    <div class="modal-content">
+        <h3 style="text-align:center; color: var(--accent); margin-top:0;">📋 مراجعة البيانات كاملة</h3>
+        <div id="previewData" class="preview-box"></div>
+        <div style="display: flex; gap: 10px;">
+            <button onclick="finalSend()" style="background: var(--success); color: white; flex: 2; padding: 15px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer;">تأكيد وإرسال ✅</button>
+            <button onclick="closeModal()" style="background: #757575; color: white; flex: 1; padding: 15px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer;">تعديل ✏️</button>
+        </div>
     </div>
-  </section>
+</div>
 
-  <!-- Screenshots -->
-  <section class="screenshots" id="how">
-    <h2 style="text-align:center; margin-bottom:40px;">📸 صور التطبيق</h2>
-    <div class="screens-grid">
-      <img src="https://c.top4top.io/p_3516tjii51.png" alt="لقطة شاشة 1">
-      <img src="https://f.top4top.io/p_35161auc01.png" alt="لقطة شاشة 2">
-      <img src="https://g.top4top.io/p_3516thhx52.png" alt="لقطة شاشة 3">
-      <img src="https://h.top4top.io/p_3516apkue3.png" alt="لقطة شاشة 4">
-      <img src="https://i.top4top.io/p_3516fqcb34.png" alt="لقطة شاشة 5">
-      <img src="https://j.top4top.io/p_3516oofik5.png" alt="لقطة شاشة 6">
-      <img src="https://k.top4top.io/p_3516ifkij6.png" alt="لقطة شاشة 7">
-      <img src="https://l.top4top.io/p_35166xq5h7.png" alt="لقطة شاشة 8">
-      <img src="https://a.top4top.io/p_3516c0nqp8.png" alt="لقطة شاشة 9">
-      <img src="https://b.top4top.io/p_3516krnqi9.png" alt="لقطة شاشة 10">
-      <img src="https://c.top4top.io/p_3516mxtih10.png" alt="لقطة شاشة 11">
-      <img src="https://c.top4top.io/p_3516z2ru61.png" alt="لقطة شاشة 12">
-      <img src="https://d.top4top.io/p_35167h19w2.png" alt="لقطة شاشة 13">
-      <img src="https://g.top4top.io/p_351650o4c1.png" alt="لقطة شاشة 14">
-      <img src="https://h.top4top.io/p_3516zgzdo2.png" alt="لقطة شاشة 15">
-      <img src="https://i.top4top.io/p_3516a4i083.png" alt="لقطة شاشة 16">
+<div class="app-container" id="mainWrapper">
+    <div id="formSection">
+        <div class="header">
+            <h2 style="margin:0">منظومة جرد حي القائم الأول</h2>
+            <p style="margin:5px 0 0; opacity:0.9; font-size:14px">التسجيل الرقمي الشامل</p>
+        </div>
+
+        <form class="form-body" id="censusForm">
+            <div class="section-head">👤 بيانات رب الأسرة</div>
+            <div class="grid">
+                <input type="text" id="name" placeholder="الاسم الرباعي واللقب" required>
+                <input type="text" id="nationalId" placeholder="رقم البطاقة الموحدة">
+                <input type="text" id="cardId" placeholder="رقم البطاقة التموينية">
+                <input type="number" id="birth" placeholder="سنة التولد">
+                <select id="education">
+                    <option value="">التحصيل الدراسي</option>
+                    <option>أمي</option><option>ابتدائية</option><option>متوسطة</option><option>إعدادية</option><option>دبلوم</option><option>بكالوريوس</option><option>دراسات عليا</option>
+                </select>
+                <input type="text" id="job" placeholder="المهنة">
+                <input type="text" id="workLocation" placeholder="موقع العمل الحالي">
+                <input type="tel" id="phone" placeholder="رقم الهاتف" required>
+            </div>
+
+            <div class="section-head">🏠 تفاصيل السكن</div>
+            <div class="grid">
+                <select id="homeType"><option>ملك</option><option>إيجار</option><option>عشوائيات</option></select>
+                <input type="text" id="prevAddress" placeholder="عنوان السكن السابق">
+                <input type="text" id="address" placeholder="العنوان الحالي">
+                <input type="text" id="moveDate" placeholder="تاريخ السكن">
+                <input type="text" id="taboo" placeholder="رقم الطابو">
+                <input type="text" id="homeNum" placeholder="رقم الدار">
+            </div>
+
+            <div class="section-head">👨‍👩‍👧‍👦 أفراد الأسرة</div>
+            <div id="membersContainer"></div>
+            <button type="button" class="btn-add" onclick="addMember()">+ إضافة فرد جديد للعائلة</button>
+
+            <button type="button" class="btn-submit" onclick="showPreview()" style="margin-top:20px; background: var(--accent);">مراجعة كافة البيانات</button>
+        </form>
     </div>
-  </section>
 
-  <!-- Download CTA -->
-  <section class="download">
-    <h2>📥 حمل التطبيق الآن</h2>
-    <div class="cta">
-      <a class="btn-primary" href="https://t.me/ali_iraqi2020" target="_blank">تحميل للأندرويد</a>
-      <a class="btn-ghost" href="https://fir-management-a6659.web.app/#" target="_blank">تحميل للآيفون والكمبيوتر</a>
+    <div id="successScreen">
+        <div class="success-icon">✔️</div>
+        <h2 style="color: var(--success)">تم الإرسال بنجاح!</h2>
+        <p>تم حفظ البيانات في السجل الرقمي لحي القائم.</p>
+        <div id="serialDisplay" style="margin:20px; font-weight:bold; color:var(--primary); font-size:18px;"></div>
+        <button class="btn-submit" onclick="resetFormForNewEntry()">إدخال استمارة جديدة</button>
     </div>
-    <p style="margin-top:20px; font-weight:bold;">📞 الدعم الفني: 07713170313</p>
-  </section>
+</div>
 
-  <!-- Footer -->
-  <footer>
-    © <span id="year"></span> تطبيق الوكيل. جميع الحقوق محفوظة. | <a href="https://t.me/ali_iraqi2020" target="_blank" style="color:#ffd700;">قناة التلغرام</a>
-  </footer>
+<script>
+    const scriptURL = "https://script.google.com/macros/s/AKfycbx5cb0Xd17zx_aK9wKYIqJY2jJHvh7W79Dxi4JZERKC6TYb_7JN6iW85Pfw_pExiwpX2g/exec";
 
-  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+    function addMember() {
+        const container = document.getElementById("membersContainer");
+        const div = document.createElement("div");
+        div.className = "member-card";
+        div.innerHTML = `
+            <button type="button" onclick="this.parentElement.remove()" style="float:left; border:none; background:none; color:red; cursor:pointer; font-weight:bold;">✕ حذف</button>
+            <div class="grid">
+                <input type="text" class="m-name" placeholder="الاسم الثلاثي">
+                <select class="m-rel"><option>زوجة</option><option>ابن</option><option>ابنة</option><option>أخرى</option></select>
+                <input type="number" class="m-birth" placeholder="سنة التولد">
+                <input type="text" class="m-job" placeholder="المهنة">
+                <select class="m-edu"><option value="">الدراسة</option><option>ابتدائية</option><option>متوسطة</option><option>إعدادية</option><option>دبلوم</option><option>بكالوريوس</option></select>
+                <select class="m-social"><option>أعزب/باكر</option><option>متزوج/ة</option><option>مطلق/ة</option><option>أرمل/ة</option></select>
+            </div>`;
+        container.appendChild(div);
+    }
+    window.onload = addMember;
 
+    function showPreview() {
+        const name = document.getElementById('name').value;
+        if(!name) { alert("يرجى ملء اسم رب الأسرة"); return; }
+        
+        let familyHtml = "";
+        document.querySelectorAll(".member-card").forEach((card, index) => {
+            const n = card.querySelector(".m-name").value;
+            if(n) familyHtml += `<div style="padding:5px; border-bottom:1px dashed #ccc;"><b>${index+1}. ${n}</b> (${card.querySelector(".m-rel").value})</div>`;
+        });
+
+        document.getElementById('previewData').innerHTML = `
+            <div class="preview-group-title">بيانات شخصية</div>
+            <div class="preview-item"><span>الاسم:</span> <span class="preview-val">${name}</span></div>
+            <div class="preview-item"><span>الموحدة:</span> <span class="preview-val">${document.getElementById('nationalId').value || '---'}</span></div>
+            <div class="preview-item"><span>الهاتف:</span> <span class="preview-val">${document.getElementById('phone').value}</span></div>
+            <div class="preview-group-title">بيانات السكن</div>
+            <div class="preview-item"><span>نوع السكن:</span> <span class="preview-val">${document.getElementById('homeType').value}</span></div>
+            <div class="preview-item"><span>العنوان:</span> <span class="preview-val">${document.getElementById('address').value || '---'}</span></div>
+            <div class="preview-item"><span>رقم الدار:</span> <span class="preview-val">${document.getElementById('homeNum').value || '---'}</span></div>
+            <div class="preview-group-title">أفراد العائلة</div>
+            <div style="font-size:12px; padding:10px;">${familyHtml || 'لا يوجد'}</div>
+        `;
+        document.getElementById('reviewModal').style.display = 'block';
+    }
+
+    function closeModal() { document.getElementById('reviewModal').style.display = 'none'; }
+
+    function finalSend() {
+        const sId = "QA-" + Math.floor(Math.random()*900000+100000);
+        let family = "";
+        document.querySelectorAll(".member-card").forEach((card, i) => {
+            const n = card.querySelector(".m-name").value;
+            if(n) family += `${i+1}- الاسم: ${n}, الصلة: ${card.querySelector(".m-rel").value}, التولد: ${card.querySelector(".m-birth").value}, المهنة: ${card.querySelector(".m-job").value}, الدراسة: ${card.querySelector(".m-edu").value}, الحالة: ${card.querySelector(".m-social").value}\n`;
+        });
+
+        const payload = {
+            serialId: sId,
+            name: document.getElementById('name').value,
+            nationalId: document.getElementById('nationalId').value,
+            cardId: document.getElementById('cardId').value,
+            birth: document.getElementById('birth').value,
+            education: document.getElementById('education').value,
+            job: document.getElementById('job').value,
+            workLocation: document.getElementById('workLocation').value,
+            phone: document.getElementById('phone').value,
+            homeType: document.getElementById('homeType').value,
+            moveDate: document.getElementById('moveDate').value,
+            address: document.getElementById('address').value,
+            prevAddress: document.getElementById('prevAddress').value,
+            taboo: document.getElementById('taboo').value,
+            homeNum: document.getElementById('homeNum').value,
+            familyMembers: family
+        };
+
+        fetch(scriptURL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
+        
+        closeModal();
+        document.getElementById('formSection').style.display = 'none';
+        document.getElementById('successScreen').style.display = 'block';
+        document.getElementById('serialDisplay').innerText = "رقم المعاملة: " + sId;
+    }
+
+    // الحل النهائي لمشكلة الصفحة البيضاء: تصفير الاستمارة يدوياً
+    function resetFormForNewEntry() {
+        document.getElementById('censusForm').reset();
+        document.getElementById('membersContainer').innerHTML = "";
+        addMember(); // إضافة حقل فرد واحد تلقائياً
+        document.getElementById('successScreen').style.display = 'none';
+        document.getElementById('formSection').style.display = 'block';
+        window.scrollTo(0, 0);
+    }
+</script>
 </body>
 </html>
