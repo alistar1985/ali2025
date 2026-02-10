@@ -2,484 +2,540 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة تحكم بيانات حي القائم الأول</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5, user-scalable=yes">
+    <meta name="theme-color" content="#0f172a">
+    <title>منظومة جرد حي القائم الأول - المختار أحمد هاني</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #1a2a4d;
-            --accent: #3b82f6;
-            --success: #10b981;
-            --error: #ef4444;
-            --warning: #f59e0b;
-            --bg-gradient: linear-gradient(180deg, #dce9f4 0%, #b8c6e9 100%);
+            --primary: #0f172a;
+            --primary-light: #1e293b;
+            --accent: #dc2626;
+            --accent-soft: #fef2f2;
+            --success: #059669;
+            --success-soft: #ecfdf5;
+            --error: #dc2626;
+            --error-soft: #fef2f2;
+            --bg: #f1f5f9;
+            --card: #ffffff;
+            --border: #e2e8f0;
+            --text: #0f172a;
+            --text-muted: #64748b;
+            --radius: 14px;
+            --radius-lg: 20px;
+            --shadow: 0 4px 6px -1px rgba(0,0,0,0.08), 0 2px 4px -2px rgba(0,0,0,0.06);
+            --shadow-lg: 0 20px 25px -5px rgba(0,0,0,0.08), 0 8px 10px -6px rgba(0,0,0,0.04);
         }
 
+        * { box-sizing: border-box; }
         body {
             font-family: 'Cairo', sans-serif;
-            margin: 0; padding: 0;
-            display: flex; justify-content: center;
+            margin: 0;
+            padding: 0;
+            background: var(--bg);
+            -webkit-user-select: none;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
             min-height: 100vh;
-            background: var(--bg-gradient);
-            background-attachment: fixed;
-            position: relative; overflow-x: hidden;
+            color: var(--text);
+        }
+        input, select, textarea { -webkit-user-select: text; user-select: text; }
+
+        .page-wrap {
+            min-height: 100vh;
+            padding: 12px;
+            padding-bottom: 28px;
+        }
+        @media (min-width: 600px) {
+            .page-wrap { padding: 24px; max-width: 720px; margin: 0 auto; }
         }
 
-        body::before {
-            content: ""; position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-image:
-                linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px);
-            background-size: 30px 30px; z-index: -1;
+        .app-container {
+            background: var(--card);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
         }
 
-        .app-container { width: 100%; max-width: 500px; padding: 30px 15px; text-align: center; }
-
-        .header-title {
-            color: var(--primary); font-size: 22px; font-weight: 900;
-            margin-bottom: 25px; line-height: 1.4;
+        .header {
+            background: linear-gradient(145deg, var(--primary) 0%, #1e3a5f 50%, #1a2a4a 100%);
+            color: white;
+            padding: 28px 20px;
+            text-align: center;
+            position: relative;
         }
-
-        #statusBox {
-            font-size: 13px; font-weight: bold; padding: 10px;
-            border-radius: 12px; margin-bottom: 20px;
-            background: rgba(255,255,255,0.5); display: inline-block; width: 100%;
+        .header::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+            opacity: 0.8;
         }
-
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
-
-        .stat-card {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px; padding: 15px 5px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-            display: flex; flex-direction: column; align-items: center;
-            border-bottom: 5px solid transparent; transition: 0.3s;
+        .header h2 {
+            margin: 0;
+            font-size: 1.35rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            line-height: 1.3;
         }
+        .header .sub {
+            margin: 6px 0 0;
+            opacity: 0.95;
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+        .header .link-dash {
+            display: inline-block;
+            margin-top: 14px;
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            text-decoration: none;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            transition: background 0.2s;
+        }
+        .header .link-dash:hover, .header .link-dash:focus { background: rgba(255,255,255,0.3); }
 
-        .stat-card .number { font-size: 26px; font-weight: 900; color: var(--primary); }
-        .stat-card .label { font-size: 11px; color: #5d6d8a; font-weight: 700; }
+        .form-body { padding: 20px 16px; }
+        @media (min-width: 600px) { .form-body { padding: 28px 24px; } }
 
-        .card-total { border-bottom-color: var(--accent); }
-        .card-owned { border-bottom-color: var(--success); }
-        .card-random { border-bottom-color: var(--error); }
-        .card-rent { border-bottom-color: var(--warning); }
-
-        .search-container {
-            background: white; border: 2px solid #fff;
-            border-radius: 50px; padding: 12px 20px;
-            display: flex; align-items: center; box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+        #loadingStatus {
+            display: block;
+            text-align: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--primary);
+            padding: 10px 14px;
+            background: var(--accent-soft);
+            border-radius: var(--radius);
             margin-bottom: 20px;
+            border: 1px solid rgba(220,38,38,0.15);
         }
 
-        .search-container input {
-            background: transparent; border: none; outline: none;
-            width: 100%; font-family: 'Cairo'; font-size: 16px;
-            color: var(--primary); text-align: center;
+        .section-head {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            color: var(--primary);
+            padding: 12px 16px;
+            border-radius: var(--radius);
+            font-weight: 800;
+            font-size: 0.95rem;
+            margin: 24px 0 14px;
+            border-right: 4px solid var(--accent);
+            box-shadow: var(--shadow);
+        }
+        .section-head:first-of-type { margin-top: 0; }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 14px;
+        }
+        @media (min-width: 480px) {
+            .grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (min-width: 640px) {
+            .grid { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
         }
 
-        .result-item {
-            background: white; border-radius: 18px; padding: 15px;
-            margin-bottom: 12px; text-align: right;
-            border-right: 6px solid var(--primary);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.04);
-            cursor: pointer; animation: fadeIn 0.4s ease;
+        input, select {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            font-family: 'Cairo', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text);
+            background: var(--card);
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        input::placeholder { color: var(--text-muted); font-weight: 500; }
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(15,23,42,0.08);
+        }
+        select { cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2364748b' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: left 14px center; padding-left: 36px; }
+
+        .input-wrap { grid-column: 1 / -1; }
+        @media (min-width: 480px) { .input-wrap { grid-column: span 1; } }
+
+        #duplicateWarning {
+            color: var(--error);
+            font-weight: 700;
+            font-size: 0.8rem;
+            margin-top: 8px;
+            padding: 10px 12px;
+            background: var(--error-soft);
+            border-radius: 10px;
+            border: 1px solid rgba(220,38,38,0.2);
+            display: none;
         }
 
-        .result-item strong { color: var(--primary); font-size: 16px; }
-        .details { font-size: 13px; color: #555; margin-top: 6px; line-height: 1.6; }
+        .member-card {
+            background: linear-gradient(180deg, #fafafa 0%, #f4f4f5 100%);
+            border: 2px solid var(--border);
+            padding: 18px;
+            border-radius: var(--radius-lg);
+            margin-bottom: 16px;
+            border-right: 5px solid var(--success);
+            box-shadow: var(--shadow);
+            transition: box-shadow 0.2s, border-color 0.2s;
+        }
+        .member-card:focus-within { border-color: var(--success); box-shadow: 0 0 0 4px rgba(5,150,105,0.1); }
 
-        .member-tag {
-            display: inline-block; background: #eee; padding: 2px 8px;
-            border-radius: 5px; font-size: 11px; margin-top: 5px;
+        .member-card .grid { margin-top: 10px; }
+        .member-card .btn-remove {
+            float: left;
+            border: none;
+            background: var(--error-soft);
+            color: var(--error);
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-family: 'Cairo', sans-serif;
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
         }
+        .member-card .btn-remove:hover { background: var(--error); color: white; }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .btn-add {
+            background: linear-gradient(135deg, var(--success) 0%, #047857 100%);
+            color: white;
+            border: none;
+            padding: 16px 20px;
+            border-radius: var(--radius);
+            width: 100%;
+            cursor: pointer;
+            font-family: 'Cairo', sans-serif;
+            font-weight: 800;
+            font-size: 1rem;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 14px rgba(5,150,105,0.35);
+            transition: transform 0.15s, box-shadow 0.2s;
+        }
+        .btn-add:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(5,150,105,0.4); }
+        .btn-add:active { transform: translateY(0); }
 
-        .loader {
-            border: 3px solid #f3f3f3; border-top: 3px solid var(--accent);
-            border-radius: 50%; width: 16px; height: 16px;
-            animation: spin 1s linear infinite; display: inline-block; vertical-align: middle; margin-left: 8px;
+        .btn-submit {
+            background: linear-gradient(135deg, var(--accent) 0%, #b91c1c 100%);
+            color: white;
+            border: none;
+            padding: 18px 24px;
+            width: 100%;
+            border-radius: var(--radius);
+            font-family: 'Cairo', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 4px 14px rgba(220,38,38,0.3);
+            transition: transform 0.15s, box-shadow 0.2s, opacity 0.2s;
         }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .btn-submit:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(220,38,38,0.4); }
+        .btn-submit:active:not(:disabled) { transform: translateY(0); }
+        .btn-submit:disabled { background: #94a3b8; box-shadow: none; cursor: not-allowed; opacity: 0.9; }
 
-        /* نافذة التفاصيل — بطاقة احترافية قابلة للطباعة */
-        #detailOverlay {
-            display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(15,23,42,0.7); backdrop-filter: blur(6px); z-index: 3000;
-            overflow-y: auto; padding: 16px; -webkit-overflow-scrolling: touch;
-        }
-        #detailModal {
-            max-width: 560px; margin: 20px auto 40px; background: #fff;
-            border-radius: 20px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
-            overflow: hidden; text-align: right;
-        }
-        .detail-actions {
-            padding: 14px 20px; background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-            border-bottom: 1px solid #e2e8f0;
-            display: flex; gap: 12px; flex-wrap: wrap;
-        }
-        .detail-actions .btn-print {
-            background: linear-gradient(135deg, var(--primary) 0%, #1e293b 100%);
-            color: white; border: none; padding: 12px 22px;
-            border-radius: 12px; font-family: 'Cairo'; font-weight: 800; cursor: pointer; font-size: 15px;
-            box-shadow: 0 4px 14px rgba(26,42,108,0.35);
-        }
-        .detail-actions .btn-close {
-            background: #64748b; color: white; border: none; padding: 12px 22px;
-            border-radius: 12px; font-family: 'Cairo'; font-weight: 700; cursor: pointer; font-size: 15px;
-        }
-        .form-print-area { padding: 0 0 24px; }
-
-        .card-photo-top {
-            width: 100%; min-height: 160px; background: linear-gradient(145deg, var(--primary) 0%, #1e3a5f 100%);
-            display: flex; align-items: center; justify-content: center;
-            padding: 24px;
-        }
-        .card-photo-frame {
-            width: 130px; height: 155px; border: 4px solid rgba(255,255,255,0.9);
-            border-radius: 16px; background: rgba(255,255,255,0.15);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 14px; font-weight: 700; color: rgba(255,255,255,0.95);
-            text-align: center; line-height: 1.5;
-        }
-        .card-main-title {
-            text-align: center; font-size: 1.1rem; font-weight: 900; color: var(--primary);
-            margin: 0; padding: 18px 20px 12px; border-bottom: 3px solid var(--accent);
-        }
-        .card-head-name {
-            text-align: center; font-size: 1.25rem; font-weight: 900; color: #0f172a;
-            padding: 14px 20px 20px; margin: 0; line-height: 1.4;
-        }
-        .card-section {
-            margin: 0 20px 20px; border-radius: 14px; overflow: hidden;
-            border: 1px solid #e2e8f0; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-        }
-        .card-section-title {
-            padding: 12px 16px; font-size: 0.95rem; font-weight: 800; color: #fff;
-            display: flex; align-items: center; gap: 8px;
-        }
-        .card-section-title.sec-head { background: linear-gradient(135deg, #1e3a5f 0%, var(--primary) 100%); }
-        .card-section-title.sec-home { background: linear-gradient(135deg, #065f46 0%, #047857 100%); }
-        .card-section-title.sec-family { background: linear-gradient(135deg, #92400e 0%, #b45309 100%); }
-        .card-section-title.sec-notes { background: linear-gradient(135deg, #475569 0%, #64748b 100%); }
-        .card-section-body { padding: 14px 16px; background: #fafbfc; }
-        .card-row {
-            display: flex; justify-content: space-between; align-items: baseline;
-            padding: 10px 0; border-bottom: 1px solid #e2e8f0; font-size: 14px; gap: 12px;
-        }
-        .card-row:last-child { border-bottom: none; }
-        .card-row .lbl { color: #64748b; font-weight: 700; flex-shrink: 0; }
-        .card-row .val { color: #0f172a; font-weight: 800; text-align: left; word-break: break-word; }
-        .card-two-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 0 20px; }
-        @media (max-width: 480px) { .card-two-cols { grid-template-columns: 1fr; } }
-        .card-col .card-row { padding: 8px 0; }
-
-        .form-table-wrap {
-            overflow-x: auto; margin: 0; border: none; border-radius: 0;
+        /* Modal */
+        #reviewModal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15,23,42,0.75);
+            backdrop-filter: blur(6px);
+            z-index: 2000;
+            overflow-y: auto;
+            padding: 16px;
             -webkit-overflow-scrolling: touch;
         }
-        .form-table {
-            width: 100%; border-collapse: collapse; font-size: 13px;
+        .modal-content {
+            background: var(--card);
+            max-width: 520px;
+            margin: 20px auto 40px;
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            box-shadow: var(--shadow-lg);
         }
-        .form-table th, .form-table td {
-            border: 1px solid #e2e8f0; padding: 10px 12px; text-align: right;
+        .modal-content h3 {
+            text-align: center;
+            color: var(--accent);
+            margin: 0 0 18px;
+            font-size: 1.15rem;
+            font-weight: 800;
         }
-        .form-table th {
-            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-            color: var(--primary); font-weight: 800; font-size: 12px;
+        .preview-box {
+            background: #f8fafc;
+            border-radius: var(--radius);
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 2px solid var(--border);
+            max-height: 55vh;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
         }
-        .form-table td { font-weight: 700; color: #334155; }
-        .form-table .col-num { width: 38px; text-align: center; }
-        .form-table-family { font-size: 12px; }
-        .form-table-family th, .form-table-family td { padding: 8px 10px; white-space: nowrap; }
-        .form-table-family td:nth-child(2) { white-space: normal; min-width: 100px; }
-        .form-notes .box {
-            min-height: 56px; border: 2px dashed #cbd5e1; border-radius: 10px;
-            padding: 12px; background: #f8fafc; margin-top: 6px;
+        .preview-group-title {
+            background: var(--primary);
+            color: white;
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-weight: 800;
+            font-size: 0.9rem;
+            margin-top: 12px;
         }
-        .form-notes .lbl { font-size: 12px; color: #64748b; font-weight: 700; margin-bottom: 6px; display: block; }
+        .preview-group-title:first-child { margin-top: 0; }
+        .preview-item {
+            border-bottom: 1px solid var(--border);
+            padding: 10px 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            gap: 12px;
+        }
+        .preview-val { font-weight: 700; color: var(--text); }
+        .modal-btns {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .modal-btns button {
+            flex: 1;
+            min-width: 120px;
+            padding: 16px;
+            border: none;
+            border-radius: var(--radius);
+            font-family: 'Cairo', sans-serif;
+            font-weight: 800;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform 0.15s;
+        }
+        .modal-btns button:active { transform: scale(0.98); }
+        .modal-btns .btn-confirm { background: var(--success); color: white; }
+        .modal-btns .btn-edit { background: var(--border); color: var(--text); }
 
-        @media print {
-            body * { visibility: hidden; }
-            #detailOverlay, #detailOverlay * { visibility: visible; }
-            #detailOverlay { position: absolute; left: 0; top: 0; right: 0; width: 100%; min-height: 100%; background: #fff; padding: 0; backdrop-filter: none; }
-            .detail-actions { display: none !important; }
-            #detailModal { max-width: 100%; box-shadow: none; margin: 0; border: none; }
-            .form-print-area { padding-bottom: 20px; }
-            .card-photo-top { min-height: 140px; }
-            .card-section { box-shadow: none; }
-            .form-table th, .form-table td { border-color: #334155; }
+        #successScreen {
+            display: none;
+            text-align: center;
+            padding: 48px 24px 40px;
+            padding-bottom: max(40px, env(safe-area-inset-bottom));
         }
+        #successScreen .icon { font-size: 4rem; margin-bottom: 12px; }
+        #successScreen h2 { color: var(--success); font-size: 1.5rem; font-weight: 800; margin: 0 0 12px; }
+        #successScreen p { font-weight: 700; color: var(--primary); font-size: 1.15rem; margin: 0 0 24px; }
+        #successScreen .btn-submit {
+            background: linear-gradient(135deg, var(--success) 0%, #047857 100%);
+            box-shadow: 0 4px 14px rgba(5,150,105,0.35);
+        }
+        #successScreen .btn-submit:hover { box-shadow: 0 6px 20px rgba(5,150,105,0.4); }
+
+        .page-wrap { padding-left: max(12px, env(safe-area-inset-left)); padding-right: max(12px, env(safe-area-inset-right)); }
     </style>
 </head>
-<body>
+<body oncontextmenu="return false;">
 
-<div id="detailOverlay" onclick="if(event.target===this) closeDetail()">
-    <div id="detailModal">
-        <div class="detail-actions no-print">
-            <button type="button" class="btn-print" onclick="window.print()">🖨️ طباعة</button>
-            <button type="button" class="btn-close" onclick="closeDetail()">إغلاق</button>
+<div id="reviewModal">
+    <div class="modal-content">
+        <h3>📋 مراجعة كافة البيانات قبل الحفظ</h3>
+        <div id="previewData" class="preview-box"></div>
+        <div class="modal-btns">
+            <button type="button" class="btn-confirm" onclick="finalSend()">تأكيد وحفظ البيانات ✅</button>
+            <button type="button" class="btn-edit" onclick="closeModal()">تعديل ✏️</button>
         </div>
-        <div class="form-print-area" id="detailBody"></div>
     </div>
 </div>
 
-<div class="app-container">
-    <div class="header-title">لوحة تحكم بيانات <br> حي القائم الأول</div>
+<div class="page-wrap">
+<div class="app-container" id="mainWrapper">
+    <div id="formSection">
+        <div class="header">
+            <h2>منظومة جرد حي القائم الأول</h2>
+            <p class="sub">المختار أحمد هاني</p>
+            <a href="dashboard.html" class="link-dash">لوحة التحكم ←</a>
+        </div>
 
-    <div id="statusBox">
-        <span id="loaderIcon" class="loader"></span>
-        <span id="statusText">جاري الاتصال بقاعدة البيانات...</span>
+        <form class="form-body" id="censusForm">
+            <span id="loadingStatus">⏳ جاري مزامنة قاعدة البيانات للفحص الفوري...</span>
+            
+            <div class="section-head">👤 بيانات رب الأسرة</div>
+            <div class="grid">
+                <div class="input-wrap">
+                    <input type="text" id="name" placeholder="الاسم الرباعي واللقب" required oninput="instantCheck(this.value)">
+                    <div id="duplicateWarning">⚠️ هذا الاسم مسجل مسبقاً! لا يمكن الإرسال.</div>
+                </div>
+                <input type="text" id="nationalId" placeholder="رقم البطاقة الموحدة">
+                <input type="text" id="cardId" placeholder="رقم البطاقة التموينية">
+                <input type="number" id="birth" placeholder="سنة التولد">
+                <select id="education">
+                    <option value="">التحصيل الدراسي</option>
+                    <option>أمي</option><option>ابتدائية</option><option>متوسطة</option><option>إعدادية</option><option>دبلوم</option><option>بكالوريوس</option><option>دراسات عليا</option>
+                </select>
+                <input type="text" id="job" placeholder="المهنة">
+                <input type="text" id="workLocation" placeholder="موقع العمل الحالي">
+                <input type="tel" id="phone" placeholder="رقم الهاتف" required>
+            </div>
+
+            <div class="section-head">🏠 تفاصيل السكن</div>
+            <div class="grid">
+                <select id="homeType"><option>ملك</option><option>إيجار</option><option>عشوائيات</option></select>
+                <input type="text" id="prevAddress" placeholder="عنوان السكن السابق">
+                <input type="text" id="address" placeholder="العنوان الحالي">
+                <input type="text" id="moveDate" placeholder="تاريخ السكن">
+                <input type="text" id="taboo" placeholder="رقم الطابو">
+                <input type="text" id="homeNum" placeholder="رقم الدار">
+            </div>
+
+            <div class="section-head">👨‍👩‍👧‍👦 أفراد الأسرة</div>
+            <div id="membersContainer"></div>
+            <button type="button" class="btn-add" onclick="addMember()">+ إضافة فرد جديد للعائلة</button>
+
+            <button type="button" id="previewBtn" class="btn-submit" onclick="showPreview()" style="margin-top:24px;">معاينة كافة البيانات</button>
+        </form>
     </div>
 
-    <div class="stats-grid">
-        <div class="stat-card card-total">
-            <div class="number" id="count-total">0</div>
-            <div class="label">إجمالي العوائل</div>
-        </div>
-        <div class="stat-card card-owned">
-            <div class="number" id="count-ملك">0</div>
-            <div class="label">سكن ملك</div>
-        </div>
-        <div class="stat-card card-random">
-            <div class="number" id="count-عشوائيات">0</div>
-            <div class="label">عشوائيات</div>
-        </div>
-        <div class="stat-card card-rent">
-            <div class="number" id="count-إيجار">0</div>
-            <div class="label">سكن إيجار</div>
-        </div>
+    <div id="successScreen">
+        <div class="icon">✔️</div>
+        <h2>تم الحفظ بنجاح!</h2>
+        <p id="serialDisplay"></p>
+        <button type="button" class="btn-submit" onclick="location.reload()">إدخال استمارة جديدة</button>
     </div>
-
-    <div class="search-container">
-        <input type="text" id="searchInput" oninput="liveSearch()" placeholder="ابحث بالاسم، الهاتف، أو أفراد العائلة...">
-    </div>
-
-    <div id="resultsArea"></div>
+</div>
 </div>
 
 <script>
-    const scriptURL = "https://script.google.com/macros/s/AKfycbzIkbcB9mzpCP2dMO2P5UN5WE1Zo3TrZ5xd6wYAZejfVQcRwiQTqc9W2oiNmJFR_I9s2g/exec";
+    const scriptURL = "https://script.google.com/macros/s/AKfycbzIkbcB9mzpCP2dMO2P5UN5WE1Zo3TrZ5xd6wYAZejfVQcRwiQTqc9W2oiNmJFR_I9s2g/exec"; 
     const SECRET_TOKEN = "AL_QAIM_MUKHTAR_2026";
-    let database = [];
+    let cachedNames = [];
 
-    function init() {
-        var statusText = document.getElementById('statusText');
-        var loaderIcon = document.getElementById('loaderIcon');
-
-        window.__dashboardData = function(result) {
-            loaderIcon.style.display = "none";
-            if (result && result.data) {
-                var raw = result.data.map(function(row) {
-                    return {
-                        serialId: row[0],
-                        date: row[1],
-                        name: row[2],
-                        nationalId: row[3],
-                        cardId: row[4],
-                        birth: row[5],
-                        education: row[6],
-                        job: row[7],
-                        workLocation: row[8],
-                        phone: row[9],
-                        homeType: row[10],
-                        address: row[11],
-                        prevAddress: row[12],
-                        moveDate: row[13],
-                        taboo: row[14],
-                        homeNum: row[15],
-                        familyMembers: row[16]
-                    };
-                });
-                database = raw.filter(function(item) {
-                    var addr = String(item.address || "").replace(/\s+/g, " ").trim();
-                    var name = String(item.name || "").replace(/\s+/g, " ").trim();
-                    var serial = String(item.serialId || "").trim();
-                    if (!name && !serial) return false;
-                    if (name === "العنوان" || name === "الاسم" || name === "اسم رب الاسرة" || name === "اسم رب الأسرة" || name === "الاسم الرباعي واللقب") return false;
-                    if (addr === "العنوان" || addr === "العنوان الحالي") return false;
-                    if (addr.length <= 20 && addr.indexOf("العنوان") === 0) return false;
-                    if (serial === "serialId" || (serial.indexOf("رقم") === 0 && serial.length < 25)) return false;
-                    return true;
-                });
-                statusText.innerText = "متصل - تم تحديث البيانات";
-                statusText.style.color = "green";
-                updateStats();
-            } else {
-                statusText.innerText = "خطأ: لا توجد بيانات في الرد (تأكد من النشر وتحديثه).";
-                statusText.style.color = "red";
-            }
-        };
-
-        window.__dashboardError = function() {
-            loaderIcon.style.display = "none";
-            statusText.innerText = "خطأ: فشل الاتصال. تحقق من الرابط والنشر (New Deployment) والتوكن.";
-            statusText.style.color = "red";
-        };
-
-        var url = scriptURL + "?token=" + encodeURIComponent(SECRET_TOKEN) + "&getAllData=true&callback=__dashboardData";
-        var script = document.createElement("script");
-        script.src = url;
-        script.onerror = window.__dashboardError;
-        document.head.appendChild(script);
-    }
-
-    function updateStats() {
-        var stats = { total: database.length, ملك: 0, إيجار: 0, عشوائيات: 0 };
-        database.forEach(function(item) {
-            var type = String(item.homeType || "").trim();
-            if (type === "ملك") stats.ملك++;
-            else if (type === "إيجار") stats.إيجار++;
-            else if (type === "عشوائيات") stats.عشوائيات++;
-        });
-
-        document.getElementById('count-total').innerText = stats.total;
-        document.getElementById('count-ملك').innerText = stats.ملك;
-        document.getElementById('count-إيجار').innerText = stats.إيجار;
-        document.getElementById('count-عشوائيات').innerText = stats.عشوائيات;
-    }
-
-    function liveSearch() {
-        var term = document.getElementById('searchInput').value.trim().toLowerCase();
-        var resultsArea = document.getElementById('resultsArea');
-        resultsArea.innerHTML = "";
-
-        if (!term) return;
-
-        var filtered = database.filter(function(f) {
-            return (f.name && String(f.name).toLowerCase().includes(term)) ||
-                (f.phone && String(f.phone).includes(term)) ||
-                (f.familyMembers && String(f.familyMembers).toLowerCase().includes(term));
-        });
-
-        if (filtered.length === 0) {
-            resultsArea.innerHTML = "<p style='color:#666; font-size:14px;'>لا توجد نتائج مطابقة</p>";
-            return;
+    // جلب قاعدة البيانات عند التشغيل للفحص الفوري
+    async function loadDatabase() {
+        try {
+            const res = await fetch(`${scriptURL}?token=${SECRET_TOKEN}&getAllNames=true`);
+            const data = await res.json();
+            cachedNames = data.names.map(n => n.toString().trim());
+            document.getElementById('loadingStatus').innerText = "✅ تم تحديث قاعدة البيانات (الفحص الفوري نشط)";
+            document.getElementById('loadingStatus').style.color = "green";
+        } catch (e) {
+            document.getElementById('loadingStatus').innerText = "⚠️ فشل التحديث التلقائي (سيتم الفحص عند الكتابة)";
         }
-
-        filtered.forEach(function(item) {
-            var div = document.createElement('div');
-            div.className = 'result-item';
-            div.onclick = function() { showDetail(item); };
-            div.innerHTML =
-                "<strong>" + (item.name || "-") + "</strong>" +
-                "<div class='details'>" +
-                "📞 " + (item.phone || 'غير مسجل') + " &nbsp;|&nbsp; 🏠 " + (item.homeType || '-') + "<br>" +
-                "📍 " + (item.address || 'غير محدد') +
-                "</div>" +
-                "<div class='member-tag'>" + (item.serialId || '-') + "</div>";
-            resultsArea.appendChild(div);
-        });
     }
 
-    function esc(s) {
-        if (s === undefined || s === null) return "";
-        return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
-    }
-    function val(v) { return (v !== undefined && v !== null && String(v).trim() !== "") ? esc(String(v).trim()) : "—"; }
-
-    function parseFamilyMembers(text) {
-        if (!text || String(text).trim() === "") return [];
-        var lines = String(text).split(/\n/);
-        var rows = [];
-        for (var i = 0; i < lines.length; i++) {
-            var line = lines[i].trim();
-            if (!line) continue;
-            var parts = line.split(/\t/);
-            if (parts.length >= 7) {
-                rows.push({
-                    num: parts[0],
-                    name: parts[1] || "—",
-                    birth: parts[2] || "—",
-                    job: parts[3] || "—",
-                    edu: parts[4] || "—",
-                    social: parts[5] || "—",
-                    relation: parts[6] || "—"
-                });
-            } else {
-                var numMatch = line.match(/^(\d+)/);
-                var num = numMatch ? numMatch[1] : (rows.length + 1);
-                var rest = line.replace(/^\d+[\-\s\.]+/, "").trim();
-                var relMatch = rest.match(/\s*\(([^)]+)\)\s*$/);
-                var name, relation;
-                if (relMatch) {
-                    relation = relMatch[1].trim();
-                    name = rest.replace(/\s*\([^)]+\)\s*$/, "").trim();
-                } else {
-                    name = rest;
-                    relation = "—";
-                }
-                rows.push({ num: num, name: name || "—", birth: "—", job: "—", edu: "—", social: "—", relation: relation });
-            }
-        }
-        return rows;
-    }
-
-    function cardRow(lbl, v) {
-        var valStr = (v !== undefined && v !== null && String(v).trim() !== "") ? String(v).trim() : "—";
-        return "<div class='card-row'><span class='lbl'>" + esc(lbl) + "</span><span class='val'>" + esc(valStr) + "</span></div>";
-    }
-
-    function showDetail(item) {
-        var body = document.getElementById('detailBody');
-
-        var html = "";
-        html += "<div class='card-photo-top'><div class='card-photo-frame'>صورة رب الأسرة</div></div>";
-        html += "<h1 class='card-main-title'>استمارة جرد عوائل وأفراد حي القائم الأول</h1>";
-        html += "<p class='card-head-name'>اسم رب الأسرة الرباعي واللقب: " + val(item.name) + "</p>";
-
-        html += "<div class='card-section'>";
-        html += "<div class='card-section-title sec-head'>👤 بيانات رب الأسرة</div>";
-        html += "<div class='card-section-body'><div class='card-two-cols'>";
-        html += "<div class='card-col'>";
-        html += cardRow("التولد", item.birth) + cardRow("العنوان", item.address) + cardRow("المهنة", item.job);
-        html += cardRow("موقع العمل", item.workLocation) + cardRow("تاريخ السكن", item.moveDate) + cardRow("رقم المعاملة", item.serialId);
-        html += "</div><div class='card-col'>";
-        html += cardRow("رقم الدار", item.homeNum) + cardRow("رقم الهاتف", item.phone) + cardRow("التحصيل الدراسي", item.education);
-        html += "</div></div></div></div>";
-
-        html += "<div class='card-section'>";
-        html += "<div class='card-section-title sec-home'>🏠 تفاصيل السكن</div>";
-        html += "<div class='card-section-body'><div class='card-two-cols'>";
-        html += "<div class='card-col'>";
-        html += cardRow("نوع السكن الحالي", item.homeType) + cardRow("موقع السكن السابق", item.prevAddress);
-        html += "</div><div class='card-col'>";
-        html += cardRow("رقم البطاقة التموينية", item.cardId) + cardRow("رقم الطابو", item.taboo);
-        html += "</div></div></div></div>";
-
-        html += "<div class='card-section'>";
-        html += "<div class='card-section-title sec-family'>👨‍👩‍👧‍👦 اسم الزوجة وأفراد الأسرة</div>";
-        html += "<div class='card-section-body'>";
-        var members = parseFamilyMembers(item.familyMembers);
-        html += "<div class='form-table-wrap'><table class='form-table form-table-family'>";
-        html += "<thead><tr><th class='col-num'>ت</th><th>الاسم</th><th>التولد</th><th>المهنة</th><th>التحصيل الدراسي</th><th>الحالة الاجتماعية</th><th>الصلة برب الأسرة</th></tr></thead><tbody>";
-        if (members.length === 0) {
-            html += "<tr><td class='col-num'>1</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>";
+    // فحص فوري بدون تأخير
+    function instantCheck(currentName) {
+        const warning = document.getElementById('duplicateWarning');
+        const btn = document.getElementById('previewBtn');
+        const nameInput = document.getElementById('name');
+        
+        if (cachedNames.includes(currentName.trim())) {
+            warning.style.display = 'block';
+            btn.disabled = true;
+            nameInput.style.border = "2px solid var(--error)";
         } else {
-            for (var j = 0; j < members.length; j++) {
-                var m = members[j];
-                html += "<tr><td class='col-num'>" + esc(m.num) + "</td><td>" + esc(m.name) + "</td><td>" + esc(m.birth) + "</td><td>" + esc(m.job) + "</td><td>" + esc(m.edu) + "</td><td>" + esc(m.social) + "</td><td>" + esc(m.relation) + "</td></tr>";
-            }
+            warning.style.display = 'none';
+            btn.disabled = false;
+            nameInput.style.border = "1px solid #ccc";
         }
-        html += "</tbody></table></div></div></div>";
-
-        html += "<div class='card-section'>";
-        html += "<div class='card-section-title sec-notes'>📝 الملاحظات</div>";
-        html += "<div class='card-section-body'><div class='form-notes'><div class='box'>&nbsp;</div></div></div></div>";
-
-        body.innerHTML = html;
-        document.getElementById('detailOverlay').style.display = "block";
-        document.body.style.overflow = "hidden";
     }
 
-    function closeDetail() {
-        document.getElementById('detailOverlay').style.display = "none";
-        document.body.style.overflow = "";
+    function addMember() {
+        const container = document.getElementById("membersContainer");
+        const div = document.createElement("div");
+        div.className = "member-card";
+        div.innerHTML = `
+            <button type="button" class="btn-remove" onclick="this.parentElement.remove()">✕ حذف</button>
+            <div class="grid">
+                <input type="text" class="m-name" placeholder="الاسم الثلاثي">
+                <select class="m-rel"><option>زوجة</option><option>ابن</option><option>ابنة</option><option>أخرى</option></select>
+                <input type="number" class="m-birth" placeholder="سنة التولد">
+                <input type="text" class="m-job" placeholder="المهنة">
+                <select class="m-edu"><option value="">الدراسة</option><option>ابتدائية</option><option>متوسطة</option><option>إعدادية</option><option>دبلوم</option><option>بكالوريوس</option></select>
+                <select class="m-social"><option>أعزب/باكر</option><option>متزوج/ة</option><option>مطلق/ة</option><option>أرمل/ة</option></select>
+            </div>`;
+        container.appendChild(div);
     }
 
-    window.onload = init;
+    function showPreview() {
+        const name = document.getElementById('name').value;
+        if (!name || !document.getElementById('phone').value) { alert("يرجى ملء الاسم ورقم الهاتف"); return; }
+        
+        let familyHtml = "";
+        document.querySelectorAll(".member-card").forEach((card, index) => {
+            const n = card.querySelector(".m-name").value;
+            const r = card.querySelector(".m-rel").value;
+            if(n) familyHtml += `<div class="preview-item"><span>${index+1}. ${n}</span> <b>(${r})</b></div>`;
+        });
+
+        document.getElementById('previewData').innerHTML = `
+            <div class="preview-group-title">👤 بيانات رب الأسرة</div>
+            <div class="preview-item"><span>الاسم:</span> <span class="preview-val">${name}</span></div>
+            <div class="preview-item"><span>الموحدة:</span> <span class="preview-val">${document.getElementById('nationalId').value || '-'}</span></div>
+            <div class="preview-item"><span>التموينية:</span> <span class="preview-val">${document.getElementById('cardId').value || '-'}</span></div>
+            <div class="preview-item"><span>التولد:</span> <span class="preview-val">${document.getElementById('birth').value || '-'}</span></div>
+            <div class="preview-item"><span>الدراسة:</span> <span class="preview-val">${document.getElementById('education').value || '-'}</span></div>
+            <div class="preview-item"><span>المهنة:</span> <span class="preview-val">${document.getElementById('job').value || '-'}</span></div>
+            <div class="preview-item"><span>الهاتف:</span> <span class="preview-val">${document.getElementById('phone').value}</span></div>
+            
+            <div class="preview-group-title">🏠 تفاصيل السكن</div>
+            <div class="preview-item"><span>نوع السكن:</span> <span class="preview-val">${document.getElementById('homeType').value}</span></div>
+            <div class="preview-item"><span>العنوان الحالي:</span> <span class="preview-val">${document.getElementById('address').value || '-'}</span></div>
+            <div class="preview-item"><span>رقم الدار:</span> <span class="preview-val">${document.getElementById('homeNum').value || '-'}</span></div>
+
+            <div class="preview-group-title">👨‍👩‍👧‍👦 أفراد العائلة</div>
+            ${familyHtml || '<div class="preview-item">لا يوجد أفراد مضافين</div>'}
+        `;
+        document.getElementById('reviewModal').style.display = 'block';
+    }
+
+    function closeModal() { document.getElementById('reviewModal').style.display = 'none'; }
+
+    function finalSend() {
+        const sId = "QA-" + Math.floor(Math.random()*900000+100000);
+        let family = "";
+        const sep = "\t";
+        document.querySelectorAll(".member-card").forEach((card, i) => {
+            const n = card.querySelector(".m-name").value.trim();
+            if (!n) return;
+            const birth = (card.querySelector(".m-birth").value || "").replace(/\t/g, " ");
+            const job = (card.querySelector(".m-job").value || "").replace(/\t/g, " ");
+            const edu = (card.querySelector(".m-edu").value || "").replace(/\t/g, " ");
+            const social = (card.querySelector(".m-social").value || "").replace(/\t/g, " ");
+            const rel = (card.querySelector(".m-rel").value || "").replace(/\t/g, " ");
+            family += (i + 1) + sep + n.replace(/\t/g, " ") + sep + birth + sep + job + sep + edu + sep + social + sep + rel + "\n";
+        });
+
+        const formData = new URLSearchParams();
+        formData.append("token", SECRET_TOKEN);
+        formData.append("serialId", sId);
+        formData.append("name", document.getElementById('name').value);
+        formData.append("nationalId", document.getElementById('nationalId').value);
+        formData.append("cardId", document.getElementById('cardId').value);
+        formData.append("birth", document.getElementById('birth').value);
+        formData.append("education", document.getElementById('education').value);
+        formData.append("job", document.getElementById('job').value);
+        formData.append("workLocation", document.getElementById('workLocation').value);
+        formData.append("phone", document.getElementById('phone').value);
+        formData.append("homeType", document.getElementById('homeType').value);
+        formData.append("address", document.getElementById('address').value);
+        formData.append("prevAddress", document.getElementById('prevAddress').value);
+        formData.append("moveDate", document.getElementById('moveDate').value);
+        formData.append("taboo", document.getElementById('taboo').value);
+        formData.append("homeNum", document.getElementById('homeNum').value);
+        formData.append("familyMembers", family);
+
+        fetch(scriptURL, { method: 'POST', body: formData, mode: 'no-cors' });
+        
+        closeModal();
+        document.getElementById('formSection').style.display = 'none';
+        document.getElementById('successScreen').style.display = 'block';
+        document.getElementById('serialDisplay').innerText = "رقم المعاملة: " + sId;
+    }
+
+    window.onload = () => { addMember(); loadDatabase(); };
 </script>
-
 </body>
 </html>
