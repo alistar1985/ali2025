@@ -192,6 +192,10 @@
         .member-card:focus-within { border-color: var(--success); box-shadow: 0 0 0 4px rgba(5,150,105,0.1); }
 
         .member-card .grid { margin-top: 10px; }
+        .member-card .m-rel-custom {
+            grid-column: 1 / -1;
+            margin-top: 4px;
+        }
         .member-card .btn-remove {
             float: left;
             border: none;
@@ -418,7 +422,7 @@
 </div>
 
 <script>
-    const scriptURL = "https://script.google.com/macros/s/AKfycbwvjt0DpIsaeAZI_Ygn4AdJ7wYIg5i_kugD3cR3eEMpUkdriu4rBR6GNA9Tz4TnFtbQMg/exec"; 
+    const scriptURL = "https://script.google.com/macros/s/AKfycbzRTLT9LSAQrXvYV2LKBx1qfJQlCpz92tLNNVIPEeEvtxZFFnwNwQSSp84FiVE6RytoiQ/exec"; 
     const SECRET_TOKEN = "AL_QAIM_MUKHTAR_2026";
     let cachedNames = [];
 
@@ -459,14 +463,49 @@
         div.innerHTML = `
             <button type="button" class="btn-remove" onclick="this.parentElement.remove()">✕ حذف</button>
             <div class="grid">
-                <input type="text" class="m-name" placeholder="الاسم الثلاثي">
-                <select class="m-rel"><option>زوجة</option><option>ابن</option><option>ابنة</option><option>أخرى</option></select>
+                <input type="text" class="m-name" placeholder="الاسم الرباعي">
+                <select class="m-rel" onchange="toggleRelationInput(this)">
+                    <option value="">صلة القرابة</option>
+                    <option>زوجة</option>
+                    <option>ابن</option>
+                    <option>ابنة</option>
+                    <option>أم</option>
+                    <option>أب</option>
+                    <option>أخت</option>
+                    <option>أخ</option>
+                    <option>طفل</option>
+                    <option>أخرى</option>
+                </select>
+                <input type="text" class="m-rel-custom" placeholder="اكتب صلة القرابة يدوياً" style="display:none;">
                 <input type="number" class="m-birth" placeholder="سنة التولد">
                 <input type="text" class="m-job" placeholder="المهنة">
                 <select class="m-edu"><option value="">الدراسة</option><option>ابتدائية</option><option>متوسطة</option><option>إعدادية</option><option>دبلوم</option><option>بكالوريوس</option></select>
-                <select class="m-social"><option>أعزب/باكر</option><option>متزوج/ة</option><option>مطلق/ة</option><option>أرمل/ة</option></select>
+                <select class="m-social">
+                    <option value="">الحالة الاجتماعية</option>
+                    <option>عزب</option>
+                    <option>باكر</option>
+                    <option>متزوج</option>
+                    <option>متزوجة</option>
+                    <option>مطلق</option>
+                    <option>مطلقة</option>
+                    <option>أرمل</option>
+                    <option>أرملة</option>
+                </select>
             </div>`;
         container.appendChild(div);
+    }
+    
+    function toggleRelationInput(select) {
+        const card = select.closest('.member-card');
+        const customInput = card.querySelector('.m-rel-custom');
+        if (select.value === 'أخرى') {
+            customInput.style.display = 'block';
+            customInput.required = true;
+        } else {
+            customInput.style.display = 'none';
+            customInput.required = false;
+            customInput.value = '';
+        }
     }
 
     function showPreview() {
@@ -476,8 +515,10 @@
         let familyHtml = "";
         document.querySelectorAll(".member-card").forEach((card, index) => {
             const n = card.querySelector(".m-name").value;
-            const r = card.querySelector(".m-rel").value;
-            if(n) familyHtml += `<div class="preview-item"><span>${index+1}. ${n}</span> <b>(${r})</b></div>`;
+            const rSelect = card.querySelector(".m-rel").value;
+            const rCustom = card.querySelector(".m-rel-custom").value;
+            const r = rSelect === 'أخرى' ? rCustom : rSelect;
+            if(n) familyHtml += `<div class="preview-item"><span>${index+1}. ${n}</span> <b>(${r || '—'})</b></div>`;
         });
 
         document.getElementById('previewData').innerHTML = `
@@ -514,7 +555,9 @@
             const job = (card.querySelector(".m-job").value || "").replace(/\t/g, " ");
             const edu = (card.querySelector(".m-edu").value || "").replace(/\t/g, " ");
             const social = (card.querySelector(".m-social").value || "").replace(/\t/g, " ");
-            const rel = (card.querySelector(".m-rel").value || "").replace(/\t/g, " ");
+            const relSelect = (card.querySelector(".m-rel").value || "").replace(/\t/g, " ");
+            const relCustom = (card.querySelector(".m-rel-custom").value || "").replace(/\t/g, " ");
+            const rel = relSelect === 'أخرى' ? relCustom : relSelect;
             family += (i + 1) + sep + n.replace(/\t/g, " ") + sep + birth + sep + job + sep + edu + sep + social + sep + rel + "\n";
         });
 
