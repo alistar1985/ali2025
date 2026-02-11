@@ -192,7 +192,9 @@
         .member-card:focus-within { border-color: var(--success); box-shadow: 0 0 0 4px rgba(5,150,105,0.1); }
 
         .member-card .grid { margin-top: 10px; }
-        .member-card .m-rel-custom {
+        .member-card .m-rel-custom,
+        .member-card .m-edu-custom,
+        .member-card .m-social-custom {
             grid-column: 1 / -1;
             margin-top: 4px;
         }
@@ -479,9 +481,21 @@
                 <input type="text" class="m-rel-custom" placeholder="اكتب صلة القرابة يدوياً" style="display:none;">
                 <input type="number" class="m-birth" placeholder="سنة التولد">
                 <input type="text" class="m-job" placeholder="المهنة">
-                <select class="m-edu"><option value="">الدراسة</option><option>ابتدائية</option><option>متوسطة</option><option>إعدادية</option><option>دبلوم</option><option>بكالوريوس</option></select>
-                <select class="m-social">
+                <select class="m-edu" onchange="toggleEducationInput(this)">
+                    <option value="">الدراسة</option>
+                    <option>روضة</option>
+                    <option>طفل</option>
+                    <option>ابتدائية</option>
+                    <option>متوسطة</option>
+                    <option>إعدادية</option>
+                    <option>دبلوم</option>
+                    <option>بكالوريوس</option>
+                    <option>أخرى</option>
+                </select>
+                <input type="text" class="m-edu-custom" placeholder="اكتب الدراسة يدوياً" style="display:none;">
+                <select class="m-social" onchange="toggleSocialInput(this)">
                     <option value="">الحالة الاجتماعية</option>
+                    <option>طفل</option>
                     <option>عزب</option>
                     <option>باكر</option>
                     <option>متزوج</option>
@@ -490,7 +504,9 @@
                     <option>مطلقة</option>
                     <option>أرمل</option>
                     <option>أرملة</option>
+                    <option>أخرى</option>
                 </select>
+                <input type="text" class="m-social-custom" placeholder="اكتب الحالة الاجتماعية يدوياً" style="display:none;">
             </div>`;
         container.appendChild(div);
     }
@@ -498,6 +514,32 @@
     function toggleRelationInput(select) {
         const card = select.closest('.member-card');
         const customInput = card.querySelector('.m-rel-custom');
+        if (select.value === 'أخرى') {
+            customInput.style.display = 'block';
+            customInput.required = true;
+        } else {
+            customInput.style.display = 'none';
+            customInput.required = false;
+            customInput.value = '';
+        }
+    }
+    
+    function toggleEducationInput(select) {
+        const card = select.closest('.member-card');
+        const customInput = card.querySelector('.m-edu-custom');
+        if (select.value === 'أخرى') {
+            customInput.style.display = 'block';
+            customInput.required = true;
+        } else {
+            customInput.style.display = 'none';
+            customInput.required = false;
+            customInput.value = '';
+        }
+    }
+    
+    function toggleSocialInput(select) {
+        const card = select.closest('.member-card');
+        const customInput = card.querySelector('.m-social-custom');
         if (select.value === 'أخرى') {
             customInput.style.display = 'block';
             customInput.required = true;
@@ -518,7 +560,22 @@
             const rSelect = card.querySelector(".m-rel").value;
             const rCustom = card.querySelector(".m-rel-custom").value;
             const r = rSelect === 'أخرى' ? rCustom : rSelect;
-            if(n) familyHtml += `<div class="preview-item"><span>${index+1}. ${n}</span> <b>(${r || '—'})</b></div>`;
+            const eduSelect = card.querySelector(".m-edu").value;
+            const eduCustom = card.querySelector(".m-edu-custom").value;
+            const edu = eduSelect === 'أخرى' ? eduCustom : eduSelect;
+            const socialSelect = card.querySelector(".m-social").value;
+            const socialCustom = card.querySelector(".m-social-custom").value;
+            const social = socialSelect === 'أخرى' ? socialCustom : socialSelect;
+            if(n) {
+                familyHtml += `<div class="preview-item">
+                    <span>${index+1}. ${n}</span> 
+                    <div style="text-align:left; margin-top:4px; font-size:0.85rem; color:var(--text-muted);">
+                        صلة القرابة: <b>${r || '—'}</b> | 
+                        الدراسة: <b>${edu || '—'}</b> | 
+                        الحالة: <b>${social || '—'}</b>
+                    </div>
+                </div>`;
+            }
         });
 
         document.getElementById('previewData').innerHTML = `
@@ -553,8 +610,12 @@
             if (!n) return;
             const birth = (card.querySelector(".m-birth").value || "").replace(/\t/g, " ");
             const job = (card.querySelector(".m-job").value || "").replace(/\t/g, " ");
-            const edu = (card.querySelector(".m-edu").value || "").replace(/\t/g, " ");
-            const social = (card.querySelector(".m-social").value || "").replace(/\t/g, " ");
+            const eduSelect = (card.querySelector(".m-edu").value || "").replace(/\t/g, " ");
+            const eduCustom = (card.querySelector(".m-edu-custom").value || "").replace(/\t/g, " ");
+            const edu = eduSelect === 'أخرى' ? eduCustom : eduSelect;
+            const socialSelect = (card.querySelector(".m-social").value || "").replace(/\t/g, " ");
+            const socialCustom = (card.querySelector(".m-social-custom").value || "").replace(/\t/g, " ");
+            const social = socialSelect === 'أخرى' ? socialCustom : socialSelect;
             const relSelect = (card.querySelector(".m-rel").value || "").replace(/\t/g, " ");
             const relCustom = (card.querySelector(".m-rel-custom").value || "").replace(/\t/g, " ");
             const rel = relSelect === 'أخرى' ? relCustom : relSelect;
