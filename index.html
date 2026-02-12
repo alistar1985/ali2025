@@ -167,6 +167,18 @@
 
         .photo-label { display: block; font-size: 0.9rem; font-weight: 700; color: var(--primary); margin-bottom: 8px; }
         .photo-input { padding: 10px; font-family: 'Cairo'; font-size: 0.9rem; }
+        .photo-input-hidden { position: absolute; width: 0; height: 0; opacity: 0; }
+        .photo-section .photo-btn-wrap { position: relative; }
+        .photo-tap-area {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            gap: 8px; padding: 28px 20px; border: 2px dashed var(--border);
+            border-radius: var(--radius); background: var(--accent-soft);
+            cursor: pointer; transition: border-color 0.2s, background 0.2s;
+            min-height: 120px;
+        }
+        .photo-tap-area:hover, .photo-tap-area:focus-within { border-color: var(--accent); background: #fef2f2; }
+        .photo-icon { font-size: 2.2rem; }
+        .photo-text { font-size: 0.95rem; font-weight: 700; color: var(--primary); }
         #duplicateWarning {
             color: var(--error);
             font-weight: 700;
@@ -194,7 +206,8 @@
         .member-card .grid { margin-top: 10px; }
         .member-card .m-rel-custom,
         .member-card .m-edu-custom,
-        .member-card .m-social-custom {
+        .member-card .m-social-custom,
+        .member-card .m-job-custom {
             grid-column: 1 / -1;
             margin-top: 4px;
         }
@@ -378,16 +391,37 @@
                 <input type="text" id="nationalId" placeholder="رقم البطاقة الموحدة">
                 <input type="text" id="cardId" placeholder="رقم البطاقة التموينية">
                 <input type="number" id="birth" placeholder="سنة التولد">
+                <select id="headGender">
+                    <option value="">جنس رب الأسرة</option>
+                    <option value="ذكر">ذكر</option>
+                    <option value="أنثى">أنثى</option>
+                </select>
                 <select id="education">
                     <option value="">التحصيل الدراسي</option>
                     <option>أمي</option><option>ابتدائية</option><option>متوسطة</option><option>إعدادية</option><option>دبلوم</option><option>بكالوريوس</option><option>دراسات عليا</option>
                 </select>
-                <input type="text" id="job" placeholder="المهنة">
+                <select id="jobType" onchange="toggleJobInput(this)">
+                    <option value="">نوع المهنة</option>
+                    <option value="عسكري">عسكري</option>
+                    <option value="منتسب">منتسب</option>
+                    <option value="موظف">موظف</option>
+                    <option value="كاسب">كاسب</option>
+                    <option value="ربة بيت">ربة بيت</option>
+                    <option value="موظفة">موظفة</option>
+                    <option value="أخرى">أخرى</option>
+                </select>
+                <input type="text" id="job" placeholder="المهنة (تفاصيل أو أخرى)" style="display:none;">
                 <input type="text" id="workLocation" placeholder="موقع العمل الحالي">
                 <input type="tel" id="phone" placeholder="رقم الهاتف" required>
-                <div class="input-wrap">
+                <div class="input-wrap photo-section">
                     <label for="photoInput" class="photo-label">📷 صورة رب الأسرة (اختياري)</label>
-                    <input type="file" id="photoInput" accept="image/jpeg,image/png,image/webp" class="photo-input">
+                    <div class="photo-btn-wrap">
+                        <input type="file" id="photoInput" accept="image/*" capture="environment" class="photo-input-hidden">
+                        <label for="photoInput" class="photo-tap-area">
+                            <span class="photo-icon">📷</span>
+                            <span class="photo-text" id="photoLabel">اضغط لالتقاط أو اختيار صورة</span>
+                        </label>
+                    </div>
                 </div>
             </div>
 
@@ -424,7 +458,7 @@
 </div>
 
 <script>
-    const scriptURL = "https://script.google.com/macros/s/AKfycbzRTLT9LSAQrXvYV2LKBx1qfJQlCpz92tLNNVIPEeEvtxZFFnwNwQSSp84FiVE6RytoiQ/exec"; 
+    const scriptURL = "https://script.google.com/macros/s/AKfycbyn8aLCnTwYegDdyQ9nyoV2VilM_JjD0Ky0a4Sk0Ox932KCAZCC9KyUatRINmcMnn-nlg/exec"; 
     const SECRET_TOKEN = "AL_QAIM_MUKHTAR_2026";
     let cachedNames = [];
 
@@ -480,7 +514,17 @@
                 </select>
                 <input type="text" class="m-rel-custom" placeholder="اكتب صلة القرابة يدوياً" style="display:none;">
                 <input type="number" class="m-birth" placeholder="سنة التولد">
-                <input type="text" class="m-job" placeholder="المهنة">
+                <select class="m-job-type" onchange="toggleMemberJobInput(this)">
+                    <option value="">نوع المهنة</option>
+                    <option value="عسكري">عسكري</option>
+                    <option value="منتسب">منتسب</option>
+                    <option value="موظف">موظف</option>
+                    <option value="كاسب">كاسب</option>
+                    <option value="ربة بيت">ربة بيت</option>
+                    <option value="موظفة">موظفة</option>
+                    <option value="أخرى">أخرى</option>
+                </select>
+                <input type="text" class="m-job-custom" placeholder="المهنة (تفاصيل أو أخرى)" style="display:none;">
                 <select class="m-edu" onchange="toggleEducationInput(this)">
                     <option value="">الدراسة</option>
                     <option>روضة</option>
@@ -550,6 +594,29 @@
         }
     }
 
+    function toggleJobInput(select) {
+        const jobInput = document.getElementById('job');
+        if (select.value === 'أخرى') {
+            jobInput.style.display = 'block';
+            jobInput.placeholder = 'اكتب المهنة يدوياً';
+        } else {
+            jobInput.style.display = 'none';
+            jobInput.value = '';
+            jobInput.placeholder = 'المهنة (تفاصيل أو أخرى)';
+        }
+    }
+
+    function toggleMemberJobInput(select) {
+        const card = select.closest('.member-card');
+        const customInput = card.querySelector('.m-job-custom');
+        if (select.value === 'أخرى') {
+            customInput.style.display = 'block';
+        } else {
+            customInput.style.display = 'none';
+            customInput.value = '';
+        }
+    }
+
     function showPreview() {
         const name = document.getElementById('name').value;
         if (!name || !document.getElementById('phone').value) { alert("يرجى ملء الاسم ورقم الهاتف"); return; }
@@ -566,11 +633,15 @@
             const socialSelect = card.querySelector(".m-social").value;
             const socialCustom = card.querySelector(".m-social-custom").value;
             const social = socialSelect === 'أخرى' ? socialCustom : socialSelect;
+            const jobType = (card.querySelector(".m-job-type") && card.querySelector(".m-job-type").value) || "";
+            const jobCustom = (card.querySelector(".m-job-custom") && card.querySelector(".m-job-custom").value) || "";
+            const job = (jobType === 'أخرى' ? jobCustom : jobType);
             if(n) {
                 familyHtml += `<div class="preview-item">
                     <span>${index+1}. ${n}</span> 
                     <div style="text-align:left; margin-top:4px; font-size:0.85rem; color:var(--text-muted);">
                         صلة القرابة: <b>${r || '—'}</b> | 
+                        المهنة: <b>${job || '—'}</b> | 
                         الدراسة: <b>${edu || '—'}</b> | 
                         الحالة: <b>${social || '—'}</b>
                     </div>
@@ -578,14 +649,17 @@
             }
         });
 
+        var jobTypeVal = document.getElementById('jobType').value;
+        var jobVal = (jobTypeVal === 'أخرى') ? document.getElementById('job').value : jobTypeVal;
         document.getElementById('previewData').innerHTML = `
             <div class="preview-group-title">👤 بيانات رب الأسرة</div>
             <div class="preview-item"><span>الاسم:</span> <span class="preview-val">${name}</span></div>
+            <div class="preview-item"><span>جنس رب الأسرة:</span> <span class="preview-val">${document.getElementById('headGender').value || '-'}</span></div>
             <div class="preview-item"><span>الموحدة:</span> <span class="preview-val">${document.getElementById('nationalId').value || '-'}</span></div>
             <div class="preview-item"><span>التموينية:</span> <span class="preview-val">${document.getElementById('cardId').value || '-'}</span></div>
             <div class="preview-item"><span>التولد:</span> <span class="preview-val">${document.getElementById('birth').value || '-'}</span></div>
             <div class="preview-item"><span>الدراسة:</span> <span class="preview-val">${document.getElementById('education').value || '-'}</span></div>
-            <div class="preview-item"><span>المهنة:</span> <span class="preview-val">${document.getElementById('job').value || '-'}</span></div>
+            <div class="preview-item"><span>المهنة:</span> <span class="preview-val">${jobVal || '-'}</span></div>
             <div class="preview-item"><span>الهاتف:</span> <span class="preview-val">${document.getElementById('phone').value}</span></div>
             
             <div class="preview-group-title">🏠 تفاصيل السكن</div>
@@ -609,7 +683,9 @@
             const n = card.querySelector(".m-name").value.trim();
             if (!n) return;
             const birth = (card.querySelector(".m-birth").value || "").replace(/\t/g, " ");
-            const job = (card.querySelector(".m-job").value || "").replace(/\t/g, " ");
+            const jobType = (card.querySelector(".m-job-type").value || "").replace(/\t/g, " ");
+            const jobCustom = (card.querySelector(".m-job-custom").value || "").replace(/\t/g, " ");
+            const job = (jobType === 'أخرى' ? jobCustom : jobType);
             const eduSelect = (card.querySelector(".m-edu").value || "").replace(/\t/g, " ");
             const eduCustom = (card.querySelector(".m-edu-custom").value || "").replace(/\t/g, " ");
             const edu = eduSelect === 'أخرى' ? eduCustom : eduSelect;
@@ -626,6 +702,8 @@
         const hasPhoto = photoInput.files && photoInput.files[0];
 
         function doSubmit(photoIdOrNull) {
+            var jobTypeVal = document.getElementById('jobType').value;
+            var jobVal = (jobTypeVal === 'أخرى') ? document.getElementById('job').value : jobTypeVal;
             var formData = new URLSearchParams();
             formData.append("token", SECRET_TOKEN);
             formData.append("serialId", sId);
@@ -633,8 +711,9 @@
             formData.append("nationalId", document.getElementById('nationalId').value);
             formData.append("cardId", document.getElementById('cardId').value);
             formData.append("birth", document.getElementById('birth').value);
+            formData.append("headGender", document.getElementById('headGender').value || "");
             formData.append("education", document.getElementById('education').value);
-            formData.append("job", document.getElementById('job').value);
+            formData.append("job", jobVal || "");
             formData.append("workLocation", document.getElementById('workLocation').value);
             formData.append("phone", document.getElementById('phone').value);
             formData.append("homeType", document.getElementById('homeType').value);
@@ -656,6 +735,8 @@
         if (hasPhoto) {
             var reader = new FileReader();
             reader.onload = function() {
+                var jobTypeVal = document.getElementById('jobType').value;
+                var jobVal = (jobTypeVal === 'أخرى') ? document.getElementById('job').value : jobTypeVal;
                 var payload = {
                     token: SECRET_TOKEN,
                     serialId: sId,
@@ -663,8 +744,9 @@
                     nationalId: document.getElementById('nationalId').value,
                     cardId: document.getElementById('cardId').value,
                     birth: document.getElementById('birth').value,
+                    headGender: document.getElementById('headGender').value || "",
                     education: document.getElementById('education').value,
-                    job: document.getElementById('job').value,
+                    job: jobVal || "",
                     workLocation: document.getElementById('workLocation').value,
                     phone: document.getElementById('phone').value,
                     homeType: document.getElementById('homeType').value,
@@ -689,6 +771,11 @@
         }
     }
 
+    document.getElementById('photoInput').addEventListener('change', function() {
+        const lbl = document.getElementById('photoLabel');
+        if (this.files && this.files[0]) lbl.textContent = '✓ تم اختيار: ' + this.files[0].name;
+        else lbl.textContent = 'اضغط لالتقاط أو اختيار صورة';
+    });
     window.onload = () => { addMember(); loadDatabase(); };
 </script>
 </body>
