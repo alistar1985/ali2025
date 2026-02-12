@@ -437,7 +437,7 @@
                 <div class="input-wrap photo-section">
                     <label for="photoInput" class="photo-label">📷 صورة رب الأسرة (اختياري)</label>
                     <div class="photo-btn-wrap">
-                        <input type="file" id="photoInput" accept="image/*" capture="environment" class="photo-input-hidden">
+                        <input type="file" id="photoInput" accept="image/*" class="photo-input-hidden">
                         <label for="photoInput" class="photo-tap-area">
                             <span class="photo-icon">📷</span>
                             <span class="photo-text" id="photoLabel">اضغط لالتقاط أو اختيار صورة</span>
@@ -451,8 +451,8 @@
                 <label for="homeType" class="sr-only">نوع السكن</label>
                 <select id="homeType" aria-label="نوع السكن"><option>ملك</option><option>إيجار</option><option>عشوائيات</option></select>
                 <input type="text" id="prevAddress" placeholder="عنوان السكن السابق" aria-label="عنوان السكن السابق">
-                <input type="text" id="address" placeholder="العنوان الحالي" aria-label="العنوان الحالي">
-                <input type="text" id="moveDate" placeholder="تاريخ السكن">
+                <input type="text" id="address" placeholder="أقرب نقطة دالة" aria-label="أقرب نقطة دالة (العنوان الحالي)">
+                <input type="text" id="moveDate" placeholder="تاريخ السكن الحالي">
                 <input type="text" id="taboo" placeholder="رقم الطابو">
                 <input type="text" id="homeNum" placeholder="رقم الدار">
             </div>
@@ -809,8 +809,8 @@
         if (phoneVal.length !== 11) msg.push('رقم الهاتف (11 رقم بالضبط)');
         if (!document.getElementById('homeType').value) msg.push('نوع السكن');
         if (!document.getElementById('prevAddress').value.trim()) msg.push('عنوان السكن السابق');
-        if (!document.getElementById('address').value.trim()) msg.push('العنوان الحالي');
-        if (!document.getElementById('moveDate').value.trim()) msg.push('تاريخ السكن');
+        if (!document.getElementById('address').value.trim()) msg.push('أقرب نقطة دالة');
+        if (!document.getElementById('moveDate').value.trim()) msg.push('تاريخ السكن الحالي');
         if (!document.getElementById('taboo').value.trim()) msg.push('رقم الطابو');
         if (!document.getElementById('homeNum').value.trim()) msg.push('رقم الدار');
         document.querySelectorAll('.member-card').forEach((card, i) => {
@@ -900,7 +900,7 @@
             
             <div class="preview-group-title">🏠 تفاصيل السكن</div>
             <div class="preview-item"><span>نوع السكن:</span> <span class="preview-val">${document.getElementById('homeType').value}</span></div>
-            <div class="preview-item"><span>العنوان الحالي:</span> <span class="preview-val">${document.getElementById('address').value || '-'}</span></div>
+            <div class="preview-item"><span>أقرب نقطة دالة:</span> <span class="preview-val">${document.getElementById('address').value || '-'}</span></div>
             <div class="preview-item"><span>رقم الدار:</span> <span class="preview-val">${document.getElementById('homeNum').value || '-'}</span></div>
 
             <div class="preview-group-title">👨‍👩‍👧‍👦 أفراد العائلة</div>
