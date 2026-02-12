@@ -179,7 +179,8 @@
         .photo-tap-area:hover, .photo-tap-area:focus-within { border-color: var(--accent); background: #fef2f2; }
         .photo-icon { font-size: 2.2rem; }
         .photo-text { font-size: 0.95rem; font-weight: 700; color: var(--primary); }
-        #duplicateWarning {
+        .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
+        #duplicateWarning, #birthError, #phoneError, .field-error {
             color: var(--error);
             font-weight: 700;
             font-size: 0.8rem;
@@ -209,6 +210,8 @@
         .member-card .m-social-custom,
         .member-card .m-job-custom {
             grid-column: 1 / -1;
+        }
+        .member-card .m-rel-custom, .member-card .m-edu-custom, .member-card .m-social-custom, .member-card .m-job-custom {
             margin-top: 4px;
         }
         .member-card .btn-remove {
@@ -319,6 +322,12 @@
             gap: 12px;
         }
         .preview-val { font-weight: 700; color: var(--text); }
+        .preview-photo-wrap {
+            text-align: center; margin: 12px 0; padding: 12px;
+            background: #f8fafc; border-radius: var(--radius); border: 2px dashed var(--border);
+        }
+        .preview-photo-img { max-width: 100%; max-height: 200px; border-radius: 10px; object-fit: contain; }
+        .preview-photo-loading { color: var(--text-muted); font-size: 0.9rem; padding: 20px; }
         .modal-btns {
             display: flex;
             gap: 12px;
@@ -385,13 +394,21 @@
             <div class="section-head">👤 بيانات رب الأسرة</div>
             <div class="grid">
                 <div class="input-wrap">
-                    <input type="text" id="name" placeholder="الاسم الرباعي واللقب" required oninput="instantCheck(this.value)">
+                    <label for="name" class="sr-only">الاسم الرباعي واللقب</label>
+                    <input type="text" id="name" placeholder="الاسم الرباعي واللقب" required oninput="instantCheck(this.value)" aria-describedby="duplicateWarning" aria-invalid="false">
                     <div id="duplicateWarning">⚠️ هذا الاسم مسجل مسبقاً! لا يمكن الإرسال.</div>
                 </div>
-                <input type="text" id="nationalId" placeholder="رقم البطاقة الموحدة">
-                <input type="text" id="cardId" placeholder="رقم البطاقة التموينية">
-                <input type="number" id="birth" placeholder="سنة التولد">
-                <select id="headGender">
+                <label for="nationalId" class="sr-only">رقم البطاقة الموحدة</label>
+                <input type="text" id="nationalId" placeholder="رقم البطاقة الموحدة" aria-label="رقم البطاقة الموحدة">
+                <label for="cardId" class="sr-only">رقم البطاقة التموينية</label>
+                <input type="text" id="cardId" placeholder="رقم البطاقة التموينية" aria-label="رقم البطاقة التموينية">
+                <div class="input-wrap">
+                    <label for="birth" class="sr-only">سنة التولد</label>
+                    <input type="text" inputmode="numeric" pattern="[0-9]*" id="birth" placeholder="سنة التولد فقط، مثال: 1980" maxlength="4" oninput="validateBirth(this)" aria-describedby="birthError" aria-label="سنة التولد">
+                    <div id="birthError" class="field-error" style="display:none;">⚠️ أدخل سنة مكونة من 4 أرقام فقط (مثال: 1980)</div>
+                </div>
+                <label for="headGender" class="sr-only">جنس رب الأسرة</label>
+                <select id="headGender" aria-label="جنس رب الأسرة">
                     <option value="">جنس رب الأسرة</option>
                     <option value="ذكر">ذكر</option>
                     <option value="أنثى">أنثى</option>
@@ -411,8 +428,12 @@
                     <option value="أخرى">أخرى</option>
                 </select>
                 <input type="text" id="job" placeholder="المهنة (تفاصيل أو أخرى)" style="display:none;">
-                <input type="text" id="workLocation" placeholder="موقع العمل الحالي">
-                <input type="tel" id="phone" placeholder="رقم الهاتف" required>
+                <input type="text" id="workLocation" placeholder="موقع العمل الحالي" aria-label="موقع العمل الحالي">
+                <div class="input-wrap">
+                    <label for="phone" class="sr-only">رقم الهاتف</label>
+                    <input type="tel" id="phone" placeholder="رقم الهاتف (11 رقم)" required maxlength="11" oninput="validatePhone(this)" aria-describedby="phoneError">
+                    <div id="phoneError" class="field-error" style="display:none;">⚠️ أدخل رقم هاتف صحيح (11 رقم فقط)</div>
+                </div>
                 <div class="input-wrap photo-section">
                     <label for="photoInput" class="photo-label">📷 صورة رب الأسرة (اختياري)</label>
                     <div class="photo-btn-wrap">
@@ -427,9 +448,10 @@
 
             <div class="section-head">🏠 تفاصيل السكن</div>
             <div class="grid">
-                <select id="homeType"><option>ملك</option><option>إيجار</option><option>عشوائيات</option></select>
-                <input type="text" id="prevAddress" placeholder="عنوان السكن السابق">
-                <input type="text" id="address" placeholder="العنوان الحالي">
+                <label for="homeType" class="sr-only">نوع السكن</label>
+                <select id="homeType" aria-label="نوع السكن"><option>ملك</option><option>إيجار</option><option>عشوائيات</option></select>
+                <input type="text" id="prevAddress" placeholder="عنوان السكن السابق" aria-label="عنوان السكن السابق">
+                <input type="text" id="address" placeholder="العنوان الحالي" aria-label="العنوان الحالي">
                 <input type="text" id="moveDate" placeholder="تاريخ السكن">
                 <input type="text" id="taboo" placeholder="رقم الطابو">
                 <input type="text" id="homeNum" placeholder="رقم الدار">
@@ -450,46 +472,195 @@
 
     <div id="successScreen">
         <div class="icon">✔️</div>
-        <h2>تم الحفظ بنجاح!</h2>
+        <h2>تم إرسال البيانات</h2>
         <p id="serialDisplay"></p>
+        <p style="font-size:0.9rem; color:var(--text-muted); margin-top:8px;">تحقق من الجدول خلال دقائق للتأكد من ظهور السجل.</p>
         <button type="button" class="btn-submit" onclick="location.reload()">إدخال استمارة جديدة</button>
     </div>
 </div>
 </div>
 
 <script>
-    const scriptURL = "https://script.google.com/macros/s/AKfycbyn8aLCnTwYegDdyQ9nyoV2VilM_JjD0Ky0a4Sk0Ox932KCAZCC9KyUatRINmcMnn-nlg/exec"; 
+    const scriptURL = "https://script.google.com/macros/s/AKfycbyN4f3BVyLNTWOJVsVOcjHeg2P8vk9TJlaGNx8dpnvInEmetM5Tg23qK3khzarKs1Knkw/exec"; 
     const SECRET_TOKEN = "AL_QAIM_MUKHTAR_2026";
-    let cachedNames = [];
+    let checkNameTimeout = null;
+    let draftTimeout = null;
+    const DRAFT_KEY = 'census_form_draft';
 
-    // جلب قاعدة البيانات عند التشغيل للفحص الفوري
-    async function loadDatabase() {
+    function saveDraft() {
         try {
-            const res = await fetch(`${scriptURL}?token=${SECRET_TOKEN}&getAllNames=true`);
-            const data = await res.json();
-            cachedNames = data.names.map(n => n.toString().trim());
-            document.getElementById('loadingStatus').innerText = "✅ تم تحديث قاعدة البيانات (الفحص الفوري نشط)";
-            document.getElementById('loadingStatus').style.color = "green";
-        } catch (e) {
-            document.getElementById('loadingStatus').innerText = "⚠️ فشل التحديث التلقائي (سيتم الفحص عند الكتابة)";
+            var members = [];
+            document.querySelectorAll('.member-card').forEach(function(card) {
+                members.push({
+                    name: (card.querySelector('.m-name') && card.querySelector('.m-name').value) || '',
+                    rel: (card.querySelector('.m-rel') && card.querySelector('.m-rel').value) || '',
+                    relCustom: (card.querySelector('.m-rel-custom') && card.querySelector('.m-rel-custom').value) || '',
+                    birth: (card.querySelector('.m-birth') && card.querySelector('.m-birth').value) || '',
+                    jobType: (card.querySelector('.m-job-type') && card.querySelector('.m-job-type').value) || '',
+                    jobCustom: (card.querySelector('.m-job-custom') && card.querySelector('.m-job-custom').value) || '',
+                    edu: (card.querySelector('.m-edu') && card.querySelector('.m-edu').value) || '',
+                    eduCustom: (card.querySelector('.m-edu-custom') && card.querySelector('.m-edu-custom').value) || '',
+                    social: (card.querySelector('.m-social') && card.querySelector('.m-social').value) || '',
+                    socialCustom: (card.querySelector('.m-social-custom') && card.querySelector('.m-social-custom').value) || ''
+                });
+            });
+            var draft = {
+                name: document.getElementById('name') && document.getElementById('name').value,
+                nationalId: document.getElementById('nationalId') && document.getElementById('nationalId').value,
+                cardId: document.getElementById('cardId') && document.getElementById('cardId').value,
+                birth: document.getElementById('birth') && document.getElementById('birth').value,
+                headGender: document.getElementById('headGender') && document.getElementById('headGender').value,
+                education: document.getElementById('education') && document.getElementById('education').value,
+                jobType: document.getElementById('jobType') && document.getElementById('jobType').value,
+                job: document.getElementById('job') && document.getElementById('job').value,
+                workLocation: document.getElementById('workLocation') && document.getElementById('workLocation').value,
+                phone: document.getElementById('phone') && document.getElementById('phone').value,
+                homeType: document.getElementById('homeType') && document.getElementById('homeType').value,
+                prevAddress: document.getElementById('prevAddress') && document.getElementById('prevAddress').value,
+                address: document.getElementById('address') && document.getElementById('address').value,
+                moveDate: document.getElementById('moveDate') && document.getElementById('moveDate').value,
+                taboo: document.getElementById('taboo') && document.getElementById('taboo').value,
+                homeNum: document.getElementById('homeNum') && document.getElementById('homeNum').value,
+                notes: document.getElementById('notes') && document.getElementById('notes').value,
+                members: members
+            };
+            localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+        } catch (e) {}
+    }
+
+    function clearDraft() {
+        try { localStorage.removeItem(DRAFT_KEY); } catch (e) {}
+    }
+
+    function scheduleDraftSave() {
+        if (draftTimeout) clearTimeout(draftTimeout);
+        draftTimeout = setTimeout(saveDraft, 800);
+    }
+
+    function restoreDraft() {
+        try {
+            var raw = localStorage.getItem(DRAFT_KEY);
+            if (!raw) return false;
+            var d = JSON.parse(raw);
+            if (!d) return false;
+            if (document.getElementById('name')) document.getElementById('name').value = d.name || '';
+            if (document.getElementById('nationalId')) document.getElementById('nationalId').value = d.nationalId || '';
+            if (document.getElementById('cardId')) document.getElementById('cardId').value = d.cardId || '';
+            if (document.getElementById('birth')) document.getElementById('birth').value = d.birth || '';
+            if (document.getElementById('headGender')) document.getElementById('headGender').value = d.headGender || '';
+            if (document.getElementById('education')) document.getElementById('education').value = d.education || '';
+            if (document.getElementById('jobType')) document.getElementById('jobType').value = d.jobType || '';
+            if (document.getElementById('job')) document.getElementById('job').value = d.job || '';
+            if (document.getElementById('workLocation')) document.getElementById('workLocation').value = d.workLocation || '';
+            var phoneEl = document.getElementById('phone');
+            if (phoneEl) { phoneEl.value = d.phone || ''; validatePhone(phoneEl); }
+            if (document.getElementById('homeType')) document.getElementById('homeType').value = d.homeType || '';
+            if (document.getElementById('prevAddress')) document.getElementById('prevAddress').value = d.prevAddress || '';
+            if (document.getElementById('address')) document.getElementById('address').value = d.address || '';
+            if (document.getElementById('moveDate')) document.getElementById('moveDate').value = d.moveDate || '';
+            if (document.getElementById('taboo')) document.getElementById('taboo').value = d.taboo || '';
+            if (document.getElementById('homeNum')) document.getElementById('homeNum').value = d.homeNum || '';
+            if (document.getElementById('notes')) document.getElementById('notes').value = d.notes || '';
+            var container = document.getElementById('membersContainer');
+            if (container && d.members && d.members.length > 0) {
+                container.innerHTML = '';
+                d.members.forEach(function() { addMember(); });
+                var cards = container.querySelectorAll('.member-card');
+                d.members.forEach(function(m, i) {
+                    if (!cards[i]) return;
+                    var c = cards[i];
+                    if (c.querySelector('.m-name')) c.querySelector('.m-name').value = m.name || '';
+                    if (c.querySelector('.m-rel')) c.querySelector('.m-rel').value = m.rel || '';
+                    if (c.querySelector('.m-rel-custom')) c.querySelector('.m-rel-custom').value = m.relCustom || '';
+                    if (c.querySelector('.m-birth')) c.querySelector('.m-birth').value = m.birth || '';
+                    if (c.querySelector('.m-job-type')) c.querySelector('.m-job-type').value = m.jobType || '';
+                    if (c.querySelector('.m-job-custom')) c.querySelector('.m-job-custom').value = m.jobCustom || '';
+                    if (c.querySelector('.m-edu')) c.querySelector('.m-edu').value = m.edu || '';
+                    if (c.querySelector('.m-edu-custom')) c.querySelector('.m-edu-custom').value = m.eduCustom || '';
+                    if (c.querySelector('.m-social')) c.querySelector('.m-social').value = m.social || '';
+                    if (c.querySelector('.m-social-custom')) c.querySelector('.m-social-custom').value = m.socialCustom || '';
+                });
+            }
+            return true;
+        } catch (e) { return false; }
+    }
+
+    // الفحص يتم على السيرفر: لا جلب لقائمة الأسماء
+    function initNameCheck() {
+        const el = document.getElementById('loadingStatus');
+        if (el) el.innerText = "✅ الفحص الفوري يتم عبر السيرفر (عند الكتابة)";
+        if (el) el.style.color = "green";
+    }
+
+    function validatePhone(input) {
+        var v = (input.value || '').replace(/\D/g, '');
+        if (v.length > 11) v = v.slice(0, 11);
+        input.value = v;
+        const errEl = document.getElementById('phoneError');
+        if (v.length > 0 && v.length !== 11) {
+            if (errEl) { errEl.style.display = 'block'; errEl.textContent = '⚠️ رقم الهاتف 11 رقم بالضبط'; }
+            input.setCustomValidity('رقم الهاتف 11 رقم بالضبط');
+        } else {
+            if (errEl) errEl.style.display = 'none';
+            input.setCustomValidity('');
         }
     }
 
-    // فحص فوري بدون تأخير
+    function validateBirth(input) {
+        const errEl = document.getElementById('birthError');
+        const val = input.value.replace(/[^0-9]/g, '');
+        input.value = val;
+        if (val.length > 4) {
+            input.value = val.slice(0, 4);
+        }
+        const finalVal = input.value;
+        if (finalVal.length > 0 && (finalVal.length !== 4 || !/^\d{4}$/.test(finalVal))) {
+            if (errEl) { errEl.style.display = 'block'; errEl.textContent = '⚠️ أدخل سنة مكونة من 4 أرقام فقط (مثال: 1980)'; }
+            input.style.border = '2px solid var(--error)';
+            return false;
+        } else {
+            if (errEl) errEl.style.display = 'none';
+            input.style.border = '';
+            return true;
+        }
+    }
+
+    function validateMemberBirth(input) {
+        const val = input.value.replace(/[^0-9]/g, '');
+        input.value = val;
+        if (val.length > 4) {
+            input.value = val.slice(0, 4);
+        }
+    }
+
+    // عند تغيير أي حرف: إخفاء التحذير فوراً، ثم فحص السيرفر بعد قليل
     function instantCheck(currentName) {
         const warning = document.getElementById('duplicateWarning');
         const btn = document.getElementById('previewBtn');
         const nameInput = document.getElementById('name');
-        
-        if (cachedNames.includes(currentName.trim())) {
-            warning.style.display = 'block';
-            btn.disabled = true;
-            nameInput.style.border = "2px solid var(--error)";
-        } else {
-            warning.style.display = 'none';
-            btn.disabled = false;
-            nameInput.style.border = "1px solid #ccc";
-        }
+        if (warning) warning.style.display = 'none';
+        if (btn) btn.disabled = false;
+        if (nameInput) { nameInput.style.border = "1px solid #ccc"; nameInput.setAttribute('aria-invalid', 'false'); }
+
+        const name = (currentName || '').trim();
+        if (!name) return;
+
+        if (checkNameTimeout) clearTimeout(checkNameTimeout);
+        checkNameTimeout = setTimeout(function() {
+            var nameSent = name;
+            var url = scriptURL + '?token=' + encodeURIComponent(SECRET_TOKEN) + '&checkName=' + encodeURIComponent(nameSent);
+            fetch(url).then(function(res) { return res.json(); }).then(function(data) {
+                var currentNow = (nameInput && nameInput.value) ? nameInput.value.trim() : '';
+                if (currentNow !== nameSent) return;
+                if (data.exists) {
+                    if (warning) warning.style.display = 'block';
+                    if (btn) btn.disabled = true;
+                    if (nameInput) { nameInput.style.border = "2px solid var(--error)"; nameInput.setAttribute('aria-invalid', 'true'); }
+                } else {
+                    if (nameInput) nameInput.setAttribute('aria-invalid', 'false');
+                }
+            }).catch(function() {});
+        }, 280);
     }
 
     function addMember() {
@@ -513,9 +684,10 @@
                     <option>أخرى</option>
                 </select>
                 <input type="text" class="m-rel-custom" placeholder="اكتب صلة القرابة يدوياً" style="display:none;">
-                <input type="number" class="m-birth" placeholder="سنة التولد">
+                <input type="text" inputmode="numeric" pattern="[0-9]*" class="m-birth" placeholder="سنة التولد فقط (4 أرقام، مثال: 1980)" maxlength="4" oninput="validateMemberBirth(this)">
                 <select class="m-job-type" onchange="toggleMemberJobInput(this)">
                     <option value="">نوع المهنة</option>
+                    <option value="طفل فقط">طفل فقط</option>
                     <option value="عسكري">عسكري</option>
                     <option value="منتسب">منتسب</option>
                     <option value="موظف">موظف</option>
@@ -617,9 +789,70 @@
         }
     }
 
+    function validateAllFields() {
+        const msg = [];
+        if (!document.getElementById('name').value.trim()) msg.push('الاسم الرباعي');
+        if (!document.getElementById('nationalId').value.trim()) msg.push('رقم البطاقة الموحدة');
+        if (!document.getElementById('cardId').value.trim()) msg.push('رقم البطاقة التموينية');
+        const birthVal = document.getElementById('birth').value.trim();
+        if (!birthVal) msg.push('سنة التولد');
+        else if (birthVal.length !== 4 || !/^\d{4}$/.test(birthVal)) msg.push('سنة التولد (بيانات خطأ - 4 أرقام فقط مثل 1980)');
+        const hg = document.getElementById('headGender').value;
+        if (!hg) msg.push('جنس رب الأسرة');
+        const edu = document.getElementById('education').value;
+        if (!edu) msg.push('التحصيل الدراسي');
+        const jt = document.getElementById('jobType').value;
+        if (!jt) msg.push('المهنة');
+        if (jt === 'أخرى' && !document.getElementById('job').value.trim()) msg.push('تفاصيل المهنة');
+        if (!document.getElementById('workLocation').value.trim()) msg.push('موقع العمل');
+        const phoneVal = (document.getElementById('phone').value || '').replace(/\D/g, '');
+        if (phoneVal.length !== 11) msg.push('رقم الهاتف (11 رقم بالضبط)');
+        if (!document.getElementById('homeType').value) msg.push('نوع السكن');
+        if (!document.getElementById('prevAddress').value.trim()) msg.push('عنوان السكن السابق');
+        if (!document.getElementById('address').value.trim()) msg.push('العنوان الحالي');
+        if (!document.getElementById('moveDate').value.trim()) msg.push('تاريخ السكن');
+        if (!document.getElementById('taboo').value.trim()) msg.push('رقم الطابو');
+        if (!document.getElementById('homeNum').value.trim()) msg.push('رقم الدار');
+        document.querySelectorAll('.member-card').forEach((card, i) => {
+            const n = card.querySelector('.m-name').value.trim();
+            if (!n) return;
+            const r = card.querySelector('.m-rel').value;
+            const rC = card.querySelector('.m-rel-custom').value;
+            if (!r || (r === 'أخرى' && !rC.trim())) msg.push('صلة القرابة للعضو ' + (i+1));
+            const mb = card.querySelector('.m-birth').value.trim();
+            if (!mb) msg.push('سنة التولد للعضو ' + (i+1));
+            else if (mb.length !== 4 || !/^\d{4}$/.test(mb)) msg.push('سنة التولد للعضو ' + (i+1) + ' (بيانات خطأ - 4 أرقام فقط)');
+            const mj = card.querySelector('.m-job-type').value;
+            if (!mj) msg.push('المهنة للعضو ' + (i+1));
+            if (mj === 'أخرى' && !card.querySelector('.m-job-custom').value.trim()) msg.push('تفاصيل المهنة للعضو ' + (i+1));
+            const med = card.querySelector('.m-edu').value;
+            if (!med) msg.push('الدراسة للعضو ' + (i+1));
+            if (med === 'أخرى' && !card.querySelector('.m-edu-custom').value.trim()) msg.push('تفاصيل الدراسة للعضو ' + (i+1));
+            const mso = card.querySelector('.m-social').value;
+            if (!mso) msg.push('الحالة الاجتماعية للعضو ' + (i+1));
+            if (mso === 'أخرى' && !card.querySelector('.m-social-custom').value.trim()) msg.push('تفاصيل الحالة للعضو ' + (i+1));
+        });
+        return msg;
+    }
+
     function showPreview() {
+        const errors = validateAllFields();
+        if (errors.length > 0) {
+            alert('يرجى ملء جميع الحقول المطلوبة:\n\n• ' + errors.join('\n• '));
+            return;
+        }
         const name = document.getElementById('name').value;
-        if (!name || !document.getElementById('phone').value) { alert("يرجى ملء الاسم ورقم الهاتف"); return; }
+        
+        const photoInput = document.getElementById('photoInput');
+        const hasPhoto = photoInput.files && photoInput.files[0];
+        if (hasPhoto) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const cont = document.getElementById('previewPhotoContainer');
+                if (cont) cont.innerHTML = '<img src="' + e.target.result + '" alt="صورة رب الأسرة" class="preview-photo-img">';
+            };
+            reader.readAsDataURL(photoInput.files[0]);
+        }
         
         let familyHtml = "";
         document.querySelectorAll(".member-card").forEach((card, index) => {
@@ -651,7 +884,10 @@
 
         var jobTypeVal = document.getElementById('jobType').value;
         var jobVal = (jobTypeVal === 'أخرى') ? document.getElementById('job').value : jobTypeVal;
-        document.getElementById('previewData').innerHTML = `
+        
+        const photoBlock = hasPhoto ? '<div class="preview-group-title">📷 صورة رب الأسرة</div><div id="previewPhotoContainer" class="preview-photo-wrap"><div class="preview-photo-loading">جاري تحميل الصورة...</div></div>' : '';
+        
+        document.getElementById('previewData').innerHTML = photoBlock + `
             <div class="preview-group-title">👤 بيانات رب الأسرة</div>
             <div class="preview-item"><span>الاسم:</span> <span class="preview-val">${name}</span></div>
             <div class="preview-item"><span>جنس رب الأسرة:</span> <span class="preview-val">${document.getElementById('headGender').value || '-'}</span></div>
@@ -675,7 +911,36 @@
 
     function closeModal() { document.getElementById('reviewModal').style.display = 'none'; }
 
+    function compressImage(file, maxWidth, quality) {
+        return new Promise(function(resolve, reject) {
+            var img = new Image();
+            var url = URL.createObjectURL(file);
+            img.onload = function() {
+                URL.revokeObjectURL(url);
+                var w = img.width, h = img.height;
+                if (w > maxWidth) { h = (h * maxWidth) / w; w = maxWidth; }
+                var canvas = document.createElement('canvas');
+                canvas.width = w;
+                canvas.height = h;
+                var ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, w, h);
+                try {
+                    var dataUrl = canvas.toDataURL('image/jpeg', quality);
+                    resolve(dataUrl);
+                } catch (e) { reject(e); }
+            };
+            img.onerror = function() { URL.revokeObjectURL(url); reject(new Error('تحميل الصورة فشل')); };
+            img.src = url;
+        });
+    }
+
     function finalSend() {
+        var phoneVal = (document.getElementById('phone').value || '').replace(/\D/g, '');
+        if (phoneVal.length !== 11) {
+            alert('رقم الهاتف: أدخل 11 رقم بالضبط.');
+            return;
+        }
+
         const sId = "QA-" + Math.floor(Math.random()*900000+100000);
         let family = "";
         const sep = "\t";
@@ -698,76 +963,72 @@
             family += (i + 1) + sep + n.replace(/\t/g, " ") + sep + birth + sep + job + sep + edu + sep + social + sep + rel + "\n";
         });
 
-        const photoInput = document.getElementById('photoInput');
-        const hasPhoto = photoInput.files && photoInput.files[0];
+        var jobTypeVal = document.getElementById('jobType').value;
+        var jobVal = (jobTypeVal === 'أخرى') ? document.getElementById('job').value : jobTypeVal;
+        var payload = {
+            token: SECRET_TOKEN,
+            action: 'addRow',
+            serialId: sId,
+            name: document.getElementById('name').value.trim(),
+            nationalId: document.getElementById('nationalId').value.trim(),
+            cardId: document.getElementById('cardId').value.trim(),
+            birth: document.getElementById('birth').value.trim(),
+            headGender: document.getElementById('headGender').value || "",
+            education: document.getElementById('education').value || "",
+            job: jobVal || "",
+            workLocation: document.getElementById('workLocation').value.trim(),
+            phone: document.getElementById('phone').value.replace(/\D/g, ''),
+            homeType: document.getElementById('homeType').value || "",
+            address: document.getElementById('address').value.trim(),
+            prevAddress: document.getElementById('prevAddress').value.trim(),
+            moveDate: document.getElementById('moveDate').value.trim(),
+            taboo: document.getElementById('taboo').value.trim(),
+            homeNum: document.getElementById('homeNum').value.trim(),
+            familyMembers: family,
+            notes: document.getElementById('notes').value.trim() || ""
+        };
 
-        function doSubmit(photoIdOrNull) {
-            var jobTypeVal = document.getElementById('jobType').value;
-            var jobVal = (jobTypeVal === 'أخرى') ? document.getElementById('job').value : jobTypeVal;
-            var formData = new URLSearchParams();
-            formData.append("token", SECRET_TOKEN);
-            formData.append("serialId", sId);
-            formData.append("name", document.getElementById('name').value);
-            formData.append("nationalId", document.getElementById('nationalId').value);
-            formData.append("cardId", document.getElementById('cardId').value);
-            formData.append("birth", document.getElementById('birth').value);
-            formData.append("headGender", document.getElementById('headGender').value || "");
-            formData.append("education", document.getElementById('education').value);
-            formData.append("job", jobVal || "");
-            formData.append("workLocation", document.getElementById('workLocation').value);
-            formData.append("phone", document.getElementById('phone').value);
-            formData.append("homeType", document.getElementById('homeType').value);
-            formData.append("address", document.getElementById('address').value);
-            formData.append("prevAddress", document.getElementById('prevAddress').value);
-            formData.append("moveDate", document.getElementById('moveDate').value);
-            formData.append("taboo", document.getElementById('taboo').value);
-            formData.append("homeNum", document.getElementById('homeNum').value);
-            formData.append("familyMembers", family);
-            formData.append("notes", document.getElementById('notes').value || "");
+        var btn = document.querySelector('.btn-confirm');
+        if (btn) { btn.disabled = true; btn.textContent = 'جاري الحفظ...'; }
 
-            fetch(scriptURL, { method: 'POST', body: formData, mode: 'no-cors' });
-            closeModal();
-            document.getElementById('formSection').style.display = 'none';
-            document.getElementById('successScreen').style.display = 'block';
-            document.getElementById('serialDisplay').innerText = "رقم المعاملة: " + sId;
-        }
-
-        if (hasPhoto) {
-            var reader = new FileReader();
-            reader.onload = function() {
-                var jobTypeVal = document.getElementById('jobType').value;
-                var jobVal = (jobTypeVal === 'أخرى') ? document.getElementById('job').value : jobTypeVal;
-                var payload = {
-                    token: SECRET_TOKEN,
-                    serialId: sId,
-                    name: document.getElementById('name').value,
-                    nationalId: document.getElementById('nationalId').value,
-                    cardId: document.getElementById('cardId').value,
-                    birth: document.getElementById('birth').value,
-                    headGender: document.getElementById('headGender').value || "",
-                    education: document.getElementById('education').value,
-                    job: jobVal || "",
-                    workLocation: document.getElementById('workLocation').value,
-                    phone: document.getElementById('phone').value,
-                    homeType: document.getElementById('homeType').value,
-                    address: document.getElementById('address').value,
-                    prevAddress: document.getElementById('prevAddress').value,
-                    moveDate: document.getElementById('moveDate').value,
-                    taboo: document.getElementById('taboo').value,
-                    homeNum: document.getElementById('homeNum').value,
-                    familyMembers: family,
-                    notes: document.getElementById('notes').value || "",
-                    photoBase64: reader.result
-                };
-                fetch(scriptURL, { method: 'POST', body: JSON.stringify(payload), headers: { 'Content-Type': 'application/json' }, mode: 'no-cors' });
+        function onDone(success, errMsg) {
+            if (btn) { btn.disabled = false; btn.textContent = 'تأكيد وحفظ البيانات ✅'; }
+            if (success) {
+                clearDraft();
                 closeModal();
                 document.getElementById('formSection').style.display = 'none';
                 document.getElementById('successScreen').style.display = 'block';
                 document.getElementById('serialDisplay').innerText = "رقم المعاملة: " + sId;
-            };
-            reader.readAsDataURL(photoInput.files[0]);
+            } else {
+                alert(errMsg || 'تحقق من الاتصال وحاول مرة أخرى.');
+            }
+        }
+
+        var photoInput = document.getElementById('photoInput');
+        var hasPhoto = photoInput.files && photoInput.files[0];
+
+        function doSend() {
+            fetch(scriptURL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+                mode: 'no-cors'
+            }).then(function() {
+                onDone(true);
+            }).catch(function(e) {
+                onDone(false, e && e.message ? e.message : 'تحقق من الاتصال وحاول مرة أخرى.');
+            });
+        }
+
+        if (hasPhoto) {
+            compressImage(photoInput.files[0], 1200, 0.75).then(function(photoBase64) {
+                payload.photoBase64 = photoBase64;
+                doSend();
+            }).catch(function(e) {
+                onDone(false, e && e.message ? e.message : 'فشل تحميل الصورة.');
+            });
         } else {
-            doSubmit("");
+            doSend();
         }
     }
 
@@ -776,7 +1037,16 @@
         if (this.files && this.files[0]) lbl.textContent = '✓ تم اختيار: ' + this.files[0].name;
         else lbl.textContent = 'اضغط لالتقاط أو اختيار صورة';
     });
-    window.onload = () => { addMember(); loadDatabase(); };
+    window.onload = function() {
+        addMember();
+        initNameCheck();
+        if (restoreDraft()) {
+            var status = document.getElementById('loadingStatus');
+            if (status) { status.innerText = 'تم استعادة مسودة سابقة. يمكنك تعديلها أو إرسالها.'; status.style.color = 'var(--primary)'; }
+        }
+        document.getElementById('censusForm').addEventListener('input', scheduleDraftSave);
+        document.getElementById('censusForm').addEventListener('change', scheduleDraftSave);
+    };
 </script>
 </body>
 </html>
