@@ -160,6 +160,15 @@
             border-color: var(--primary);
             box-shadow: 0 0 0 4px rgba(15,23,42,0.08);
         }
+        /* الحقول الفارغة المطلوبة - باللون الأحمر */
+        input.field-required-empty, select.field-required-empty {
+            border-color: var(--error);
+            background: var(--error-soft);
+        }
+        input.field-required-empty:focus, select.field-required-empty:focus {
+            border-color: var(--error);
+            box-shadow: 0 0 0 4px rgba(220,38,38,0.15);
+        }
         select { cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2364748b' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: left 14px center; padding-left: 36px; }
 
         .input-wrap { grid-column: 1 / -1; }
@@ -481,7 +490,7 @@
 </div>
 
 <script>
-    const scriptURL = "https://script.google.com/macros/s/AKfycbzfGuB8lTuJZHjr6DuXt9axgUSAFwreJ1dkMKcyHIc_mAFaWSnFHt0GLnANaf2wWDqP0Q/exec"; 
+    const scriptURL = "https://script.google.com/macros/s/AKfycbwpCAopw7_dQ1YvZin0BcNOqc9sJIGFKC0gKcJD9aWGPIhE2Sid4FRHohRgm6grFQDnNw/exec"; 
     const SECRET_TOKEN = "AL_QAIM_MUKHTAR_2026";
     let checkNameTimeout = null;
     let draftTimeout = null;
@@ -668,7 +677,7 @@
         const div = document.createElement("div");
         div.className = "member-card";
         div.innerHTML = `
-            <button type="button" class="btn-remove" onclick="this.parentElement.remove()">✕ حذف</button>
+            <button type="button" class="btn-remove" onclick="this.parentElement.remove(); highlightEmptyFields();">✕ حذف</button>
             <div class="grid">
                 <input type="text" class="m-name" placeholder="الاسم الرباعي">
                 <select class="m-rel" onchange="toggleRelationInput(this)">
@@ -725,6 +734,8 @@
                 <input type="text" class="m-social-custom" placeholder="اكتب الحالة الاجتماعية يدوياً" style="display:none;">
             </div>`;
         container.appendChild(div);
+        // تحديث التلوين بعد إضافة العضو
+        setTimeout(highlightEmptyFields, 50);
     }
     
     function toggleRelationInput(select) {
@@ -737,7 +748,9 @@
             customInput.style.display = 'none';
             customInput.required = false;
             customInput.value = '';
+            customInput.classList.remove('field-required-empty');
         }
+        highlightEmptyFields();
     }
     
     function toggleEducationInput(select) {
@@ -750,7 +763,9 @@
             customInput.style.display = 'none';
             customInput.required = false;
             customInput.value = '';
+            customInput.classList.remove('field-required-empty');
         }
+        highlightEmptyFields();
     }
     
     function toggleSocialInput(select) {
@@ -763,7 +778,9 @@
             customInput.style.display = 'none';
             customInput.required = false;
             customInput.value = '';
+            customInput.classList.remove('field-required-empty');
         }
+        highlightEmptyFields();
     }
 
     function toggleJobInput(select) {
@@ -775,7 +792,9 @@
             jobInput.style.display = 'none';
             jobInput.value = '';
             jobInput.placeholder = 'المهنة (تفاصيل أو أخرى)';
+            jobInput.classList.remove('field-required-empty');
         }
+        highlightEmptyFields();
     }
 
     function toggleMemberJobInput(select) {
@@ -786,7 +805,138 @@
         } else {
             customInput.style.display = 'none';
             customInput.value = '';
+            customInput.classList.remove('field-required-empty');
         }
+        highlightEmptyFields();
+    }
+
+    // تلوين الحقول الفارغة المطلوبة بالأحمر
+    function highlightEmptyFields() {
+        // الحقول الأساسية المطلوبة
+        const requiredFields = [
+            'name', 'nationalId', 'cardId', 'birth', 'headGender', 
+            'education', 'jobType', 'workLocation', 'phone',
+            'homeType', 'prevAddress', 'address', 'moveDate', 'taboo', 'homeNum'
+        ];
+        
+        requiredFields.forEach(function(fieldId) {
+            const el = document.getElementById(fieldId);
+            if (!el) return;
+            
+            const val = (el.value || '').trim();
+            if (!val) {
+                el.classList.add('field-required-empty');
+            } else {
+                el.classList.remove('field-required-empty');
+            }
+        });
+        
+        // فحص حقل "أخرى" للمهنة
+        const jobType = document.getElementById('jobType');
+        const jobInput = document.getElementById('job');
+        if (jobType && jobType.value === 'أخرى' && jobInput) {
+            if (!jobInput.value.trim()) {
+                jobInput.classList.add('field-required-empty');
+            } else {
+                jobInput.classList.remove('field-required-empty');
+            }
+        }
+        
+        // فحص حقول أفراد الأسرة
+        document.querySelectorAll('.member-card').forEach(function(card) {
+            const nameEl = card.querySelector('.m-name');
+            const hasName = nameEl && nameEl.value.trim();
+            
+            if (!hasName) return; // إذا لم يُكتب اسم، نتجاهل بقية حقول هذا العضو
+            
+            // الحقول المطلوبة للعضو
+            const mRel = card.querySelector('.m-rel');
+            const mRelCustom = card.querySelector('.m-rel-custom');
+            const mBirth = card.querySelector('.m-birth');
+            const mJobType = card.querySelector('.m-job-type');
+            const mJobCustom = card.querySelector('.m-job-custom');
+            const mEdu = card.querySelector('.m-edu');
+            const mEduCustom = card.querySelector('.m-edu-custom');
+            const mSocial = card.querySelector('.m-social');
+            const mSocialCustom = card.querySelector('.m-social-custom');
+            
+            // صلة القرابة
+            if (mRel) {
+                if (!mRel.value) {
+                    mRel.classList.add('field-required-empty');
+                } else {
+                    mRel.classList.remove('field-required-empty');
+                    // فحص "أخرى"
+                    if (mRel.value === 'أخرى' && mRelCustom) {
+                        if (!mRelCustom.value.trim()) {
+                            mRelCustom.classList.add('field-required-empty');
+                        } else {
+                            mRelCustom.classList.remove('field-required-empty');
+                        }
+                    }
+                }
+            }
+            
+            // سنة التولد
+            if (mBirth) {
+                if (!mBirth.value.trim()) {
+                    mBirth.classList.add('field-required-empty');
+                } else {
+                    mBirth.classList.remove('field-required-empty');
+                }
+            }
+            
+            // المهنة
+            if (mJobType) {
+                if (!mJobType.value) {
+                    mJobType.classList.add('field-required-empty');
+                } else {
+                    mJobType.classList.remove('field-required-empty');
+                    // فحص "أخرى"
+                    if (mJobType.value === 'أخرى' && mJobCustom) {
+                        if (!mJobCustom.value.trim()) {
+                            mJobCustom.classList.add('field-required-empty');
+                        } else {
+                            mJobCustom.classList.remove('field-required-empty');
+                        }
+                    }
+                }
+            }
+            
+            // الدراسة
+            if (mEdu) {
+                if (!mEdu.value) {
+                    mEdu.classList.add('field-required-empty');
+                } else {
+                    mEdu.classList.remove('field-required-empty');
+                    // فحص "أخرى"
+                    if (mEdu.value === 'أخرى' && mEduCustom) {
+                        if (!mEduCustom.value.trim()) {
+                            mEduCustom.classList.add('field-required-empty');
+                        } else {
+                            mEduCustom.classList.remove('field-required-empty');
+                        }
+                    }
+                }
+            }
+            
+            // الحالة الاجتماعية
+            if (mSocial) {
+                if (!mSocial.value) {
+                    mSocial.classList.add('field-required-empty');
+                } else {
+                    mSocial.classList.remove('field-required-empty');
+                    // فحص "أخرى"
+                    if (mSocial.value === 'أخرى' && mSocialCustom) {
+                        if (!mSocialCustom.value.trim()) {
+                            mSocialCustom.classList.add('field-required-empty');
+                        } else {
+                            mSocialCustom.classList.remove('field-required-empty');
+                        }
+                    }
+                }
+            }
+        });
     }
 
     function validateAllFields() {
@@ -836,6 +986,7 @@
     }
 
     function showPreview() {
+        highlightEmptyFields(); // تلوين جميع الحقول الفارغة أولاً
         const errors = validateAllFields();
         if (errors.length > 0) {
             alert('يرجى ملء جميع الحقول المطلوبة:\n\n• ' + errors.join('\n• '));
@@ -1044,8 +1195,18 @@
             var status = document.getElementById('loadingStatus');
             if (status) { status.innerText = 'تم استعادة مسودة سابقة. يمكنك تعديلها أو إرسالها.'; status.style.color = 'var(--primary)'; }
         }
-        document.getElementById('censusForm').addEventListener('input', scheduleDraftSave);
-        document.getElementById('censusForm').addEventListener('change', scheduleDraftSave);
+        // تلوين الحقول الفارغة عند التحميل
+        setTimeout(highlightEmptyFields, 100);
+        
+        // تحديث الألوان عند التغيير
+        document.getElementById('censusForm').addEventListener('input', function() {
+            scheduleDraftSave();
+            highlightEmptyFields();
+        });
+        document.getElementById('censusForm').addEventListener('change', function() {
+            scheduleDraftSave();
+            highlightEmptyFields();
+        });
     };
 </script>
 </body>
