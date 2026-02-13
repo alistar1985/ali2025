@@ -680,7 +680,7 @@
                 <input type="text" id="workLocation" placeholder="موقع العمل الحالي" aria-label="موقع العمل الحالي">
                 <div class="input-wrap">
                     <label for="phone" class="sr-only">رقم الهاتف</label>
-                    <input type="tel" id="phone" placeholder="رقم الهاتف (11 رقم)" required maxlength="11" oninput="validatePhone(this)" aria-describedby="phoneError">
+                    <input type="tel" id="phone" inputmode="tel" placeholder="رقم الهاتف (11 رقم)" required maxlength="11" oninput="validatePhone(this)" aria-describedby="phoneError">
                     <div id="phoneError" class="field-error" style="display:none;">⚠️ أدخل رقم هاتف صحيح (11 رقم فقط)</div>
                 </div>
                 <div class="input-wrap photo-section">
@@ -745,7 +745,7 @@
 </div>
 
 <script>
-    const scriptURL = "https://script.google.com/macros/s/AKfycbxMAHG0ZkbdNOXhVQ_dDWiknjDK3dooFBrYBZFtX4jITFBskNq5GVdw8l7dUMpDIzm5wQ/exec"; 
+    const scriptURL = "https://script.google.com/macros/s/AKfycbw16zwxhUwGJDtnFfXbH2YXQy4KeAWZWBsI06IU66FAi_QPUMYM0PMuZT7XG2ZcMWktOQ/exec"; 
     const SECRET_TOKEN = "AL_QAIM_MUKHTAR_2026";
     let checkNameTimeout = null;
     let draftTimeout = null;
