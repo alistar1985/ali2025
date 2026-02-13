@@ -613,148 +613,9 @@
             .page-wrap { padding-left: max(20px, env(safe-area-inset-left)); padding-right: max(20px, env(safe-area-inset-right)); }
         }
 
-        /* ===== CUSTOM SELECT DROPDOWN ===== */
-        .custom-select-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(10,15,30,0.7);
-            backdrop-filter: blur(8px);
-            z-index: 5000;
-            align-items: flex-end;
-            justify-content: center;
-            padding: 0;
-        }
-        .custom-select-overlay.active {
-            display: flex;
-        }
-        .custom-select-sheet {
-            background: var(--card);
-            width: 100%;
-            max-width: 520px;
-            max-height: 70vh;
-            border-radius: 24px 24px 0 0;
-            overflow: hidden;
-            animation: sheetUp 0.3s ease-out;
-            box-shadow: 0 -10px 40px rgba(0,0,0,0.15);
-        }
-        @media (min-width: 600px) {
-            .custom-select-overlay {
-                align-items: center;
-            }
-            .custom-select-sheet {
-                border-radius: 24px;
-                max-height: 60vh;
-                margin: 20px;
-            }
-        }
-        @keyframes sheetUp {
-            from { transform: translateY(100%); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-        .custom-select-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 18px 20px 14px;
-            border-bottom: 2px solid var(--border-light);
-        }
-        .custom-select-title {
-            font-weight: 800;
-            font-size: 1rem;
-            color: var(--primary);
-        }
-        .custom-select-close {
-            width: 36px;
-            height: 36px;
-            border: none;
-            background: var(--border-light);
-            border-radius: 50%;
-            font-size: 1.1rem;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--text-muted);
-            transition: all 0.2s;
-            font-family: 'Cairo';
-        }
-        .custom-select-close:hover {
-            background: var(--error-soft);
-            color: var(--error);
-        }
-        .custom-select-options {
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
-            max-height: calc(70vh - 70px);
-            padding: 8px 12px 20px;
-        }
-        @media (min-width: 600px) {
-            .custom-select-options { max-height: calc(60vh - 70px); }
-        }
-        .custom-select-option {
-            display: flex;
-            align-items: center;
-            padding: 14px 16px;
-            margin: 4px 0;
-            border-radius: 14px;
-            cursor: pointer;
-            font-family: 'Cairo', sans-serif;
-            font-weight: 700;
-            font-size: 1rem;
-            color: var(--text);
-            transition: all 0.2s ease;
-            border: 2px solid transparent;
-            gap: 12px;
-        }
-        .custom-select-option:active {
-            transform: scale(0.97);
-        }
-        .custom-select-option:hover {
-            background: var(--border-light);
-        }
-        .custom-select-option.selected {
-            background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%);
-            border-color: var(--primary-mid);
-            color: var(--primary);
-        }
-        .custom-select-option .cs-check {
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            border: 2px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            font-size: 0.75rem;
-            transition: all 0.2s;
-        }
-        .custom-select-option.selected .cs-check {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-mid) 100%);
-            border-color: var(--primary);
-            color: white;
-        }
-        /* إخفاء القائمة الأصلية على الهاتف */
-        select.has-custom-select {
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            appearance: none;
-        }
     </style>
 </head>
 <body oncontextmenu="return false;">
-
-<!-- القائمة المنسدلة المخصصة -->
-<div id="customSelectOverlay" class="custom-select-overlay" onclick="if(event.target===this)closeCustomSelect()">
-    <div class="custom-select-sheet">
-        <div class="custom-select-header">
-            <span class="custom-select-title" id="customSelectTitle">اختر</span>
-            <button type="button" class="custom-select-close" onclick="closeCustomSelect()">✕</button>
-        </div>
-        <div class="custom-select-options" id="customSelectOptions"></div>
-    </div>
-</div>
 
 <div id="reviewModal">
     <div class="modal-content">
@@ -1582,91 +1443,19 @@
         if (this.files && this.files[0]) lbl.textContent = '✓ تم اختيار: ' + this.files[0].name;
         else lbl.textContent = 'اضغط لالتقاط أو اختيار صورة';
     });
-    // ===== القائمة المنسدلة المخصصة (اختيار بنقرة واحدة) =====
-    var _activeSelect = null;
-
-    function getSelectTitle(sel) {
-        // استخدام أول option كعنوان
-        if (sel.options && sel.options[0]) {
-            var first = sel.options[0].textContent.trim();
-            if (sel.options[0].value === '' || sel.options[0].value === first) return first;
-        }
-        return 'اختر';
-    }
-
-    function openCustomSelect(sel) {
-        _activeSelect = sel;
-        var overlay = document.getElementById('customSelectOverlay');
-        var optionsContainer = document.getElementById('customSelectOptions');
-        var titleEl = document.getElementById('customSelectTitle');
-
-        titleEl.textContent = getSelectTitle(sel);
-        optionsContainer.innerHTML = '';
-
-        for (var i = 0; i < sel.options.length; i++) {
-            var opt = sel.options[i];
-            // تخطي الخيار الأول إذا كان placeholder فارغ
-            if (i === 0 && opt.value === '') continue;
-
-            var div = document.createElement('div');
-            div.className = 'custom-select-option' + (opt.value === sel.value ? ' selected' : '');
-            div.setAttribute('data-value', opt.value);
-            div.innerHTML = '<span class="cs-check">' + (opt.value === sel.value ? '✓' : '') + '</span><span>' + opt.textContent + '</span>';
-            div.addEventListener('click', (function(value) {
-                return function() {
-                    selectCustomOption(value);
-                };
-            })(opt.value));
-            optionsContainer.appendChild(div);
-        }
-
-        overlay.classList.add('active');
-        document.body.style.overflow = 'hidden';
-    }
-
-    function selectCustomOption(value) {
-        if (_activeSelect) {
-            _activeSelect.value = value;
-            // تشغيل حدث change
-            var event = new Event('change', { bubbles: true });
-            _activeSelect.dispatchEvent(event);
-            // تشغيل حدث input للتحديث الفوري
-            var inputEvent = new Event('input', { bubbles: true });
-            _activeSelect.dispatchEvent(inputEvent);
-        }
-        closeCustomSelect();
-    }
-
-    function closeCustomSelect() {
-        var overlay = document.getElementById('customSelectOverlay');
-        overlay.classList.remove('active');
-        document.body.style.overflow = '';
-        _activeSelect = null;
-    }
-
-    function initCustomSelects() {
-        // اعتراض كل القوائم المنسدلة
-        document.addEventListener('mousedown', function(e) {
-            var sel = e.target.closest('select');
-            if (sel) {
-                e.preventDefault();
-                openCustomSelect(sel);
+    // ===== اختيار فوري من القوائم المنسدلة (بدون الضغط على "تم") =====
+    function initInstantSelects() {
+        document.addEventListener('change', function(e) {
+            if (e.target.tagName === 'SELECT') {
+                e.target.blur();
             }
-        }, true);
-        // لأجهزة اللمس
-        document.addEventListener('touchend', function(e) {
-            var sel = e.target.closest('select');
-            if (sel) {
-                e.preventDefault();
-                openCustomSelect(sel);
-            }
-        }, true);
+        });
     }
 
     window.onload = function() {
         addMember();
         initNameCheck();
-        initCustomSelects();
+        initInstantSelects();
         if (restoreDraft()) {
             var status = document.getElementById('loadingStatus');
             if (status) { status.innerText = 'تم استعادة مسودة سابقة. يمكنك تعديلها أو إرسالها.'; status.style.color = 'var(--primary)'; }
