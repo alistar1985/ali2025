@@ -698,7 +698,7 @@
             <div class="section-head">🏠 تفاصيل السكن</div>
             <div class="grid">
                 <label for="homeType" class="sr-only">نوع السكن</label>
-                <select id="homeType" aria-label="نوع السكن"><option>ملك</option><option>إيجار</option><option>عشوائيات</option></select>
+                <select id="homeType" aria-label="نوع السكن"><option value="" selected>اختر نوع السكن</option><option value="ملك">ملك</option><option value="إيجار">إيجار</option><option value="عشوائيات">عشوائيات</option></select>
                 <input type="text" id="prevAddress" placeholder="عنوان السكن السابق" aria-label="عنوان السكن السابق">
                 <input type="text" id="address" placeholder="أقرب نقطة دالة" aria-label="أقرب نقطة دالة (العنوان الحالي)">
                 <input type="text" id="moveDate" placeholder="تاريخ السكن الحالي">
@@ -745,7 +745,7 @@
 </div>
 
 <script>
-    const scriptURL = "https://script.google.com/macros/s/AKfycbw16zwxhUwGJDtnFfXbH2YXQy4KeAWZWBsI06IU66FAi_QPUMYM0PMuZT7XG2ZcMWktOQ/exec"; 
+    const scriptURL = "https://script.google.com/macros/s/AKfycbzvwuoM70zmctBNyDZ6ZoRkxj4AqRu4yCLvOG23bkzID3eGgjIlU3tWh3cPDuOo1nuB7Q/exec"; 
     const SECRET_TOKEN = "AL_QAIM_MUKHTAR_2026";
     let checkNameTimeout = null;
     let draftTimeout = null;
