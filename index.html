@@ -282,6 +282,10 @@
         }
         .photo-icon { font-size: 2.5rem; animation: float 3s ease-in-out infinite; }
         .photo-text { font-size: 0.92rem; font-weight: 700; color: var(--text-muted); }
+        .photo-section.field-required-empty .photo-tap-area {
+            border-color: var(--error);
+            background: var(--error-soft);
+        }
         .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
 
         /* ===== ERRORS ===== */
@@ -684,7 +688,7 @@
                     <div id="phoneError" class="field-error" style="display:none;">⚠️ أدخل رقم هاتف صحيح (11 رقم فقط)</div>
                 </div>
                 <div class="input-wrap photo-section">
-                    <label for="photoInput" class="photo-label">📷 صورة رب الأسرة (اختياري)</label>
+                    <label for="photoInput" class="photo-label">📷 صورة رب الأسرة</label>
                     <div class="photo-btn-wrap">
                         <input type="file" id="photoInput" accept="image/*" class="photo-input-hidden">
                         <label for="photoInput" class="photo-tap-area">
@@ -1086,6 +1090,17 @@
             }
         });
         
+        // فحص صورة رب الأسرة (مطلوبة)
+        const photoInput = document.getElementById('photoInput');
+        const photoSection = document.querySelector('.photo-section');
+        if (photoSection) {
+            if (!photoInput.files || !photoInput.files[0]) {
+                photoSection.classList.add('field-required-empty');
+            } else {
+                photoSection.classList.remove('field-required-empty');
+            }
+        }
+        
         // فحص حقل "أخرى" للمهنة
         const jobType = document.getElementById('jobType');
         const jobInput = document.getElementById('job');
@@ -1218,6 +1233,8 @@
         if (!document.getElementById('moveDate').value.trim()) msg.push('تاريخ السكن الحالي');
         if (!document.getElementById('taboo').value.trim()) msg.push('رقم الطابو');
         if (!document.getElementById('homeNum').value.trim()) msg.push('رقم الدار');
+        const photoInput = document.getElementById('photoInput');
+        if (!photoInput.files || !photoInput.files[0]) msg.push('صورة رب الأسرة');
         document.querySelectorAll('.member-card').forEach((card, i) => {
             const n = card.querySelector('.m-name').value.trim();
             if (!n) return;
@@ -1442,6 +1459,7 @@
         const lbl = document.getElementById('photoLabel');
         if (this.files && this.files[0]) lbl.textContent = '✓ تم اختيار: ' + this.files[0].name;
         else lbl.textContent = 'اضغط لالتقاط أو اختيار صورة';
+        highlightEmptyFields();
     });
     // ===== اختيار فوري من القوائم المنسدلة (بدون الضغط على "تم") =====
     function initInstantSelects() {
