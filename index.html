@@ -668,7 +668,7 @@
                 </select>
                 <select id="education">
                     <option value="">التحصيل الدراسي</option>
-                    <option>أمي</option><option>ابتدائية</option><option>متوسطة</option><option>إعدادية</option><option>دبلوم</option><option>بكالوريوس</option><option>دراسات عليا</option>
+                    <option>أمي</option><option>ابتدائية</option><option>متوسطة</option><option>إعدادية</option><option>دبلوم</option><option>بكالوريوس</option><option>دراسات عليا</option><option>طالب</option>
                 </select>
                 <select id="jobType" onchange="toggleJobInput(this)">
                     <option value="">نوع المهنة</option>
@@ -678,6 +678,7 @@
                     <option value="كاسب">كاسب</option>
                     <option value="ربة بيت">ربة بيت</option>
                     <option value="موظفة">موظفة</option>
+                    <option value="طالب">طالب</option>
                     <option value="أخرى">أخرى</option>
                 </select>
                 <input type="text" id="job" placeholder="المهنة (تفاصيل أو أخرى)" style="display:none;">
@@ -702,7 +703,7 @@
             <div class="section-head">🏠 تفاصيل السكن</div>
             <div class="grid">
                 <label for="homeType" class="sr-only">نوع السكن</label>
-                <select id="homeType" aria-label="نوع السكن"><option value="" selected>اختر نوع السكن</option><option value="ملك">ملك</option><option value="إيجار">إيجار</option><option value="عشوائيات">عشوائيات</option></select>
+                <select id="homeType" aria-label="نوع السكن"><option value="" selected>اختر نوع السكن</option><option value="ملك">ملك</option><option value="إيجار">إيجار</option><option value="عشوائيات">عشوائيات</option><option value="رقم بلدية">رقم بلدية</option></select>
                 <input type="text" id="prevAddress" placeholder="عنوان السكن السابق" aria-label="عنوان السكن السابق">
                 <input type="text" id="address" placeholder="أقرب نقطة دالة" aria-label="أقرب نقطة دالة (العنوان الحالي)">
                 <input type="text" id="moveDate" placeholder="تاريخ السكن الحالي">
@@ -962,6 +963,7 @@
                     <option value="كاسب">كاسب</option>
                     <option value="ربة بيت">ربة بيت</option>
                     <option value="موظفة">موظفة</option>
+                    <option value="طالب">طالب</option>
                     <option value="أخرى">أخرى</option>
                 </select>
                 <input type="text" class="m-job-custom" placeholder="المهنة (تفاصيل أو أخرى)" style="display:none;">
@@ -974,6 +976,7 @@
                     <option>إعدادية</option>
                     <option>دبلوم</option>
                     <option>بكالوريوس</option>
+                    <option>طالب</option>
                     <option>أخرى</option>
                 </select>
                 <input type="text" class="m-edu-custom" placeholder="اكتب الدراسة يدوياً" style="display:none;">
