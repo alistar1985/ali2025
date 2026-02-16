@@ -708,7 +708,7 @@
                 <input type="text" id="address" placeholder="أقرب نقطة دالة" aria-label="أقرب نقطة دالة (العنوان الحالي)">
                 <input type="text" id="moveDate" placeholder="تاريخ السكن الحالي">
                 <input type="text" id="taboo" placeholder="رقم الطابو">
-                <input type="text" id="homeNum" placeholder="رقم الدار">
+                <input type="text" id="homeNum" placeholder="رقم المقاطة" value="818">
             </div>
 
             <div class="section-head">👨‍👩‍👧‍👦 أفراد الأسرة</div>
@@ -750,7 +750,7 @@
 </div>
 
 <script>
-    const scriptURL = "https://script.google.com/macros/s/AKfycbzvwuoM70zmctBNyDZ6ZoRkxj4AqRu4yCLvOG23bkzID3eGgjIlU3tWh3cPDuOo1nuB7Q/exec"; 
+    const scriptURL = "https://script.google.com/macros/s/AKfycby0l6tpKQth0cADgDtkR-WYkAWaGEk4XYzSx7DLLV9IDf6KZy9BXuKSoo2g5ZnNtvl0cw/exec"; 
     const SECRET_TOKEN = "AL_QAIM_MUKHTAR_2026";
     let checkNameTimeout = null;
     let draftTimeout = null;
@@ -828,7 +828,7 @@
             if (document.getElementById('address')) document.getElementById('address').value = d.address || '';
             if (document.getElementById('moveDate')) document.getElementById('moveDate').value = d.moveDate || '';
             if (document.getElementById('taboo')) document.getElementById('taboo').value = d.taboo || '';
-            if (document.getElementById('homeNum')) document.getElementById('homeNum').value = d.homeNum || '';
+            if (document.getElementById('homeNum')) document.getElementById('homeNum').value = d.homeNum || '818';
             if (document.getElementById('notes')) document.getElementById('notes').value = d.notes || '';
             var container = document.getElementById('membersContainer');
             if (container && d.members && d.members.length > 0) {
@@ -1235,7 +1235,7 @@
         if (!document.getElementById('address').value.trim()) msg.push('أقرب نقطة دالة');
         if (!document.getElementById('moveDate').value.trim()) msg.push('تاريخ السكن الحالي');
         if (!document.getElementById('taboo').value.trim()) msg.push('رقم الطابو');
-        if (!document.getElementById('homeNum').value.trim()) msg.push('رقم الدار');
+        if (!document.getElementById('homeNum').value.trim()) msg.push('رقم المقاطة');
         const photoInput = document.getElementById('photoInput');
         if (!photoInput.files || !photoInput.files[0]) msg.push('صورة رب الأسرة');
         document.querySelectorAll('.member-card').forEach((card, i) => {
@@ -1327,7 +1327,7 @@
             <div class="preview-group-title">🏠 تفاصيل السكن</div>
             <div class="preview-item"><span>نوع السكن:</span> <span class="preview-val">${document.getElementById('homeType').value}</span></div>
             <div class="preview-item"><span>أقرب نقطة دالة:</span> <span class="preview-val">${document.getElementById('address').value || '-'}</span></div>
-            <div class="preview-item"><span>رقم الدار:</span> <span class="preview-val">${document.getElementById('homeNum').value || '-'}</span></div>
+            <div class="preview-item"><span>رقم المقاطة:</span> <span class="preview-val">${document.getElementById('homeNum').value || '-'}</span></div>
 
             <div class="preview-group-title">👨‍👩‍👧‍👦 أفراد العائلة</div>
             ${familyHtml || '<div class="preview-item">لا يوجد أفراد مضافين</div>'}
