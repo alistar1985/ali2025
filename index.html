@@ -329,11 +329,18 @@
             box-shadow: 0 0 0 4px rgba(16,185,129,0.1), var(--shadow);
         }
 
+        #membersContainer {
+            display: block;
+            width: 100%;
+            min-height: 20px;
+        }
         .member-card .grid { margin-top: 12px; }
         .member-card .m-rel-custom,
         .member-card .m-edu-custom,
         .member-card .m-social-custom,
-        .member-card .m-job-custom {
+        .member-card .m-job-custom,
+        .member-card .m-work-job,
+        .member-card .m-work-location {
             grid-column: 1 / -1;
             margin-top: 4px;
         }
@@ -715,7 +722,7 @@
             </div>
 
             <div class="section-head">👨‍👩‍👧‍👦 أفراد الأسرة</div>
-            <div id="membersContainer"></div>
+            <div id="membersContainer" style="min-height: 20px;"></div>
             <button type="button" class="btn-add" onclick="addMember()">+ إضافة فرد جديد للعائلة</button>
 
             <div class="section-head">📝 الملاحظات</div>
@@ -739,8 +746,8 @@
     <a href="https://wa.me/96407713170313" target="_blank" rel="noopener" class="contact-bar">
         <div class="contact-bar-icon">💬</div>
         <div class="contact-bar-text">
-            للاستفسار أو إذا واجهتك مشكلة
-            <small>تواصل معنا عبر واتساب: 07713170313</small>
+            الاستفسار أو واجهتك مشكلة
+            <small>للتواصل واتساب اضغط هنا</small>
         </div>
         <div class="contact-bar-arrow">‹</div>
     </a>
@@ -753,7 +760,7 @@
 </div>
 
 <script>
-    const scriptURL = "https://script.google.com/macros/s/AKfycbwmi_u3VajlM3t5qPgu9OGbjGw2s7ntSsaMUsEXaecOmA6NNA36bv2rTQUXLW0YX0648w/exec"; 
+    const scriptURL = "https://script.google.com/macros/s/AKfycbyET3MEAoalA76kx72zZ3eiig_hOikAUG8LdQQOFTQpvnbu8nxwlvat7F_9LBPPEw06NQ/exec"; 
     const SECRET_TOKEN = "AL_QAIM_MUKHTAR_2026";
     let checkNameTimeout = null;
     let draftTimeout = null;
@@ -770,6 +777,8 @@
                     birth: (card.querySelector('.m-birth') && card.querySelector('.m-birth').value) || '',
                     jobType: (card.querySelector('.m-job-type') && card.querySelector('.m-job-type').value) || '',
                     jobCustom: (card.querySelector('.m-job-custom') && card.querySelector('.m-job-custom').value) || '',
+                    workJob: (card.querySelector('.m-work-job') && card.querySelector('.m-work-job').value) || '',
+                    workLocation: (card.querySelector('.m-work-location') && card.querySelector('.m-work-location').value) || '',
                     edu: (card.querySelector('.m-edu') && card.querySelector('.m-edu').value) || '',
                     eduCustom: (card.querySelector('.m-edu-custom') && card.querySelector('.m-edu-custom').value) || '',
                     social: (card.querySelector('.m-social') && card.querySelector('.m-social').value) || '',
@@ -847,8 +856,13 @@
                     if (c.querySelector('.m-rel')) c.querySelector('.m-rel').value = m.rel || '';
                     if (c.querySelector('.m-rel-custom')) c.querySelector('.m-rel-custom').value = m.relCustom || '';
                     if (c.querySelector('.m-birth')) c.querySelector('.m-birth').value = m.birth || '';
-                    if (c.querySelector('.m-job-type')) c.querySelector('.m-job-type').value = m.jobType || '';
+                    if (c.querySelector('.m-job-type')) {
+                        c.querySelector('.m-job-type').value = m.jobType || '';
+                        toggleMemberJobInput(c.querySelector('.m-job-type'));
+                    }
                     if (c.querySelector('.m-job-custom')) c.querySelector('.m-job-custom').value = m.jobCustom || '';
+                    if (c.querySelector('.m-work-job')) c.querySelector('.m-work-job').value = m.workJob || '';
+                    if (c.querySelector('.m-work-location')) c.querySelector('.m-work-location').value = m.workLocation || '';
                     if (c.querySelector('.m-edu')) c.querySelector('.m-edu').value = m.edu || '';
                     if (c.querySelector('.m-edu-custom')) c.querySelector('.m-edu-custom').value = m.eduCustom || '';
                     if (c.querySelector('.m-social')) c.querySelector('.m-social').value = m.social || '';
@@ -939,6 +953,10 @@
 
     function addMember() {
         const container = document.getElementById("membersContainer");
+        if (!container) {
+            console.error("membersContainer not found!");
+            return;
+        }
         const div = document.createElement("div");
         div.className = "member-card";
         div.innerHTML = `
@@ -978,6 +996,8 @@
                     <option value="أخرى">أخرى</option>
                 </select>
                 <input type="text" class="m-job-custom" placeholder="المهنة (تفاصيل أو أخرى)" style="display:none;">
+                <input type="text" class="m-work-job" placeholder="مهنة العمل" style="display:none;">
+                <input type="text" class="m-work-location" placeholder="مكان العمل" style="display:none;">
                 <select class="m-edu" onchange="toggleEducationInput(this)">
                     <option value="">الدراسة</option>
                     <option>روضة</option>
@@ -994,7 +1014,7 @@
                 <select class="m-social" onchange="toggleSocialInput(this)">
                     <option value="">الحالة الاجتماعية</option>
                     <option>طفل</option>
-                    <option>عزب</option>
+                    <option>أعزب</option>
                     <option>باكر</option>
                     <option>متزوج</option>
                     <option>متزوجة</option>
@@ -1007,6 +1027,8 @@
                 <input type="text" class="m-social-custom" placeholder="اكتب الحالة الاجتماعية يدوياً" style="display:none;">
             </div>`;
         container.appendChild(div);
+        // التمرير إلى العنصر المضاف
+        div.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         // تحديث التلوين بعد إضافة العضو
         setTimeout(highlightEmptyFields, 50);
     }
@@ -1022,6 +1044,11 @@
             customInput.required = false;
             customInput.value = '';
             customInput.classList.remove('field-required-empty');
+        }
+        // التحقق من إظهار/إخفاء حقلي "مهنة العمل" و "مكان العمل" عند تغيير صلة القرابة
+        const jobTypeSelect = card.querySelector('.m-job-type');
+        if (jobTypeSelect) {
+            toggleMemberJobInput(jobTypeSelect);
         }
         highlightEmptyFields();
     }
@@ -1073,12 +1100,36 @@
     function toggleMemberJobInput(select) {
         const card = select.closest('.member-card');
         const customInput = card.querySelector('.m-job-custom');
+        const workJobInput = card.querySelector('.m-work-job');
+        const workLocationInput = card.querySelector('.m-work-location');
+        const relationSelect = card.querySelector('.m-rel');
+        const relationValue = relationSelect ? relationSelect.value : '';
+        const isWife = relationValue === 'زوجة' || relationValue === 'الزوجة الثانية';
+        
         if (select.value === 'أخرى') {
             customInput.style.display = 'block';
+            if (workJobInput) workJobInput.style.display = 'none';
+            if (workLocationInput) workLocationInput.style.display = 'none';
+        } else if (select.value === 'موظفة' && isWife) {
+            customInput.style.display = 'none';
+            customInput.value = '';
+            customInput.classList.remove('field-required-empty');
+            if (workJobInput) workJobInput.style.display = 'block';
+            if (workLocationInput) workLocationInput.style.display = 'block';
         } else {
             customInput.style.display = 'none';
             customInput.value = '';
             customInput.classList.remove('field-required-empty');
+            if (workJobInput) {
+                workJobInput.style.display = 'none';
+                workJobInput.value = '';
+                workJobInput.classList.remove('field-required-empty');
+            }
+            if (workLocationInput) {
+                workLocationInput.style.display = 'none';
+                workLocationInput.value = '';
+                workLocationInput.classList.remove('field-required-empty');
+            }
         }
         highlightEmptyFields();
     }
@@ -1171,6 +1222,11 @@
             }
             
             // المهنة
+            const mWorkJob = card.querySelector('.m-work-job');
+            const mWorkLocation = card.querySelector('.m-work-location');
+            const relationValue = mRel ? mRel.value : '';
+            const isWife = relationValue === 'زوجة' || relationValue === 'الزوجة الثانية';
+            
             if (mJobType) {
                 if (!mJobType.value) {
                     mJobType.classList.add('field-required-empty');
@@ -1183,6 +1239,20 @@
                         } else {
                             mJobCustom.classList.remove('field-required-empty');
                         }
+                    }
+                    // فحص "موظفة" + زوجة: يجب ملء "مهنة العمل" و "مكان العمل"
+                    if (mJobType.value === 'موظفة' && isWife) {
+                        if (mWorkJob) {
+                            if (!mWorkJob.value.trim()) mWorkJob.classList.add('field-required-empty');
+                            else mWorkJob.classList.remove('field-required-empty');
+                        }
+                        if (mWorkLocation) {
+                            if (!mWorkLocation.value.trim()) mWorkLocation.classList.add('field-required-empty');
+                            else mWorkLocation.classList.remove('field-required-empty');
+                        }
+                    } else {
+                        if (mWorkJob) mWorkJob.classList.remove('field-required-empty');
+                        if (mWorkLocation) mWorkLocation.classList.remove('field-required-empty');
                     }
                 }
             }
@@ -1259,8 +1329,14 @@
             if (!mb) msg.push('سنة التولد للعضو ' + (i+1));
             else if (mb.length !== 4 || !/^\d{4}$/.test(mb)) msg.push('سنة التولد للعضو ' + (i+1) + ' (بيانات خطأ - 4 أرقام فقط)');
             const mj = card.querySelector('.m-job-type').value;
+            const mr = card.querySelector('.m-rel').value;
+            const isWife = mr === 'زوجة' || mr === 'الزوجة الثانية';
             if (!mj) msg.push('المهنة للعضو ' + (i+1));
             if (mj === 'أخرى' && !card.querySelector('.m-job-custom').value.trim()) msg.push('تفاصيل المهنة للعضو ' + (i+1));
+            if (mj === 'موظفة' && isWife) {
+                if (card.querySelector('.m-work-job') && !card.querySelector('.m-work-job').value.trim()) msg.push('مهنة العمل للعضو ' + (i+1) + ' (موظفة)');
+                if (card.querySelector('.m-work-location') && !card.querySelector('.m-work-location').value.trim()) msg.push('مكان العمل للعضو ' + (i+1) + ' (موظفة)');
+            }
             const med = card.querySelector('.m-edu').value;
             if (!med) msg.push('الدراسة للعضو ' + (i+1));
             if (med === 'أخرى' && !card.querySelector('.m-edu-custom').value.trim()) msg.push('تفاصيل الدراسة للعضو ' + (i+1));
@@ -1306,12 +1382,16 @@
             const jobType = (card.querySelector(".m-job-type") && card.querySelector(".m-job-type").value) || "";
             const jobCustom = (card.querySelector(".m-job-custom") && card.querySelector(".m-job-custom").value) || "";
             const job = (jobType === 'أخرى' ? jobCustom : jobType);
+            const isWife = r === 'زوجة' || r === 'الزوجة الثانية';
+            const workJob = (card.querySelector(".m-work-job") && card.querySelector(".m-work-job").value) ? card.querySelector(".m-work-job").value.trim() : "";
+            const workLoc = (card.querySelector(".m-work-location") && card.querySelector(".m-work-location").value) ? card.querySelector(".m-work-location").value.trim() : "";
             if(n) {
+                var workText = (jobType === 'موظفة' && isWife && (workJob || workLoc)) ? ' | مهنة العمل: <b>' + (workJob || '—') + '</b> | مكان العمل: <b>' + (workLoc || '—') + '</b>' : '';
                 familyHtml += `<div class="preview-item">
                     <span>${index+1}. ${n}</span> 
                     <div style="text-align:left; margin-top:4px; font-size:0.85rem; color:var(--text-muted);">
                         صلة القرابة: <b>${r || '—'}</b> | 
-                        المهنة: <b>${job || '—'}</b> | 
+                        المهنة: <b>${job || '—'}</b>${workText} | 
                         الدراسة: <b>${edu || '—'}</b> | 
                         الحالة: <b>${social || '—'}</b>
                     </div>
@@ -1382,6 +1462,7 @@
         const sId = "QA-" + Math.floor(Math.random()*900000+100000);
         let family = "";
         const sep = "\t";
+        var memberWorkLocations = [];
         document.querySelectorAll(".member-card").forEach((card, i) => {
             const n = card.querySelector(".m-name").value.trim();
             if (!n) return;
@@ -1398,6 +1479,12 @@
             const relSelect = (card.querySelector(".m-rel").value || "").replace(/\t/g, " ");
             const relCustom = (card.querySelector(".m-rel-custom").value || "").replace(/\t/g, " ");
             const rel = relSelect === 'أخرى' ? relCustom : relSelect;
+            const isWife = rel === 'زوجة' || rel === 'الزوجة الثانية';
+            const workJob = (card.querySelector(".m-work-job") && card.querySelector(".m-work-job").value) ? card.querySelector(".m-work-job").value.trim() : "";
+            const workLoc = (card.querySelector(".m-work-location") && card.querySelector(".m-work-location").value) ? card.querySelector(".m-work-location").value.trim() : "";
+            if (jobType === 'موظفة' && isWife && (workJob || workLoc)) {
+                memberWorkLocations.push(n + ": مهنة العمل: " + (workJob || "—") + " | مكان العمل: " + (workLoc || "—"));
+            }
             family += (i + 1) + sep + n.replace(/\t/g, " ") + sep + birth + sep + job + sep + edu + sep + social + sep + rel + "\n";
         });
 
@@ -1424,6 +1511,7 @@
             homeNum: document.getElementById('homeNum').value.trim(),
             housingCard: (document.getElementById('housingCard') && document.getElementById('housingCard').value) ? document.getElementById('housingCard').value.trim() : "",
             familyMembers: family,
+            memberWorkLocations: memberWorkLocations.join(" | ") || "",
             notes: document.getElementById('notes').value.trim() || ""
         };
 
