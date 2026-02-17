@@ -483,6 +483,7 @@
             align-items: center;
             font-size: 0.9rem;
             gap: 12px;
+            background: linear-gradient(135deg, #fafbfc 0%, #f5f6f8 100%);
         }
         .preview-val { font-weight: 700; color: var(--text); }
         .preview-photo-wrap {
@@ -668,7 +669,7 @@
                     <div id="birthError" class="field-error" style="display:none;">⚠️ أدخل سنة مكونة من 4 أرقام فقط (مثال: 1980)</div>
                 </div>
                 <label for="headGender" class="sr-only">جنس رب الأسرة</label>
-                <select id="headGender" aria-label="جنس رب الأسرة">
+                <select id="headGender" aria-label="جنس رب الأسرة" onchange="updateHeadJobTypeOptions()">
                     <option value="">جنس رب الأسرة</option>
                     <option value="ذكر">ذكر</option>
                     <option value="أنثى">أنثى</option>
@@ -677,7 +678,7 @@
                     <option value="">التحصيل الدراسي</option>
                     <option>أمي</option><option>ابتدائية</option><option>متوسطة</option><option>إعدادية</option><option>دبلوم</option><option>بكالوريوس</option><option>دراسات عليا</option><option>طالب</option>
                 </select>
-                <select id="jobType" onchange="toggleJobInput(this)">
+                <select id="jobType" onchange="toggleJobInput(this); updateHeadWorkLocation();">
                     <option value="">نوع المهنة</option>
                     <option value="عسكري">عسكري</option>
                     <option value="منتسب">منتسب</option>
@@ -690,11 +691,15 @@
                     <option value="متقاعدة">متقاعدة</option>
                     <option value="أخرى">أخرى</option>
                 </select>
+                <!-- الخيارات تُحدَّث حسب جنس رب الأسرة عبر updateHeadJobTypeOptions() -->
                 <input type="text" id="job" placeholder="المهنة (تفاصيل أو أخرى)" style="display:none;">
                 <input type="text" id="workLocation" placeholder="موقع العمل الحالي" aria-label="موقع العمل الحالي">
                 <div class="input-wrap">
                     <label for="phone" class="sr-only">رقم الهاتف</label>
-                    <input type="tel" id="phone" inputmode="tel" placeholder="رقم الهاتف (11 رقم)" required maxlength="11" oninput="validatePhone(this)" aria-describedby="phoneError">
+                    <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                        <input type="tel" id="phone" inputmode="tel" placeholder="رقم الهاتف (11 رقم)" required maxlength="11" oninput="validatePhone(this)" aria-describedby="phoneError" style="flex:1; min-width:140px;">
+                        <span id="phoneCount" style="display:inline-block; min-width:32px; padding:8px 12px; background:var(--primary); color:white; border-radius:10px; font-weight:800; font-size:1.1rem; text-align:center;">11</span>
+                    </div>
                     <div id="phoneError" class="field-error" style="display:none;">⚠️ أدخل رقم هاتف صحيح (11 رقم فقط)</div>
                 </div>
                 <div class="input-wrap photo-section">
@@ -712,7 +717,7 @@
             <div class="section-head">🏠 تفاصيل السكن</div>
             <div class="grid">
                 <label for="homeType" class="sr-only">نوع السكن</label>
-                <select id="homeType" aria-label="نوع السكن"><option value="" selected>اختر نوع السكن</option><option value="ملك">ملك</option><option value="إيجار">إيجار</option><option value="عشوائيات">عشوائيات</option><option value="رقم بلدية">رقم بلدية</option></select>
+                <select id="homeType" aria-label="نوع السكن" onchange="updateTabooByHomeType()"><option value="" selected>اختر نوع السكن</option><option value="ملك">ملك</option><option value="إيجار">إيجار</option><option value="عشوائيات">عشوائيات</option><option value="رقم بلدية">رقم بلدية</option></select>
                 <input type="text" id="prevAddress" placeholder="عنوان السكن السابق" aria-label="عنوان السكن السابق">
                 <input type="text" id="address" placeholder="أقرب نقطة دالة" aria-label="أقرب نقطة دالة (العنوان الحالي)">
                 <input type="text" id="moveDate" placeholder="تاريخ السكن الحالي">
@@ -830,10 +835,12 @@
             if (document.getElementById('cardId')) document.getElementById('cardId').value = d.cardId || '';
             if (document.getElementById('birth')) document.getElementById('birth').value = d.birth || '';
             if (document.getElementById('headGender')) document.getElementById('headGender').value = d.headGender || '';
+            updateHeadJobTypeOptions();
             if (document.getElementById('education')) document.getElementById('education').value = d.education || '';
             if (document.getElementById('jobType')) document.getElementById('jobType').value = d.jobType || '';
             if (document.getElementById('job')) document.getElementById('job').value = d.job || '';
             if (document.getElementById('workLocation')) document.getElementById('workLocation').value = d.workLocation || '';
+            updateHeadWorkLocation();
             var phoneEl = document.getElementById('phone');
             if (phoneEl) { phoneEl.value = d.phone || ''; validatePhone(phoneEl); }
             if (document.getElementById('homeType')) document.getElementById('homeType').value = d.homeType || '';
@@ -841,6 +848,7 @@
             if (document.getElementById('address')) document.getElementById('address').value = d.address || '';
             if (document.getElementById('moveDate')) document.getElementById('moveDate').value = d.moveDate || '';
             if (document.getElementById('taboo')) document.getElementById('taboo').value = d.taboo || '';
+            updateTabooByHomeType();
             if (document.getElementById('homeNum')) document.getElementById('homeNum').value = d.homeNum || '818';
             if (document.getElementById('housingCard')) document.getElementById('housingCard').value = d.housingCard || '';
             if (document.getElementById('notes')) document.getElementById('notes').value = d.notes || '';
@@ -853,7 +861,8 @@
                     if (!cards[i]) return;
                     var c = cards[i];
                     if (c.querySelector('.m-name')) c.querySelector('.m-name').value = m.name || '';
-                    if (c.querySelector('.m-rel')) c.querySelector('.m-rel').value = m.rel || '';
+                    var relEl = c.querySelector('.m-rel');
+                    if (relEl) { relEl.value = m.rel || ''; updateMemberJobAndSocialOptions(relEl); }
                     if (c.querySelector('.m-rel-custom')) c.querySelector('.m-rel-custom').value = m.relCustom || '';
                     if (c.querySelector('.m-birth')) c.querySelector('.m-birth').value = m.birth || '';
                     if (c.querySelector('.m-job-type')) {
@@ -884,6 +893,8 @@
         var v = (input.value || '').replace(/\D/g, '');
         if (v.length > 11) v = v.slice(0, 11);
         input.value = v;
+        var countEl = document.getElementById('phoneCount');
+        if (countEl) countEl.textContent = String(11 - v.length);
         const errEl = document.getElementById('phoneError');
         if (v.length > 0 && v.length !== 11) {
             if (errEl) { errEl.style.display = 'block'; errEl.textContent = '⚠️ رقم الهاتف 11 رقم بالضبط'; }
@@ -983,7 +994,7 @@
                 <input type="text" inputmode="numeric" pattern="[0-9]*" class="m-birth" placeholder="سنة التولد فقط (4 أرقام، مثال: 1980)" maxlength="4" oninput="validateMemberBirth(this)">
                 <select class="m-job-type" onchange="toggleMemberJobInput(this)">
                     <option value="">نوع المهنة</option>
-                    <option value="طفل فقط">طفل فقط</option>
+                    <option value="طفل">طفل</option>
                     <option value="عسكري">عسكري</option>
                     <option value="منتسب">منتسب</option>
                     <option value="موظف">موظف</option>
@@ -1033,6 +1044,41 @@
         setTimeout(highlightEmptyFields, 50);
     }
     
+    var MEMBER_REL_MALE = ['ابن', 'حفيد', 'أب', 'أخ'];
+    var MEMBER_REL_FEMALE = ['زوجة', 'الزوجة الثانية', 'ابنة', 'حفيدة', 'أم', 'أخت', 'زوجة ابن'];
+    var MEMBER_JOB_MALE = ['', 'طفل', 'عسكري', 'منتسب', 'موظف', 'كاسب', 'طالب', 'متقاعد', 'أخرى'];
+    var MEMBER_JOB_FEMALE = ['', 'موظفة', 'ربة بيت', 'طالبة', 'متقاعدة', 'أخرى'];
+    var MEMBER_JOB_ALL = ['', 'طفل', 'عسكري', 'منتسب', 'موظف', 'موظفة', 'كاسب', 'ربة بيت', 'طالب', 'طالبة', 'متقاعد', 'متقاعدة', 'أخرى'];
+    var MEMBER_SOCIAL_MALE = ['', 'طفل', 'أعزب', 'باكر', 'متزوج', 'مطلق', 'أرمل', 'أخرى'];
+    var MEMBER_SOCIAL_FEMALE = ['', 'طفل', 'باكر', 'متزوجة', 'مطلقة', 'أرملة', 'أخرى'];
+    var MEMBER_SOCIAL_ALL = ['', 'طفل', 'أعزب', 'باكر', 'متزوج', 'متزوجة', 'مطلق', 'مطلقة', 'أرمل', 'أرملة', 'أخرى'];
+
+    function updateMemberJobAndSocialOptions(relationSelect) {
+        var card = relationSelect.closest('.member-card');
+        if (!card) return;
+        var rel = relationSelect.value || '';
+        var jobSelect = card.querySelector('.m-job-type');
+        var socialSelect = card.querySelector('.m-social');
+        var isMale = MEMBER_REL_MALE.indexOf(rel) !== -1;
+        var isFemale = MEMBER_REL_FEMALE.indexOf(rel) !== -1;
+        var jobOpts = isMale ? MEMBER_JOB_MALE : (isFemale ? MEMBER_JOB_FEMALE : MEMBER_JOB_ALL);
+        var socialOpts = isMale ? MEMBER_SOCIAL_MALE : (isFemale ? MEMBER_SOCIAL_FEMALE : MEMBER_SOCIAL_ALL);
+        if (jobSelect) {
+            var curJob = jobSelect.value;
+            jobSelect.innerHTML = jobOpts.map(function(v) { return '<option value="' + v + '">' + (v === '' ? 'نوع المهنة' : v) + '</option>'; }).join('');
+            if (jobOpts.indexOf(curJob) !== -1) jobSelect.value = curJob; else jobSelect.value = '';
+            toggleMemberJobInput(jobSelect);
+        }
+        if (socialSelect) {
+            var curSocial = socialSelect.value;
+            socialSelect.innerHTML = socialOpts.map(function(v) { return '<option value="' + v + '">' + (v === '' ? 'الحالة الاجتماعية' : v) + '</option>'; }).join('');
+            if (socialOpts.indexOf(curSocial) !== -1) socialSelect.value = curSocial; else socialSelect.value = '';
+            var sc = card.querySelector('.m-social-custom');
+            if (sc) { if (curSocial && socialOpts.indexOf(curSocial) === -1) { sc.style.display = 'block'; sc.value = curSocial; } else sc.style.display = 'none'; }
+        }
+        highlightEmptyFields();
+    }
+
     function toggleRelationInput(select) {
         const card = select.closest('.member-card');
         const customInput = card.querySelector('.m-rel-custom');
@@ -1045,11 +1091,18 @@
             customInput.value = '';
             customInput.classList.remove('field-required-empty');
         }
+        // تحديث خيارات المهنة والحالة الاجتماعية حسب الجنس (ذكر/أنثى) من صلة القرابة
+        updateMemberJobAndSocialOptions(select);
+        // إذا اختار زوجة أو الزوجة الثانية: الحالة الاجتماعية تختار تلقائياً "متزوجة"
+        if (select.value === 'زوجة' || select.value === 'الزوجة الثانية') {
+            const socialSelect = card.querySelector('.m-social');
+            if (socialSelect) socialSelect.value = 'متزوجة';
+            const socialCustom = card.querySelector('.m-social-custom');
+            if (socialCustom) { socialCustom.style.display = 'none'; socialCustom.value = ''; }
+        }
         // التحقق من إظهار/إخفاء حقلي "مهنة العمل" و "مكان العمل" عند تغيير صلة القرابة
         const jobTypeSelect = card.querySelector('.m-job-type');
-        if (jobTypeSelect) {
-            toggleMemberJobInput(jobTypeSelect);
-        }
+        if (jobTypeSelect) toggleMemberJobInput(jobTypeSelect);
         highlightEmptyFields();
     }
     
@@ -1079,6 +1132,83 @@
             customInput.required = false;
             customInput.value = '';
             customInput.classList.remove('field-required-empty');
+        }
+        highlightEmptyFields();
+    }
+
+    function updateHeadJobTypeOptions() {
+        const headGender = document.getElementById('headGender');
+        const jobTypeSelect = document.getElementById('jobType');
+        if (!headGender || !jobTypeSelect) return;
+        const currentVal = jobTypeSelect.value;
+        var list;
+        if (headGender.value === 'ذكر') {
+            list = [
+                { v: '', t: 'نوع المهنة' },
+                { v: 'عسكري', t: 'عسكري' }, { v: 'منتسب', t: 'منتسب' }, { v: 'موظف', t: 'موظف' },
+                { v: 'كاسب', t: 'كاسب' }, { v: 'طالب', t: 'طالب' }, { v: 'متقاعد', t: 'متقاعد' }, { v: 'أخرى', t: 'أخرى' }
+            ];
+        } else if (headGender.value === 'أنثى') {
+            list = [
+                { v: '', t: 'نوع المهنة' },
+                { v: 'طالبة', t: 'طالبة' }, { v: 'ربة بيت', t: 'ربة بيت' }, { v: 'موظفة', t: 'موظفة' },
+                { v: 'متقاعدة', t: 'متقاعدة' }, { v: 'أخرى', t: 'أخرى' }
+            ];
+        } else {
+            list = [
+                { v: '', t: 'نوع المهنة' },
+                { v: 'عسكري', t: 'عسكري' }, { v: 'منتسب', t: 'منتسب' }, { v: 'موظف', t: 'موظف' }, { v: 'موظفة', t: 'موظفة' },
+                { v: 'كاسب', t: 'كاسب' }, { v: 'ربة بيت', t: 'ربة بيت' }, { v: 'طالب', t: 'طالب' },
+                { v: 'متقاعد', t: 'متقاعد' }, { v: 'متقاعدة', t: 'متقاعدة' }, { v: 'أخرى', t: 'أخرى' }
+            ];
+        }
+        var allowed = list.map(function(o) { return o.v; });
+        if (allowed.indexOf(currentVal) === -1) jobTypeSelect.value = '';
+        jobTypeSelect.innerHTML = list.map(function(o) { return '<option value="' + (o.v || '') + '">' + o.t + '</option>'; }).join('');
+        if (allowed.indexOf(currentVal) !== -1) jobTypeSelect.value = currentVal;
+        toggleJobInput(jobTypeSelect);
+        updateHeadWorkLocation();
+        highlightEmptyFields();
+    }
+
+    var HEAD_JOB_NO_WORK = ['ربة بيت', 'طالب', 'طالبة', 'متقاعد', 'متقاعدة'];
+    var HEAD_JOB_NO_WORK_TEXT = { 'طالب': 'طالب لا يعمل', 'طالبة': 'طالبة لا تعمل', 'ربة بيت': 'ربة بيت لا تعمل', 'متقاعد': 'متقاعد لا يعمل', 'متقاعدة': 'متقاعدة لا تعمل' };
+    var TABOO_ASHWAIIAT_TEXT = 'عشوائيات لا يوجد رقم طابو';
+    var TABOO_PLACEHOLDER_DEFAULT = 'رقم الطابو';
+    var TABOO_PLACEHOLDER_IJAR = 'رقم طابو البيت المؤجرة';
+    function updateTabooByHomeType() {
+        var ht = document.getElementById('homeType');
+        var tabooEl = document.getElementById('taboo');
+        if (!ht || !tabooEl) return;
+        if (ht.value === 'عشوائيات') {
+            tabooEl.value = TABOO_ASHWAIIAT_TEXT;
+            tabooEl.readOnly = true;
+            tabooEl.placeholder = TABOO_PLACEHOLDER_DEFAULT;
+            tabooEl.classList.remove('field-required-empty');
+        } else if (ht.value === 'إيجار') {
+            tabooEl.readOnly = false;
+            tabooEl.placeholder = TABOO_PLACEHOLDER_IJAR;
+            if (tabooEl.value === TABOO_ASHWAIIAT_TEXT) tabooEl.value = '';
+        } else {
+            tabooEl.readOnly = false;
+            tabooEl.placeholder = TABOO_PLACEHOLDER_DEFAULT;
+            if (tabooEl.value === TABOO_ASHWAIIAT_TEXT) tabooEl.value = '';
+        }
+        highlightEmptyFields();
+    }
+
+    function updateHeadWorkLocation() {
+        var jt = document.getElementById('jobType');
+        var wl = document.getElementById('workLocation');
+        if (!jt || !wl) return;
+        if (HEAD_JOB_NO_WORK.indexOf(jt.value) !== -1) {
+            wl.value = HEAD_JOB_NO_WORK_TEXT[jt.value] || jt.value + ' لا يعمل';
+            wl.readOnly = true;
+            wl.classList.remove('field-required-empty');
+        } else {
+            wl.readOnly = false;
+            var autoTexts = ['طالب لا يعمل', 'طالبة لا تعمل', 'ربة بيت لا تعمل', 'متقاعد لا يعمل', 'متقاعدة لا تعمل'];
+            if (autoTexts.indexOf(wl.value) !== -1) wl.value = '';
         }
         highlightEmptyFields();
     }
@@ -1143,10 +1273,21 @@
             'homeType', 'prevAddress', 'address', 'moveDate', 'taboo', 'homeNum', 'housingCard'
         ];
         
+        const jt = document.getElementById('jobType') ? document.getElementById('jobType').value : '';
+        const workLocationOptional = HEAD_JOB_NO_WORK.indexOf(jt) !== -1;
+        const homeTypeVal = document.getElementById('homeType') ? document.getElementById('homeType').value : '';
+        const tabooOptional = homeTypeVal === 'عشوائيات';
         requiredFields.forEach(function(fieldId) {
             const el = document.getElementById(fieldId);
             if (!el) return;
-            
+            if (fieldId === 'workLocation' && workLocationOptional) {
+                el.classList.remove('field-required-empty');
+                return;
+            }
+            if (fieldId === 'taboo' && tabooOptional) {
+                el.classList.remove('field-required-empty');
+                return;
+            }
             const val = (el.value || '').trim();
             if (!val) {
                 el.classList.add('field-required-empty');
@@ -1308,14 +1449,14 @@
         const jt = document.getElementById('jobType').value;
         if (!jt) msg.push('المهنة');
         if (jt === 'أخرى' && !document.getElementById('job').value.trim()) msg.push('تفاصيل المهنة');
-        if (!document.getElementById('workLocation').value.trim()) msg.push('موقع العمل');
+        if (HEAD_JOB_NO_WORK.indexOf(jt) === -1 && !document.getElementById('workLocation').value.trim()) msg.push('موقع العمل');
         const phoneVal = (document.getElementById('phone').value || '').replace(/\D/g, '');
         if (phoneVal.length !== 11) msg.push('رقم الهاتف (11 رقم بالضبط)');
         if (!document.getElementById('homeType').value) msg.push('نوع السكن');
         if (!document.getElementById('prevAddress').value.trim()) msg.push('عنوان السكن السابق');
         if (!document.getElementById('address').value.trim()) msg.push('أقرب نقطة دالة');
         if (!document.getElementById('moveDate').value.trim()) msg.push('تاريخ السكن الحالي');
-        if (!document.getElementById('taboo').value.trim()) msg.push('رقم الطابو');
+        if (document.getElementById('homeType').value !== 'عشوائيات' && !document.getElementById('taboo').value.trim()) msg.push('رقم الطابو');
         if (!document.getElementById('homeNum').value.trim()) msg.push('رقم المقاطة');
         const photoInput = document.getElementById('photoInput');
         if (!photoInput.files || !photoInput.files[0]) msg.push('صورة رب الأسرة');
@@ -1578,6 +1719,7 @@
         addMember();
         initNameCheck();
         initInstantSelects();
+        updateHeadJobTypeOptions();
         if (restoreDraft()) {
             var status = document.getElementById('loadingStatus');
             if (status) { status.innerText = 'تم استعادة مسودة سابقة. يمكنك تعديلها أو إرسالها.'; status.style.color = 'var(--primary)'; }
