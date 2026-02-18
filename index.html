@@ -1543,23 +1543,86 @@
 
     function compressImage(file, maxWidth, quality) {
         return new Promise(function(resolve, reject) {
+            // التحقق من نوع الملف
+            if (!file.type || !file.type.match(/^image\/(jpeg|jpg|png|webp)$/i)) {
+                reject(new Error('نوع الصورة غير مدعوم. استخدم JPG أو PNG.'));
+                return;
+            }
+            
             var img = new Image();
             var url = URL.createObjectURL(file);
-            img.onload = function() {
+            var timeout = setTimeout(function() {
                 URL.revokeObjectURL(url);
-                var w = img.width, h = img.height;
-                if (w > maxWidth) { h = (h * maxWidth) / w; w = maxWidth; }
-                var canvas = document.createElement('canvas');
-                canvas.width = w;
-                canvas.height = h;
-                var ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0, w, h);
+                reject(new Error('انتهت مهلة تحميل الصورة. جرب صورة أصغر.'));
+            }, 30000); // 30 ثانية timeout
+            
+            img.onload = function() {
+                clearTimeout(timeout);
+                URL.revokeObjectURL(url);
                 try {
-                    var dataUrl = canvas.toDataURL('image/jpeg', quality);
+                    var w = img.width, h = img.height;
+                    var originalSize = file.size;
+                    
+                    // إذا كانت الصورة كبيرة جداً، قلل الحجم والجودة تلقائياً
+                    var targetWidth = maxWidth;
+                    var targetQuality = quality;
+                    
+                    // إذا كانت الصورة أكبر من 5 ميجابايت، قلل الحجم أكثر
+                    if (originalSize > 5 * 1024 * 1024) {
+                        targetWidth = Math.min(maxWidth, 800); // أقصى عرض 800 بكسل
+                        targetQuality = 0.6; // جودة أقل
+                    }
+                    // إذا كانت الصورة أكبر من 10 ميجابايت، قلل أكثر
+                    else if (originalSize > 10 * 1024 * 1024) {
+                        targetWidth = Math.min(maxWidth, 600); // أقصى عرض 600 بكسل
+                        targetQuality = 0.5; // جودة أقل
+                    }
+                    
+                    // إذا كانت الصورة كبيرة جداً في الأبعاد، قلل الحجم
+                    if (w > targetWidth) {
+                        h = (h * targetWidth) / w;
+                        w = targetWidth;
+                    }
+                    
+                    var canvas = document.createElement('canvas');
+                    canvas.width = w;
+                    canvas.height = h;
+                    var ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, w, h);
+                    
+                    // جرب ضغط الصورة بجودة مختلفة حتى نحصل على حجم معقول
+                    var dataUrl = canvas.toDataURL('image/jpeg', targetQuality);
+                    var compressedSize = (dataUrl.length * 3) / 4;
+                    
+                    // إذا كانت الصورة المضغوطة لا تزال كبيرة (> 3 ميجابايت)، قلل الجودة أكثر
+                    if (compressedSize > 3 * 1024 * 1024) {
+                        targetQuality = 0.4;
+                        dataUrl = canvas.toDataURL('image/jpeg', targetQuality);
+                        compressedSize = (dataUrl.length * 3) / 4;
+                    }
+                    
+                    // إذا كانت لا تزال كبيرة (> 4 ميجابايت)، قلل الحجم أكثر
+                    if (compressedSize > 4 * 1024 * 1024) {
+                        targetWidth = Math.min(w, 500);
+                        h = (h * targetWidth) / w;
+                        w = targetWidth;
+                        canvas.width = w;
+                        canvas.height = h;
+                        ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, w, h);
+                        dataUrl = canvas.toDataURL('image/jpeg', 0.35);
+                    }
+                    
                     resolve(dataUrl);
-                } catch (e) { reject(e); }
+                } catch (e) {
+                    reject(new Error('فشل ضغط الصورة: ' + (e.message || 'خطأ غير معروف')));
+                }
             };
-            img.onerror = function() { URL.revokeObjectURL(url); reject(new Error('تحميل الصورة فشل')); };
+            img.onerror = function() {
+                clearTimeout(timeout);
+                URL.revokeObjectURL(url);
+                reject(new Error('الصورة تالفة أو غير مدعومة. جرب صورة أخرى.'));
+            };
             img.src = url;
         });
     }
@@ -1647,24 +1710,46 @@
         var hasPhoto = photoInput.files && photoInput.files[0];
 
         function doSend() {
+            var requestBody = JSON.stringify(payload);
+            // التحقق من حجم الطلب (Google Apps Script له حد أقصى ~50 ميجابايت)
+            if (requestBody.length > 45 * 1024 * 1024) {
+                onDone(false, 'البيانات كبيرة جداً. جرب تقليل حجم الصورة أو عدد أفراد الأسرة.');
+                return;
+            }
+            
             fetch(scriptURL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload),
+                body: requestBody,
                 mode: 'no-cors'
             }).then(function() {
-                onDone(true);
+                // مع no-cors لا يمكن قراءة الرد، لكن نعتبر النجاح إذا لم يكن هناك خطأ
+                setTimeout(function() {
+                    onDone(true);
+                }, 500); // انتظر قليلاً للتأكد من اكتمال الطلب
             }).catch(function(e) {
-                onDone(false, e && e.message ? e.message : 'تحقق من الاتصال وحاول مرة أخرى.');
+                console.error('خطأ في رفع البيانات:', e);
+                onDone(false, 'فشل رفع البيانات. تحقق من الاتصال وحاول مرة أخرى.');
             });
         }
 
         if (hasPhoto) {
+            // إظهار رسالة للمستخدم أن الصورة قيد الضغط
+            if (btn) { btn.textContent = 'جاري ضغط الصورة...'; }
+            
             compressImage(photoInput.files[0], 1200, 0.75).then(function(photoBase64) {
+                var base64Size = (photoBase64.length * 3) / 4;
+                var sizeMB = (base64Size / (1024 * 1024)).toFixed(2);
+                console.log('تم ضغط الصورة إلى: ' + sizeMB + ' ميجابايت');
+                
+                // حتى لو كانت كبيرة، نحاول إرسالها (Google Apps Script يمكنه التعامل معها)
                 payload.photoBase64 = photoBase64;
+                if (btn) { btn.textContent = 'جاري الحفظ...'; }
                 doSend();
             }).catch(function(e) {
-                onDone(false, e && e.message ? e.message : 'فشل تحميل الصورة.');
+                var errorMsg = e && e.message ? e.message : 'فشل تحميل الصورة.';
+                console.error('خطأ في ضغط الصورة:', e);
+                onDone(false, errorMsg);
             });
         } else {
             doSend();
