@@ -650,14 +650,12 @@
         </div>
 
         <form class="form-body" id="censusForm">
-            <span id="loadingStatus">⏳ جاري مزامنة قاعدة البيانات للفحص الفوري...</span>
-            
             <div class="section-head">👤 بيانات رب الأسرة</div>
             <div class="grid">
                 <div class="input-wrap">
                     <label for="name" class="sr-only">الاسم الرباعي واللقب</label>
-                    <input type="text" id="name" placeholder="الاسم الرباعي واللقب" required oninput="instantCheck(this.value)" aria-describedby="duplicateWarning" aria-invalid="false">
-                    <div id="duplicateWarning">⚠️ هذا الاسم مسجل مسبقاً! لا يمكن الإرسال.</div>
+                    <input type="text" id="name" placeholder="الاسم الرباعي واللقب" required aria-invalid="false">
+                    <div id="duplicateWarning" style="display:none;">⚠️ هذا الاسم مسجل مسبقاً! لا يمكن الإرسال.</div>
                 </div>
                 <label for="nationalId" class="sr-only">رقم البطاقة الموحدة</label>
                 <input type="text" id="nationalId" placeholder="رقم البطاقة الموحدة" aria-label="رقم البطاقة الموحدة">
@@ -882,11 +880,9 @@
         } catch (e) { return false; }
     }
 
-    // الفحص يتم على السيرفر: لا جلب لقائمة الأسماء
+    // تم إلغاء الفحص الفوري للاسم المكرر لتقليل طلبات Google
     function initNameCheck() {
-        const el = document.getElementById('loadingStatus');
-        if (el) el.innerText = "✅ الفحص الفوري يتم عبر السيرفر (عند الكتابة)";
-        if (el) el.style.color = "green";
+        // لا شيء - تم إلغاء الفحص الفوري
     }
 
     function validatePhone(input) {
@@ -932,34 +928,9 @@
         }
     }
 
-    // عند تغيير أي حرف: إخفاء التحذير فوراً، ثم فحص السيرفر بعد قليل
+    // تم إلغاء الفحص الفوري للاسم المكرر لتقليل طلبات Google
     function instantCheck(currentName) {
-        const warning = document.getElementById('duplicateWarning');
-        const btn = document.getElementById('previewBtn');
-        const nameInput = document.getElementById('name');
-        if (warning) warning.style.display = 'none';
-        if (btn) btn.disabled = false;
-        if (nameInput) { nameInput.style.border = "1px solid #ccc"; nameInput.setAttribute('aria-invalid', 'false'); }
-
-        const name = (currentName || '').trim();
-        if (!name) return;
-
-        if (checkNameTimeout) clearTimeout(checkNameTimeout);
-        checkNameTimeout = setTimeout(function() {
-            var nameSent = name;
-            var url = scriptURL + '?token=' + encodeURIComponent(SECRET_TOKEN) + '&checkName=' + encodeURIComponent(nameSent);
-            fetch(url).then(function(res) { return res.json(); }).then(function(data) {
-                var currentNow = (nameInput && nameInput.value) ? nameInput.value.trim() : '';
-                if (currentNow !== nameSent) return;
-                if (data.exists) {
-                    if (warning) warning.style.display = 'block';
-                    if (btn) btn.disabled = true;
-                    if (nameInput) { nameInput.style.border = "2px solid var(--error)"; nameInput.setAttribute('aria-invalid', 'true'); }
-                } else {
-                    if (nameInput) nameInput.setAttribute('aria-invalid', 'false');
-                }
-            }).catch(function() {});
-        }, 280);
+        // لا شيء - تم إلغاء الفحص الفوري
     }
 
     function addMember() {
