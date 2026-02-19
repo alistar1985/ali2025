@@ -881,7 +881,7 @@
 <div id="mapModal">
     <div id="mapContainer">
         <div id="mapHeader">
-            <span>اختر الموقع من الخريطة</span>
+            <span id="mapHeaderText">اختر موقع من الخريطة - حي القائم</span>
             <button id="mapCloseBtn" onclick="closeMapSelector()">×</button>
         </div>
         <div id="mapDiv"></div>
@@ -2034,7 +2034,7 @@
                     document.getElementById('locationLink').value = link;
                     selectedLocation = { lat: lat, lng: lng };
                     
-                    if (locationText) locationText.textContent = '✅ تم تحديد الموقع: ' + lat.toFixed(6) + ', ' + lng.toFixed(6);
+                    if (locationText) locationText.textContent = '✅ تم تحديد الموقع: حي القائم - ' + lat.toFixed(6) + ', ' + lng.toFixed(6);
                     if (statusDiv) {
                         statusDiv.style.background = '#ecfdf5';
                         statusDiv.style.color = '#065f46';
@@ -2076,6 +2076,12 @@
         var statusDiv = document.getElementById('locationStatus');
         if (statusDiv) statusDiv.dataset.initialized = 'true';
         
+        // إظهار رسالة الانتظار
+        var mapHeaderText = document.getElementById('mapHeaderText');
+        if (mapHeaderText) {
+            mapHeaderText.textContent = '⏳ انتظر، جاري التحويل إلى القبلة - حي القائم...';
+        }
+        
         // إظهار الـ modal أولاً
         modal.classList.add('show');
         document.body.style.overflow = 'hidden';
@@ -2114,6 +2120,11 @@
                                 if (mapMarker) map.removeLayer(mapMarker);
                                 mapMarker = L.marker([lat, lng]).addTo(map);
                                 selectedLocation = { lat: lat, lng: lng };
+                                
+                                // تغيير النص بعد تحميل الموقع
+                                if (mapHeaderText) {
+                                    mapHeaderText.textContent = 'اختر موقع من الخريطة - حي القائم';
+                                }
                             }
                         },
                         function() {
@@ -2122,7 +2133,16 @@
                             if (map) {
                                 setTimeout(function() {
                                     map.invalidateSize();
+                                    // تغيير النص بعد تحميل الخريطة
+                                    if (mapHeaderText) {
+                                        mapHeaderText.textContent = 'اختر موقع من الخريطة - حي القائم';
+                                    }
                                 }, 200);
+                            } else {
+                                // تغيير النص حتى لو لم تكن الخريطة جاهزة
+                                if (mapHeaderText) {
+                                    mapHeaderText.textContent = 'اختر موقع من الخريطة - حي القائم';
+                                }
                             }
                         }
                     );
@@ -2131,7 +2151,16 @@
                     if (map) {
                         setTimeout(function() {
                             map.invalidateSize();
+                            // تغيير النص بعد تحميل الخريطة
+                            if (mapHeaderText) {
+                                mapHeaderText.textContent = 'اختر موقع من الخريطة - حي القائم';
+                            }
                         }, 200);
+                    } else {
+                        // تغيير النص حتى لو لم تكن الخريطة جاهزة
+                        if (mapHeaderText) {
+                            mapHeaderText.textContent = 'اختر موقع من الخريطة - حي القائم';
+                        }
                     }
                 }
                 
@@ -2148,6 +2177,10 @@
                 setTimeout(function() {
                     if (map) {
                         map.invalidateSize();
+                    }
+                    // تغيير النص بعد تحميل الخريطة
+                    if (mapHeaderText) {
+                        mapHeaderText.textContent = 'اختر موقع من الخريطة - حي القائم';
                     }
                 }, 150);
             }
@@ -2172,7 +2205,7 @@
         
         var statusDiv = document.getElementById('locationStatus');
         var locationText = document.getElementById('locationText');
-        if (locationText) locationText.textContent = '✅ تم تحديد الموقع: ' + lat.toFixed(6) + ', ' + lng.toFixed(6);
+        if (locationText) locationText.textContent = '✅ تم تحديد الموقع: حي القائم - ' + lat.toFixed(6) + ', ' + lng.toFixed(6);
             if (statusDiv) {
                 statusDiv.style.display = 'block';
                 statusDiv.style.visibility = 'visible';
