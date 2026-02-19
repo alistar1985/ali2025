@@ -5,6 +5,10 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5, user-scalable=yes">
     <meta name="theme-color" content="#0a0f1e">
+    <!-- منع الـ cache لضمان ظهور التحديثات على GitHub Pages -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>منظومة جرد حي القائم الأول - المختار أحمد هاني</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -62,21 +66,54 @@
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 0;
+        }
+        html, body {
+            overflow-x: hidden;
+            scroll-behavior: auto;  /* منع التمرير التلقائي */
+        }
         body {
             font-family: 'Cairo', sans-serif;
-            background: linear-gradient(160deg, #e8ecf1 0%, #f0f2f5 30%, #f5f3ef 100%);
+            /* خلفية جديدة احترافية ومميزة */
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(10, 15, 30, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(230, 57, 70, 0.04) 0%, transparent 50%),
+                radial-gradient(circle at 40% 20%, rgba(212, 168, 83, 0.03) 0%, transparent 50%),
+                linear-gradient(160deg, #f8fafc 0%, #f1f5f9 25%, #e8f0f5 50%, #f0f4f8 75%, #fafbfc 100%);
+            background-attachment: fixed;  /* تثبيت الخلفية عند التمرير */
             -webkit-user-select: none;
             user-select: none;
             -webkit-tap-highlight-color: transparent;
             min-height: 100vh;
             color: var(--text);
+            position: relative;
         }
+        
+        /* إضافة نمط إضافي للخلفية */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(10, 15, 30, 0.02) 35px, rgba(10, 15, 30, 0.02) 70px);
+            pointer-events: none;
+            z-index: 0;
+        }
+        
         input, select, textarea { -webkit-user-select: text; user-select: text; }
 
+        /* التأكد من أن المحتوى يظهر فوق الخلفية */
         .page-wrap {
             min-height: 100vh;
             padding: 0;
             padding-bottom: 0;
+            position: relative;
+            z-index: 1;
         }
         @media (min-width: 600px) {
             .page-wrap { padding: 20px; max-width: 720px; margin: 0 auto; }
@@ -88,22 +125,33 @@
             box-shadow: none;
             overflow: hidden;
             animation: fadeInUp 0.5s ease-out;
+            position: relative;
+            z-index: 1;
+            /* إضافة ظل خفيف للتمييز عن الخلفية */
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
         }
         @media (min-width: 600px) {
             .app-container {
                 border-radius: var(--radius-xl);
                 box-shadow: var(--shadow-xl);
+                /* ظل أقوى على الشاشات الكبيرة */
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
             }
         }
 
         /* ===== HEADER ===== */
         .header {
-            background: linear-gradient(135deg, #0a0f1e 0%, #111d35 35%, #162544 65%, #1a2d50 100%);
+            /* خلفية Header جديدة احترافية */
+            background: 
+                radial-gradient(ellipse at top, rgba(212, 168, 83, 0.15) 0%, transparent 50%),
+                linear-gradient(135deg, #0a0f1e 0%, #0f172a 20%, #111d35 40%, #162544 60%, #1a2d50 80%, #1e3a5f 100%);
             color: white;
             padding: 36px 20px 28px;
             text-align: center;
             position: relative;
             overflow: hidden;
+            /* إضافة تأثير لامع */
+            box-shadow: inset 0 -2px 20px rgba(0, 0, 0, 0.2);
         }
         .header::before {
             content: "";
@@ -809,6 +857,37 @@
     </style>
 </head>
 <body oncontextmenu="return false;">
+<script>
+    // منع التمرير التلقائي عند فتح الصفحة
+    (function() {
+        // التأكد من أن الصفحة في الأعلى فوراً
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', function() {
+                window.scrollTo(0, 0);
+                document.documentElement.scrollTop = 0;
+                document.body.scrollTop = 0;
+            });
+        } else {
+            window.scrollTo(0, 0);
+            document.documentElement.scrollTop = 0;
+            document.body.scrollTop = 0;
+        }
+        
+        // منع التمرير التلقائي عند تحميل الصفحة
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                window.scrollTo(0, 0);
+                document.documentElement.scrollTop = 0;
+                document.body.scrollTop = 0;
+            }, 0);
+        });
+        
+        // منع التمرير التلقائي عند تغيير hash
+        window.addEventListener('hashchange', function() {
+            window.scrollTo(0, 0);
+        });
+    })();
+</script>
 
 <div id="reviewModal">
     <div class="modal-content">
@@ -905,7 +984,8 @@
                 <input type="text" id="housingCard" placeholder="بطاقة السكن مكتب معلومات" aria-label="بطاقة السكن مكتب معلومات">
             </div>
             
-            <div class="input-wrap" style="margin-top: 20px; padding: 20px; background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border-radius: 16px; border: 2px solid #0ea5e9;">
+            <div class="input-wrap" style="margin-top: 20px; padding: 20px; background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #dbeafe 100%); border-radius: 16px; border: 2px solid #0ea5e9; box-shadow: 0 4px 16px rgba(14, 165, 233, 0.15); position: relative; overflow: hidden;">
+                <div style="position: absolute; top: -50%; right: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(14, 165, 233, 0.1) 0%, transparent 70%); pointer-events: none;"></div>
                 <label for="locationLink" class="sr-only">موقع السكن</label>
                 <div style="display: flex; gap: 12px; flex-wrap: wrap;">
                     <button type="button" id="getCurrentLocationBtn" onclick="getCurrentLocation()" style="flex: 1; min-width: 160px; padding: 16px 20px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: 2px solid rgba(255,255,255,0.3); border-radius: 16px; font-family: Cairo; font-size: 1.05rem; font-weight: 800; cursor: pointer; box-shadow: 0 6px 20px rgba(16,185,129,0.4), 0 2px 8px rgba(0,0,0,0.1); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden;">
@@ -946,8 +1026,9 @@
                     }
                 </style>
                 <input type="hidden" id="locationLink" placeholder="رابط الموقع">
-                <div id="locationStatus" style="margin-top: 12px; padding: 12px 16px; background: #ffffff; border-radius: 12px; font-size: 0.95rem; color: #6b7280; display: none; border: 1px solid #e5e7eb;">
+                <div id="locationStatus" style="margin-top: 12px; padding: 12px 16px; background: #ffffff; border-radius: 12px; font-size: 0.95rem; color: #6b7280; display: none; border: 1px solid #e5e7eb; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
                     <span id="locationText">لم يتم تحديد الموقع</span>
+                </div>
                 </div>
             </div>
 
@@ -1260,8 +1341,13 @@
                 <input type="text" class="m-social-custom" placeholder="اكتب الحالة الاجتماعية يدوياً" style="display:none;">
             </div>`;
         container.appendChild(div);
-        // التمرير إلى العنصر المضاف
-        div.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        // التمرير إلى العنصر المضاف فقط إذا كان المستخدم أضافه يدوياً (وليس عند التحميل)
+        // التحقق من أن الصفحة محملة بالكامل قبل التمرير
+        if (document.readyState === 'complete' && !window._isInitialLoad) {
+            setTimeout(function() {
+                div.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 100);
+        }
         // تحديث التلوين بعد إضافة العضو
         setTimeout(highlightEmptyFields, 50);
     }
@@ -1924,8 +2010,13 @@
                 statusDiv.style.color = '#991b1b';
             }
             if (locationText) locationText.textContent = '❌ يجب تحديد الموقع قبل الإرسال';
-            // التمرير إلى حقل الموقع
-            document.getElementById('getCurrentLocationBtn').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            // التمرير إلى حقل الموقع (فقط إذا كان المستخدم يحاول الإرسال)
+            setTimeout(function() {
+                var btn = document.getElementById('getCurrentLocationBtn');
+                if (btn) {
+                    btn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }, 100);
             return;
         }
 
@@ -2258,59 +2349,65 @@
                     detectRetina: true
                 });
                 
-                // إضافة طبقة افتراضية موثوقة (CartoDB Positron) - تعمل دائماً على GitHub Pages
-                // ثم محاولة التبديل إلى Google Maps إذا كان متاحاً
-                var currentLayer = cartoPositronLayer;
+                // طريقة عرض جديدة: استخدام Google Maps مباشرة كافتراضي
+                // مع fallback تلقائي إلى CartoDB إذا فشل Google Maps
+                var currentLayer = null;
                 var errorCount = 0;
-                var maxErrors = 3;  // عدد الأخطاء المسموح قبل التبديل
+                var maxErrors = 5;  // عدد الأخطاء المسموح قبل التبديل
+                var layerSwitched = false;
                 
-                // إضافة CartoDB Positron كطبقة افتراضية (تعمل دائماً)
-                cartoPositronLayer.addTo(map);
+                // محاولة استخدام Google Maps مباشرة كطبقة افتراضية
+                googleMapsLayer.addTo(map);
+                currentLayer = googleMapsLayer;
                 
-                // محاولة إضافة Google Maps بعد تحميل الخريطة
-                setTimeout(function() {
-                    // اختبار Google Maps
-                    var testImg = new Image();
-                    testImg.crossOrigin = 'anonymous';
-                    testImg.onload = function() {
-                        // Google Maps يعمل - استبدل الطبقة
-                        try {
-                            map.removeLayer(cartoPositronLayer);
-                            googleMapsLayer.addTo(map);
-                            currentLayer = googleMapsLayer;
-                            console.log('تم التبديل إلى Google Maps');
-                        } catch(e) {
-                            console.log('خطأ في التبديل إلى Google Maps:', e);
-                        }
-                    };
-                    testImg.onerror = function() {
-                        // Google Maps لا يعمل - ابق على CartoDB
-                        console.log('Google Maps غير متاح، استخدام CartoDB Positron');
-                    };
-                    // اختبار تحميل tile واحد من Google Maps
-                    testImg.src = 'https://mt0.google.com/vt/lyrs=m&x=' + Math.floor(Math.pow(2, 10) / 2) + '&y=' + Math.floor(Math.pow(2, 10) / 2) + '&z=10';
-                }, 500);
-                
-                // معالجة أخطاء تحميل الـ tiles للطبقة الحالية
-                map.on('tileerror', function(error, tile) {
-                    errorCount++;
-                    // إذا فشل تحميل Google Maps عدة مرات، ارجع إلى CartoDB
-                    if (currentLayer === googleMapsLayer && errorCount >= maxErrors) {
-                        try {
-                            map.removeLayer(googleMapsLayer);
-                            cartoPositronLayer.addTo(map);
-                            currentLayer = cartoPositronLayer;
-                            errorCount = 0;
-                            console.log('تم التبديل إلى CartoDB Positron بسبب أخطاء متعددة في Google Maps');
-                        } catch(e) {
-                            console.log('خطأ في التبديل:', e);
+                // معالجة أخطاء تحميل الـ tiles - التبديل التلقائي عند الفشل
+                googleMapsLayer.on('tileerror', function(error, tile) {
+                    if (!layerSwitched) {
+                        errorCount++;
+                        // إذا فشل تحميل Google Maps عدة مرات، استخدم CartoDB
+                        if (errorCount >= maxErrors) {
+                            try {
+                                map.removeLayer(googleMapsLayer);
+                                cartoPositronLayer.addTo(map);
+                                currentLayer = cartoPositronLayer;
+                                layerSwitched = true;
+                                errorCount = 0;
+                                console.log('تم التبديل إلى CartoDB Positron بسبب أخطاء في Google Maps');
+                            } catch(e) {
+                                console.log('خطأ في التبديل:', e);
+                            }
                         }
                     }
                 });
                 
+                // إذا لم تظهر أي tiles خلال ثانيتين، استخدم CartoDB مباشرة
+                setTimeout(function() {
+                    if (!layerSwitched && currentLayer === googleMapsLayer) {
+                        // التحقق من وجود tiles محملة
+                        var tilesLoaded = false;
+                        map.eachLayer(function(layer) {
+                            if (layer instanceof L.TileLayer && layer._tiles && Object.keys(layer._tiles).length > 0) {
+                                tilesLoaded = true;
+                            }
+                        });
+                        
+                        if (!tilesLoaded) {
+                            try {
+                                map.removeLayer(googleMapsLayer);
+                                cartoPositronLayer.addTo(map);
+                                currentLayer = cartoPositronLayer;
+                                layerSwitched = true;
+                                console.log('تم التبديل إلى CartoDB Positron - لم يتم تحميل Google Maps');
+                            } catch(e) {
+                                console.log('خطأ في التبديل:', e);
+                            }
+                        }
+                    }
+                }, 2000);
+                
                 // إضافة طبقات للتبديل بينها
                 var baseMaps = {
-                    "🗺️ Google Maps": googleMapsLayer,
+                    "🗺️ Google Maps (واضحة)": googleMapsLayer,
                     "🗺️ CartoDB Positron": cartoPositronLayer,
                     "🌙 CartoDB Dark": cartoDarkLayer,
                     "🛰️ Google Satellite": googleSatelliteLayer,
@@ -2319,10 +2416,22 @@
                 };
                 
                 // إضافة عنصر التحكم في الطبقات في الزاوية اليمنى السفلية
-                L.control.layers(baseMaps, null, {
+                // مع تحسينات للعرض على الهاتف
+                var layersControl = L.control.layers(baseMaps, null, {
                     position: 'bottomright',
-                    collapsed: false  // إظهار القائمة مفتوحة للوصول السريع
+                    collapsed: true,  // إظهار القائمة مطوية لتوفير المساحة
+                    autoZIndex: true  // ترتيب تلقائي للطبقات
                 }).addTo(map);
+                
+                // تحسين عرض عنصر التحكم على الهاتف
+                setTimeout(function() {
+                    var control = document.querySelector('.leaflet-control-layers');
+                    if (control) {
+                        control.style.maxHeight = '60vh';
+                        control.style.overflowY = 'auto';
+                        control.style.fontSize = '13px';
+                    }
+                }, 100);
                 
                 // التأكد من أن الخريطة تعرض بشكل صحيح مع إعادة حساب الحجم
                 // هذا مهم جداً لضمان عمل الخريطة بشكل صحيح على GitHub Pages
@@ -2539,6 +2648,14 @@
     }
 
     window.onload = function() {
+        // منع التمرير التلقائي عند التحميل
+        window._isInitialLoad = true;
+        
+        // التأكد من أن الصفحة في الأعلى عند التحميل
+        window.scrollTo(0, 0);
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+        
         addMember();
         initNameCheck();
         initInstantSelects();
@@ -2559,7 +2676,37 @@
             scheduleDraftSave();
             highlightEmptyFields();
         });
+        
+        // بعد التحميل، إزالة علامة التحميل الأولي
+        setTimeout(function() {
+            window._isInitialLoad = false;
+        }, 1000);
+        
+        // التأكد مرة أخرى من أن الصفحة في الأعلى
+        setTimeout(function() {
+            window.scrollTo(0, 0);
+            document.documentElement.scrollTop = 0;
+            document.body.scrollTop = 0;
+        }, 100);
     };
+    
+    // منع التمرير التلقائي عند فتح الصفحة
+    window.addEventListener('beforeunload', function() {
+        window.scrollTo(0, 0);
+    });
+    
+    // التأكد من أن الصفحة تبدأ من الأعلى
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+            window.scrollTo(0, 0);
+            document.documentElement.scrollTop = 0;
+            document.body.scrollTop = 0;
+        });
+    } else {
+        window.scrollTo(0, 0);
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+    }
 </script>
 </body>
 </html>
