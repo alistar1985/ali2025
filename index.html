@@ -357,6 +357,84 @@
         #mapDiv {
             width: 100%;
             height: 400px;
+            position: relative;
+        }
+        
+        /* ضبط موضع عناصر التحكم في الطبقات */
+        .leaflet-control-layers {
+            margin: 10px !important;
+            background: rgba(255, 255, 255, 0.95) !important;
+            border-radius: 8px !important;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15) !important;
+            padding: 8px !important;
+        }
+        .leaflet-control-layers-toggle {
+            width: 36px !important;
+            height: 36px !important;
+            background-size: 24px 24px !important;
+        }
+        .leaflet-control-layers-expanded {
+            padding: 10px !important;
+            min-width: 180px !important;
+        }
+        .leaflet-control-layers label {
+            font-family: Cairo !important;
+            font-size: 14px !important;
+            font-weight: 600 !important;
+            margin-bottom: 6px !important;
+            display: block !important;
+            cursor: pointer !important;
+        }
+        .leaflet-control-layers input[type="radio"] {
+            margin-left: 8px !important;
+        }
+        
+        /* زر الحصول على الموقع الحالي في الخريطة */
+        #mapCurrentLocationBtn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            z-index: 1000;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border: 3px solid white;
+            border-radius: 50%;
+            width: 56px;
+            height: 56px;
+            font-size: 28px;
+            cursor: pointer;
+            box-shadow: 0 4px 16px rgba(16,185,129,0.5), 0 2px 8px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
+        }
+        #mapCurrentLocationBtn:hover {
+            transform: scale(1.15) rotate(5deg);
+            box-shadow: 0 6px 20px rgba(16,185,129,0.6), 0 4px 12px rgba(0,0,0,0.2);
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+        }
+        #mapCurrentLocationBtn:active {
+            transform: scale(1.05) rotate(0deg);
+        }
+        #mapCurrentLocationBtn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: scale(1);
+        }
+        #mapCurrentLocationBtn.loading {
+            animation: pulse-location 1.5s infinite;
+        }
+        @keyframes pulse-location {
+            0%, 100% { 
+                opacity: 1; 
+                transform: scale(1);
+            }
+            50% { 
+                opacity: 0.7; 
+                transform: scale(1.1);
+            }
         }
         #mapActions {
             padding: 20px;
@@ -802,20 +880,51 @@
                 <input type="text" id="taboo" placeholder="رقم الطابو">
                 <input type="text" id="homeNum" placeholder="رقم المقاطة" value="818">
                 <input type="text" id="housingCard" placeholder="بطاقة السكن مكتب معلومات" aria-label="بطاقة السكن مكتب معلومات">
-                <div class="input-wrap" style="grid-column: 1 / -1;">
-                    <label for="locationLink" class="sr-only">موقع السكن</label>
-                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                        <button type="button" id="getCurrentLocationBtn" onclick="getCurrentLocation()" style="flex: 1; min-width: 150px; padding: 14px 16px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; border-radius: 14px; font-family: Cairo; font-size: 1rem; font-weight: 700; cursor: pointer; box-shadow: 0 4px 14px rgba(16,185,129,0.3);">
-                            📍 الموقع الحالي
-                        </button>
-                        <button type="button" id="selectFromMapBtn" onclick="openMapSelector()" style="flex: 1; min-width: 150px; padding: 14px 16px; background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; border: none; border-radius: 14px; font-family: Cairo; font-size: 1rem; font-weight: 700; cursor: pointer; box-shadow: 0 4px 14px rgba(59,130,246,0.3);">
-                            🗺️ اختر من الخريطة
-                        </button>
-                    </div>
-                    <input type="hidden" id="locationLink" placeholder="رابط الموقع">
-                    <div id="locationStatus" style="margin-top: 8px; padding: 10px 14px; background: #f3f4f6; border-radius: 10px; font-size: 0.9rem; color: #6b7280; display: none;">
-                        <span id="locationText">لم يتم تحديد الموقع</span>
-                    </div>
+            </div>
+            
+            <div class="input-wrap" style="margin-top: 20px; padding: 20px; background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border-radius: 16px; border: 2px solid #0ea5e9;">
+                <label for="locationLink" class="sr-only">موقع السكن</label>
+                <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                    <button type="button" id="getCurrentLocationBtn" onclick="getCurrentLocation()" style="flex: 1; min-width: 160px; padding: 16px 20px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: 2px solid rgba(255,255,255,0.3); border-radius: 16px; font-family: Cairo; font-size: 1.05rem; font-weight: 800; cursor: pointer; box-shadow: 0 6px 20px rgba(16,185,129,0.4), 0 2px 8px rgba(0,0,0,0.1); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden;">
+                        <span style="display: inline-block; margin-left: 8px; font-size: 1.3em; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));">📍</span>
+                        <span>الموقع الحالي</span>
+                    </button>
+                    <button type="button" id="selectFromMapBtn" onclick="openMapSelector()" style="flex: 1; min-width: 160px; padding: 16px 20px; background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; border: 2px solid rgba(255,255,255,0.3); border-radius: 16px; font-family: Cairo; font-size: 1.05rem; font-weight: 800; cursor: pointer; box-shadow: 0 6px 20px rgba(59,130,246,0.4), 0 2px 8px rgba(0,0,0,0.1); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden;">
+                        <span style="display: inline-block; margin-left: 8px; font-size: 1.3em; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));">🗺️</span>
+                        <span>اختر من الخريطة</span>
+                    </button>
+                </div>
+                <style>
+                    #getCurrentLocationBtn:hover, #selectFromMapBtn:hover {
+                        transform: translateY(-2px);
+                        box-shadow: 0 8px 24px rgba(16,185,129,0.5), 0 4px 12px rgba(0,0,0,0.15) !important;
+                    }
+                    #getCurrentLocationBtn:active, #selectFromMapBtn:active {
+                        transform: translateY(0);
+                    }
+                    #getCurrentLocationBtn:disabled {
+                        opacity: 0.6;
+                        cursor: not-allowed;
+                        transform: none !important;
+                    }
+                    #getCurrentLocationBtn.loading::after {
+                        content: '';
+                        position: absolute;
+                        top: 0;
+                        left: -100%;
+                        width: 100%;
+                        height: 100%;
+                        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+                        animation: shimmer 1.5s infinite;
+                    }
+                    @keyframes shimmer {
+                        0% { left: -100%; }
+                        100% { left: 100%; }
+                    }
+                </style>
+                <input type="hidden" id="locationLink" placeholder="رابط الموقع">
+                <div id="locationStatus" style="margin-top: 12px; padding: 12px 16px; background: #ffffff; border-radius: 12px; font-size: 0.95rem; color: #6b7280; display: none; border: 1px solid #e5e7eb;">
+                    <span id="locationText">لم يتم تحديد الموقع</span>
                 </div>
             </div>
 
@@ -861,10 +970,14 @@
 <div id="mapModal">
     <div id="mapContainer">
         <div id="mapHeader">
-            <span>اختر الموقع من الخريطة</span>
+            <span>🗺️ اختر موقع البيت من الخريطة - حي القائم - البصرة</span>
             <button id="mapCloseBtn" onclick="closeMapSelector()">×</button>
         </div>
-        <div id="mapDiv"></div>
+        <div id="mapDiv">
+            <button id="mapCurrentLocationBtn" onclick="getCurrentLocationFromMap()" title="الحصول على موقعي الحالي">
+                📍
+            </button>
+        </div>
         <div id="mapActions">
             <button id="confirmLocationBtn" onclick="confirmMapLocation()">✓ تأكيد الموقع</button>
             <button id="cancelMapBtn" onclick="closeMapSelector()">إلغاء</button>
@@ -1928,7 +2041,10 @@
         var statusDiv = document.getElementById('locationStatus');
         var locationText = document.getElementById('locationText');
         
-        if (btn) btn.disabled = true;
+        if (btn) {
+            btn.disabled = true;
+            btn.classList.add('loading');
+        }
         if (statusDiv) {
             statusDiv.style.display = 'block';
             statusDiv.style.background = '#fef3c7';
@@ -1982,7 +2098,10 @@
                         statusDiv.style.background = '#ecfdf5';
                         statusDiv.style.color = '#065f46';
                     }
-                    if (btn) btn.disabled = false;
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.classList.remove('loading');
+                    }
                 },
                 function(error) {
                     var errorMsg = '❌ فشل الحصول على الموقع';
@@ -2000,7 +2119,10 @@
                         statusDiv.style.background = '#fef2f2';
                         statusDiv.style.color = '#991b1b';
                     }
-                    if (btn) btn.disabled = false;
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.classList.remove('loading');
+                    }
                 },
                 { 
                     enableHighAccuracy: true,  // يطلب صلاحية دقيقة (قد يجبر المتصفح على طلب الصلاحية)
@@ -2015,22 +2137,74 @@
         var modal = document.getElementById('mapModal');
         if (!modal) return;
         
+        // إحداثيات حي القائم في البصرة - القبلة (إحداثيات دقيقة)
+        var qaimLat = 30.5200;  // خط العرض لحي القائم - البصرة
+        var qaimLng = 47.8200;  // خط الطول لحي القائم - البصرة
+        
         modal.classList.add('show');
         document.body.style.overflow = 'hidden';
         
-        // تهيئة الخريطة
+        // تهيئة الخريطة بعد إظهار الـ modal
         setTimeout(function() {
-            // إحداثيات حي القائم في البصرة - القبلة (إحداثيات دقيقة)
-            var qaimLat = 30.5200;  // خط العرض لحي القائم - البصرة
-            var qaimLng = 47.8200;  // خط الطول لحي القائم - البصرة
-            
             if (!map) {
                 // إنشاء الخريطة ووضعها مباشرة على حي القائم - البصرة
-                map = L.map('mapDiv').setView([qaimLat, qaimLng], 15);
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    attribution: '© OpenStreetMap',
-                    maxZoom: 19
+                map = L.map('mapDiv', {
+                    zoomControl: true,
+                    doubleClickZoom: true,
+                    scrollWheelZoom: true
+                }).setView([qaimLat, qaimLng], 15);
+                
+                // طبقة Google Maps Style (واضحة ودقيقة مثل Google Maps)
+                var googleMapsLayer = L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+                    attribution: '© Google Maps',
+                    maxZoom: 20,
+                    subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
+                });
+                
+                // طبقة Google Satellite (قمر صناعي عالي الجودة)
+                var googleSatelliteLayer = L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+                    attribution: '© Google Satellite',
+                    maxZoom: 20,
+                    subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
+                });
+                
+                // طبقة Google Hybrid (قمر صناعي مع أسماء الشوارع)
+                var googleHybridLayer = L.tileLayer('https://{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
+                    attribution: '© Google Hybrid',
+                    maxZoom: 20,
+                    subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
+                });
+                
+                // طبقة التضاريس (OpenTopoMap) - كبديل
+                var terrainLayer = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenTopoMap & OpenStreetMap',
+                    maxZoom: 17,
+                    subdomains: ['a', 'b', 'c']
+                });
+                
+                // إضافة طبقة Google Maps كطبقة أساسية (تظهر تلقائياً - واضحة ودقيقة)
+                googleMapsLayer.addTo(map);
+                
+                // إضافة طبقات للتبديل بينها
+                var baseMaps = {
+                    "🗺️ Google Maps (واضحة)": googleMapsLayer,
+                    "🛰️ القمر الصناعي": googleSatelliteLayer,
+                    "🛰️ Hybrid (قمر + أسماء)": googleHybridLayer,
+                    "🗻 التضاريس": terrainLayer
+                };
+                
+                // إضافة عنصر التحكم في الطبقات في الزاوية اليمنى السفلية
+                L.control.layers(baseMaps, null, {
+                    position: 'bottomright'  // نقل عنصر التحكم إلى الأسفل اليمين
                 }).addTo(map);
+                
+                // التأكد من أن الخريطة تعرض بشكل صحيح
+                setTimeout(function() {
+                    if (map) {
+                        map.invalidateSize();
+                        map.setView([qaimLat, qaimLng], 15);
+                    }
+                }, 100);
                 
                 // عند النقر على الخريطة - المستخدم يختار موقعه
                 map.on('click', function(e) {
@@ -2039,11 +2213,33 @@
                     // إزالة المسمار السابق إن وجد
                     if (mapMarker) map.removeLayer(mapMarker);
                     // إضافة مسمار جديد على الموقع المختار
-                    mapMarker = L.marker([lat, lng]).addTo(map);
+                    mapMarker = L.marker([lat, lng], {
+                        draggable: true,  // يمكن سحب المسمار
+                        icon: L.icon({
+                            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+                            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+                            iconSize: [25, 41],
+                            iconAnchor: [12, 41],
+                            popupAnchor: [1, -34],
+                            shadowSize: [41, 41]
+                        })
+                    }).addTo(map);
+                    
+                    // عند سحب المسمار، تحديث الموقع
+                    mapMarker.on('dragend', function(e) {
+                        var pos = mapMarker.getLatLng();
+                        selectedLocation = { lat: pos.lat, lng: pos.lng };
+                        mapMarker.setPopupContent('📍 الموقع المختار<br>' + pos.lat.toFixed(6) + ', ' + pos.lng.toFixed(6));
+                    });
+                    
                     selectedLocation = { lat: lat, lng: lng };
+                    
+                    // إظهار الإحداثيات في popup
+                    mapMarker.bindPopup('📍 الموقع المختار<br>' + lat.toFixed(6) + ', ' + lng.toFixed(6)).openPopup();
                 });
             } else {
                 // إذا كانت الخريطة موجودة مسبقاً، نعيد التركيز على حي القائم
+                map.invalidateSize();
                 map.setView([qaimLat, qaimLng], 15);
                 // إزالة أي مسمار سابق
                 if (mapMarker) {
@@ -2052,7 +2248,82 @@
                 }
                 selectedLocation = null;
             }
-        }, 100);
+        }, 200);
+    }
+    
+    // الحصول على الموقع الحالي من داخل الخريطة
+    function getCurrentLocationFromMap() {
+        var btn = document.getElementById('mapCurrentLocationBtn');
+        if (!btn || !map) return;
+        
+        btn.classList.add('loading');
+        btn.disabled = true;
+        
+        if (!navigator.geolocation) {
+            alert('المتصفح لا يدعم تحديد الموقع');
+            btn.classList.remove('loading');
+            btn.disabled = false;
+            return;
+        }
+        
+        // في كل مرة نطلب الصلاحية من جديد
+        navigator.geolocation.getCurrentPosition(
+            function(position) {
+                var lat = position.coords.latitude;
+                var lng = position.coords.longitude;
+                
+                // نقل الخريطة إلى الموقع الحالي
+                map.setView([lat, lng], 16);
+                
+                // إزالة المسمار السابق إن وجد
+                if (mapMarker) map.removeLayer(mapMarker);
+                
+                // إضافة مسمار على الموقع الحالي
+                mapMarker = L.marker([lat, lng], {
+                    draggable: true,
+                    icon: L.icon({
+                        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+                        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+                        iconSize: [25, 41],
+                        iconAnchor: [12, 41],
+                        popupAnchor: [1, -34],
+                        shadowSize: [41, 41]
+                    })
+                }).addTo(map);
+                
+                // عند سحب المسمار، تحديث الموقع
+                mapMarker.on('dragend', function(e) {
+                    var pos = mapMarker.getLatLng();
+                    selectedLocation = { lat: pos.lat, lng: pos.lng };
+                });
+                
+                selectedLocation = { lat: lat, lng: lng };
+                
+                // إظهار الإحداثيات
+                mapMarker.bindPopup('📍 موقعك الحالي<br>' + lat.toFixed(6) + ', ' + lng.toFixed(6)).openPopup();
+                
+                btn.classList.remove('loading');
+                btn.disabled = false;
+            },
+            function(error) {
+                var errorMsg = '❌ فشل الحصول على الموقع';
+                if (error.code === error.PERMISSION_DENIED) {
+                    errorMsg = '❌ تم رفض الصلاحية. يرجى السماح بالوصول إلى الموقع في إعدادات المتصفح';
+                } else if (error.code === error.POSITION_UNAVAILABLE) {
+                    errorMsg = '❌ الموقع غير متاح';
+                } else if (error.code === error.TIMEOUT) {
+                    errorMsg = '❌ انتهت مهلة الطلب';
+                }
+                alert(errorMsg);
+                btn.classList.remove('loading');
+                btn.disabled = false;
+            },
+            { 
+                enableHighAccuracy: true,
+                timeout: 15000,
+                maximumAge: 0  // لا يستخدم cache، يطلب الموقع من جديد في كل مرة
+            }
+        );
     }
     
     function closeMapSelector() {
@@ -2063,7 +2334,7 @@
     
     function confirmMapLocation() {
         if (!selectedLocation) {
-            alert('يرجى اختيار موقع من الخريطة أولاً');
+            alert('⚠️ يرجى اختيار موقع من الخريطة أولاً\n\nيمكنك:\n• النقر على الخريطة لاختيار الموقع\n• أو الضغط على زر 📍 للحصول على موقعك الحالي');
             return;
         }
         var lat = selectedLocation.lat;
