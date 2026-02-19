@@ -2,6 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5, user-scalable=yes">
     <meta name="theme-color" content="#0a0f1e">
     <title>منظومة جرد حي القائم الأول - المختار أحمد هاني</title>
@@ -2167,6 +2168,7 @@
         document.body.style.overflow = 'hidden';
         
         // تهيئة الخريطة بعد إظهار الـ modal
+        // استخدام setTimeout لضمان أن الـ modal ظهر بالكامل قبل تهيئة الخريطة
         setTimeout(function() {
             if (!map) {
                 // إنشاء الخريطة ووضعها مباشرة على حي القائم - البصرة
@@ -2323,15 +2325,20 @@
                 }).addTo(map);
                 
                 // التأكد من أن الخريطة تعرض بشكل صحيح مع إعادة حساب الحجم
+                // هذا مهم جداً لضمان عمل الخريطة بشكل صحيح على GitHub Pages
                 setTimeout(function() {
                     if (map) {
-                        map.invalidateSize(true);  // إعادة حساب الحجم بقوة
+                        // إعادة حساب الحجم بقوة - مهم جداً عند فتح المودال
+                        map.invalidateSize(true);
                         map.setView([qaimLat, qaimLng], 16);  // تكبير أعلى للدقة
                         
-                        // إعادة حساب الحجم مرة أخرى بعد التأكد من تحميل الـ modal
+                        // إعادة حساب الحجم مرة أخرى بعد التأكد من تحميل الـ modal بالكامل
+                        // هذا يضمن عمل الخريطة بشكل صحيح على جميع المنصات
                         setTimeout(function() {
                             if (map) {
                                 map.invalidateSize(true);
+                                // إعادة تعيين العرض للتأكد من أن الخريطة تعمل بشكل صحيح
+                                map.setView([qaimLat, qaimLng], 16);
                             }
                         }, 300);
                     }
@@ -2370,21 +2377,27 @@
                 });
             } else {
                 // إذا كانت الخريطة موجودة مسبقاً، نعيد التركيز على حي القائم
-                map.invalidateSize(true);  // إعادة حساب الحجم بقوة
-                map.setView([qaimLat, qaimLng], 16);  // تكبير أعلى للدقة
+                // إعادة حساب الحجم بقوة - مهم جداً عند إعادة فتح المودال
+                setTimeout(function() {
+                    if (map) {
+                        map.invalidateSize(true);
+                        map.setView([qaimLat, qaimLng], 16);  // تكبير أعلى للدقة
+                        
+                        // إعادة حساب الحجم مرة أخرى للتأكد
+                        setTimeout(function() {
+                            if (map) {
+                                map.invalidateSize(true);
+                            }
+                        }, 200);
+                    }
+                }, 100);
+                
                 // إزالة أي مسمار سابق
                 if (mapMarker) {
                     map.removeLayer(mapMarker);
                     mapMarker = null;
                 }
                 selectedLocation = null;
-                
-                // إعادة حساب الحجم مرة أخرى للتأكد
-                setTimeout(function() {
-                    if (map) {
-                        map.invalidateSize(true);
-                    }
-                }, 200);
             }
         }, 200);
     }
