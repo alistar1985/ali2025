@@ -2020,52 +2020,37 @@
         
         // تهيئة الخريطة
         setTimeout(function() {
+            // إحداثيات حي القائم في البصرة - القبلة (إحداثيات دقيقة)
+            var qaimLat = 30.5200;  // خط العرض لحي القائم - البصرة
+            var qaimLng = 47.8200;  // خط الطول لحي القائم - البصرة
+            
             if (!map) {
-                // إحداثيات حي القائم في البصرة - القبلة
-                var qaimLat = 30.5200;  // خط العرض لحي القائم
-                var qaimLng = 47.8200;  // خط الطول لحي القائم
-                
-                map = L.map('mapDiv').setView([qaimLat, qaimLng], 15); // حي القائم - البصرة مباشرة
+                // إنشاء الخريطة ووضعها مباشرة على حي القائم - البصرة
+                map = L.map('mapDiv').setView([qaimLat, qaimLng], 15);
                 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                     attribution: '© OpenStreetMap',
                     maxZoom: 19
                 }).addTo(map);
                 
-                // إضافة علامة على حي القائم
-                var qaimMarker = L.marker([qaimLat, qaimLng]).addTo(map);
-                qaimMarker.bindPopup('📍 حي القائم - البصرة').openPopup();
-                selectedLocation = { lat: qaimLat, lng: qaimLng };
-                
-                // محاولة الحصول على الموقع الحالي (اختياري)
-                if (navigator.geolocation) {
-                    navigator.geolocation.getCurrentPosition(
-                        function(position) {
-                            var lat = position.coords.latitude;
-                            var lng = position.coords.longitude;
-                            // إذا كان المستخدم قريب من حي القائم (في نطاق 5 كم)، نركز على موقعه
-                            var distance = Math.sqrt(Math.pow(lat - qaimLat, 2) + Math.pow(lng - qaimLng, 2)) * 111; // تقريب المسافة بالكيلومتر
-                            if (distance < 5) {
-                                map.setView([lat, lng], 16);
-                                if (mapMarker) map.removeLayer(mapMarker);
-                                mapMarker = L.marker([lat, lng]).addTo(map);
-                                selectedLocation = { lat: lat, lng: lng };
-                                if (qaimMarker) map.removeLayer(qaimMarker);
-                            }
-                        },
-                        function() {
-                            // إذا فشل، نبقى على حي القائم
-                        }
-                    );
-                }
-                
-                // عند النقر على الخريطة
+                // عند النقر على الخريطة - المستخدم يختار موقعه
                 map.on('click', function(e) {
                     var lat = e.latlng.lat;
                     var lng = e.latlng.lng;
+                    // إزالة المسمار السابق إن وجد
                     if (mapMarker) map.removeLayer(mapMarker);
+                    // إضافة مسمار جديد على الموقع المختار
                     mapMarker = L.marker([lat, lng]).addTo(map);
                     selectedLocation = { lat: lat, lng: lng };
                 });
+            } else {
+                // إذا كانت الخريطة موجودة مسبقاً، نعيد التركيز على حي القائم
+                map.setView([qaimLat, qaimLng], 15);
+                // إزالة أي مسمار سابق
+                if (mapMarker) {
+                    map.removeLayer(mapMarker);
+                    mapMarker = null;
+                }
+                selectedLocation = null;
             }
         }, 100);
     }
