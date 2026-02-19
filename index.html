@@ -63,10 +63,16 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         html {
             scroll-behavior: auto;
+            overflow-x: hidden;
+            position: relative;
+        }
+        html:target {
+            scroll-margin-top: 0;
         }
         html, body {
             overflow-x: hidden;
             scroll-behavior: auto;
+            position: relative;
         }
         body {
             font-family: 'Cairo', sans-serif;
@@ -77,6 +83,12 @@
             min-height: 100vh;
             color: var(--text);
             position: relative;
+            top: 0;
+            left: 0;
+        }
+        /* منع التمرير التلقائي من hash anchors */
+        *[id]:target {
+            scroll-margin-top: 0;
         }
         input, select, textarea { -webkit-user-select: text; user-select: text; }
 
@@ -947,6 +959,9 @@
 
     function restoreDraft() {
         try {
+            // منع التمرير أثناء استعادة المسودة
+            var scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop;
+            
             var raw = localStorage.getItem(DRAFT_KEY);
             if (!raw) return false;
             var d = JSON.parse(raw);
@@ -976,7 +991,13 @@
             var container = document.getElementById('membersContainer');
             if (container && d.members && d.members.length > 0) {
                 container.innerHTML = '';
+                // إضافة الأعضاء بدون تمرير تلقائي
                 d.members.forEach(function() { addMember(); });
+                // التأكد من البقاء في أعلى الصفحة بعد إضافة الأعضاء
+                window.scrollTo(0, 0);
+                document.documentElement.scrollTop = 0;
+                document.body.scrollTop = 0;
+                
                 var cards = container.querySelectorAll('.member-card');
                 d.members.forEach(function(m, i) {
                     if (!cards[i]) return;
@@ -998,7 +1019,19 @@
                     if (c.querySelector('.m-social')) c.querySelector('.m-social').value = m.social || '';
                     if (c.querySelector('.m-social-custom')) c.querySelector('.m-social-custom').value = m.socialCustom || '';
                 });
+                // التأكد من البقاء في أعلى الصفحة بعد استعادة جميع البيانات
+                setTimeout(function() {
+                    window.scrollTo(0, 0);
+                    document.documentElement.scrollTop = 0;
+                    document.body.scrollTop = 0;
+                }, 50);
             }
+            // التأكد من البقاء في أعلى الصفحة
+            setTimeout(function() {
+                window.scrollTo(0, 0);
+                document.documentElement.scrollTop = 0;
+                document.body.scrollTop = 0;
+            }, 100);
             return true;
         } catch (e) { return false; }
     }
@@ -1132,8 +1165,13 @@
                 <input type="text" class="m-social-custom" placeholder="اكتب الحالة الاجتماعية يدوياً" style="display:none;">
             </div>`;
         container.appendChild(div);
-        // التمرير إلى العنصر المضاف
-        div.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        // التمرير إلى العنصر المضاف فقط إذا لم يكن التحميل الأولي
+        // (عند استعادة المسودة، لا نريد التمرير التلقائي)
+        if (!window._isInitialLoad) {
+            setTimeout(function() {
+                div.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 100);
+        }
         // تحديث التلوين بعد إضافة العضو
         setTimeout(highlightEmptyFields, 50);
     }
@@ -2142,13 +2180,19 @@
         });
     }
 
-    // منع أي تمرير تلقائي عند التحميل
+    // منع أي تمرير تلقائي عند التحميل - تنفيذ فوري قبل أي شيء آخر
     (function() {
-        var scrollPosition = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop;
-        if (scrollPosition > 0) {
-            window.scrollTo(0, 0);
-            document.documentElement.scrollTop = 0;
-            document.body.scrollTop = 0;
+        // إزالة hash من URL فوراً
+        if (window.location.hash) {
+            window.history.replaceState(null, null, window.location.pathname + window.location.search);
+        }
+        // إعادة تعيين موضع التمرير فوراً
+        window.scrollTo(0, 0);
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+        // منع التمرير التلقائي من hash
+        if (window.location.hash) {
+            window.location.hash = '';
         }
     })();
     
@@ -2157,6 +2201,7 @@
         // إزالة أي hash من الرابط
         if (window.location.hash) {
             window.history.replaceState(null, null, window.location.pathname + window.location.search);
+            window.location.hash = '';
         }
         // التمرير إلى أعلى الصفحة
         setTimeout(function() {
@@ -2169,6 +2214,11 @@
     // التأكد من فتح الصفحة من البداية عند فتح الرابط مباشرة
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', function() {
+            // إزالة hash
+            if (window.location.hash) {
+                window.history.replaceState(null, null, window.location.pathname + window.location.search);
+                window.location.hash = '';
+            }
             setTimeout(function() {
                 window.scrollTo(0, 0);
                 document.documentElement.scrollTop = 0;
@@ -2176,14 +2226,31 @@
             }, 0);
         });
     } else {
+        // إزالة hash
+        if (window.location.hash) {
+            window.history.replaceState(null, null, window.location.pathname + window.location.search);
+            window.location.hash = '';
+        }
         setTimeout(function() {
             window.scrollTo(0, 0);
             document.documentElement.scrollTop = 0;
             document.body.scrollTop = 0;
         }, 0);
     }
+    
+    // منع التمرير التلقائي من hash عند تغيير URL
+    window.addEventListener('hashchange', function(e) {
+        e.preventDefault();
+        window.history.replaceState(null, null, window.location.pathname + window.location.search);
+        window.scrollTo(0, 0);
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+    });
 
     window.onload = function() {
+        // علامة التحميل الأولي لمنع التمرير التلقائي
+        window._isInitialLoad = true;
+        
         // التأكد من فتح الصفحة من البداية
         window.scrollTo(0, 0);
         document.documentElement.scrollTop = 0;
@@ -2209,6 +2276,10 @@
             window.scrollTo(0, 0);
             document.documentElement.scrollTop = 0;
             document.body.scrollTop = 0;
+            // إزالة علامة التحميل الأولي بعد انتهاء التحميل
+            setTimeout(function() {
+                window._isInitialLoad = false;
+            }, 500);
         }, 200);
         
         // تحديث الألوان عند التغيير
