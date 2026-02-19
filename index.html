@@ -6,6 +6,8 @@
     <meta name="theme-color" content="#0a0f1e">
     <title>منظومة جرد حي القائم الأول - المختار أحمد هاني</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
         :root {
             --primary: #0a0f1e;
@@ -300,6 +302,84 @@
             border: 1px solid rgba(239,68,68,0.15);
             display: none;
             animation: slideDown 0.3s ease-out;
+        }
+
+        /* ===== MAP MODAL ===== */
+        #mapModal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        #mapModal.show {
+            display: flex;
+        }
+        #mapContainer {
+            background: white;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        #mapHeader {
+            padding: 20px;
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+            font-weight: 800;
+            font-size: 1.1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        #mapCloseBtn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+        }
+        #mapDiv {
+            width: 100%;
+            height: 400px;
+        }
+        #mapActions {
+            padding: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        #mapActions button {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            font-family: Cairo;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+        #confirmLocationBtn {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+        #cancelMapBtn {
+            background: #f3f4f6;
+            color: #6b7280;
         }
 
         /* ===== MEMBER CARD ===== */
@@ -722,6 +802,21 @@
                 <input type="text" id="taboo" placeholder="رقم الطابو">
                 <input type="text" id="homeNum" placeholder="رقم المقاطة" value="818">
                 <input type="text" id="housingCard" placeholder="بطاقة السكن مكتب معلومات" aria-label="بطاقة السكن مكتب معلومات">
+                <div class="input-wrap" style="grid-column: 1 / -1;">
+                    <label for="locationLink" class="sr-only">موقع السكن</label>
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        <button type="button" id="getCurrentLocationBtn" onclick="getCurrentLocation()" style="flex: 1; min-width: 150px; padding: 14px 16px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; border-radius: 14px; font-family: Cairo; font-size: 1rem; font-weight: 700; cursor: pointer; box-shadow: 0 4px 14px rgba(16,185,129,0.3);">
+                            📍 الموقع الحالي
+                        </button>
+                        <button type="button" id="selectFromMapBtn" onclick="openMapSelector()" style="flex: 1; min-width: 150px; padding: 14px 16px; background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; border: none; border-radius: 14px; font-family: Cairo; font-size: 1rem; font-weight: 700; cursor: pointer; box-shadow: 0 4px 14px rgba(59,130,246,0.3);">
+                            🗺️ اختر من الخريطة
+                        </button>
+                    </div>
+                    <input type="hidden" id="locationLink" placeholder="رابط الموقع">
+                    <div id="locationStatus" style="margin-top: 8px; padding: 10px 14px; background: #f3f4f6; border-radius: 10px; font-size: 0.9rem; color: #6b7280; display: none;">
+                        <span id="locationText">لم يتم تحديد الموقع</span>
+                    </div>
+                </div>
             </div>
 
             <div class="section-head">👨‍👩‍👧‍👦 أفراد الأسرة</div>
@@ -762,12 +857,32 @@
 </div>
 </div>
 
+<!-- Modal للخريطة -->
+<div id="mapModal">
+    <div id="mapContainer">
+        <div id="mapHeader">
+            <span>اختر الموقع من الخريطة</span>
+            <button id="mapCloseBtn" onclick="closeMapSelector()">×</button>
+        </div>
+        <div id="mapDiv"></div>
+        <div id="mapActions">
+            <button id="confirmLocationBtn" onclick="confirmMapLocation()">✓ تأكيد الموقع</button>
+            <button id="cancelMapBtn" onclick="closeMapSelector()">إلغاء</button>
+        </div>
+    </div>
+</div>
+
 <script>
-    const scriptURL = "https://script.google.com/macros/s/AKfycbyET3MEAoalA76kx72zZ3eiig_hOikAUG8LdQQOFTQpvnbu8nxwlvat7F_9LBPPEw06NQ/exec"; 
+    const scriptURL = "https://script.google.com/macros/s/AKfycbxb4IeKEDgFVqvPMJgMxhTWQzq--lUcNU9THwRFQsGTcFiWwcxcoxZpwDFxO6uAUwVhcA/exec"; 
     const SECRET_TOKEN = "AL_QAIM_MUKHTAR_2026";
     let checkNameTimeout = null;
     let draftTimeout = null;
     const DRAFT_KEY = 'census_form_draft';
+    
+    // متغيرات الخريطة
+    let map = null;
+    let mapMarker = null;
+    let selectedLocation = null;
 
     function saveDraft() {
         try {
@@ -1278,6 +1393,27 @@
             }
         }
         
+        // فحص الموقع (إجباري)
+        const locationLink = document.getElementById('locationLink');
+        const locationStatus = document.getElementById('locationStatus');
+        const getCurrentLocationBtn = document.getElementById('getCurrentLocationBtn');
+        const selectFromMapBtn = document.getElementById('selectFromMapBtn');
+        if (!locationLink || !locationLink.value || !locationLink.value.trim()) {
+            if (getCurrentLocationBtn) getCurrentLocationBtn.style.border = '2px solid var(--error)';
+            if (selectFromMapBtn) selectFromMapBtn.style.border = '2px solid var(--error)';
+            if (locationStatus) {
+                locationStatus.style.display = 'block';
+                locationStatus.style.background = '#fef2f2';
+                locationStatus.style.color = '#991b1b';
+                if (locationStatus.querySelector('#locationText')) {
+                    locationStatus.querySelector('#locationText').textContent = '⚠️ يجب تحديد الموقع (الموقع الحالي أو من الخريطة)';
+                }
+            }
+        } else {
+            if (getCurrentLocationBtn) getCurrentLocationBtn.style.border = '';
+            if (selectFromMapBtn) selectFromMapBtn.style.border = '';
+        }
+        
         // فحص حقل "أخرى" للمهنة
         const jobType = document.getElementById('jobType');
         const jobInput = document.getElementById('job');
@@ -1431,6 +1567,11 @@
         if (!document.getElementById('homeNum').value.trim()) msg.push('رقم المقاطة');
         const photoInput = document.getElementById('photoInput');
         if (!photoInput.files || !photoInput.files[0]) msg.push('صورة رب الأسرة');
+        // التحقق من الموقع (إجباري)
+        const locationLink = document.getElementById('locationLink');
+        if (!locationLink || !locationLink.value || !locationLink.value.trim()) {
+            msg.push('موقع السكن (يجب اختيار الموقع الحالي أو من الخريطة)');
+        }
         document.querySelectorAll('.member-card').forEach((card, i) => {
             const n = card.querySelector('.m-name').value.trim();
             if (!n) return;
@@ -1633,6 +1774,24 @@
             alert('رقم الهاتف: أدخل 11 رقم بالضبط.');
             return;
         }
+        
+        // التحقق من الموقع (إجباري)
+        const locationLink = document.getElementById('locationLink');
+        if (!locationLink || !locationLink.value || !locationLink.value.trim()) {
+            alert('⚠️ يجب تحديد موقع السكن أولاً!\n\nيرجى الضغط على "الموقع الحالي" أو "اختر من الخريطة"');
+            // إظهار رسالة في حالة الموقع
+            var statusDiv = document.getElementById('locationStatus');
+            var locationText = document.getElementById('locationText');
+            if (statusDiv) {
+                statusDiv.style.display = 'block';
+                statusDiv.style.background = '#fef2f2';
+                statusDiv.style.color = '#991b1b';
+            }
+            if (locationText) locationText.textContent = '❌ يجب تحديد الموقع قبل الإرسال';
+            // التمرير إلى حقل الموقع
+            document.getElementById('getCurrentLocationBtn').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return;
+        }
 
         const sId = "QA-" + Math.floor(Math.random()*900000+100000);
         let family = "";
@@ -1687,7 +1846,8 @@
             housingCard: (document.getElementById('housingCard') && document.getElementById('housingCard').value) ? document.getElementById('housingCard').value.trim() : "",
             familyMembers: family,
             memberWorkLocations: memberWorkLocations.join(" | ") || "",
-            notes: document.getElementById('notes').value.trim() || ""
+            notes: document.getElementById('notes').value.trim() || "",
+            locationLink: (document.getElementById('locationLink') && document.getElementById('locationLink').value) ? document.getElementById('locationLink').value.trim() : ""
         };
 
         var btn = document.querySelector('.btn-confirm');
@@ -1762,6 +1922,162 @@
         else lbl.textContent = 'اضغط لالتقاط أو اختيار صورة';
         highlightEmptyFields();
     });
+    // ===== دوال الموقع =====
+    function getCurrentLocation() {
+        var btn = document.getElementById('getCurrentLocationBtn');
+        var statusDiv = document.getElementById('locationStatus');
+        var locationText = document.getElementById('locationText');
+        
+        if (btn) btn.disabled = true;
+        if (statusDiv) {
+            statusDiv.style.display = 'block';
+            statusDiv.style.background = '#fef3c7';
+            statusDiv.style.color = '#92400e';
+        }
+        if (locationText) locationText.textContent = '⏳ جاري الحصول على الموقع...';
+        
+        if (!navigator.geolocation) {
+            if (locationText) locationText.textContent = '❌ المتصفح لا يدعم تحديد الموقع';
+            if (statusDiv) {
+                statusDiv.style.background = '#fef2f2';
+                statusDiv.style.color = '#991b1b';
+            }
+            if (btn) btn.disabled = false;
+            return;
+        }
+        
+        navigator.geolocation.getCurrentPosition(
+            function(position) {
+                var lat = position.coords.latitude;
+                var lng = position.coords.longitude;
+                var link = 'https://www.google.com/maps?q=' + lat + ',' + lng;
+                document.getElementById('locationLink').value = link;
+                selectedLocation = { lat: lat, lng: lng };
+                
+                if (locationText) locationText.textContent = '✅ تم تحديد الموقع: ' + lat.toFixed(6) + ', ' + lng.toFixed(6);
+                if (statusDiv) {
+                    statusDiv.style.background = '#ecfdf5';
+                    statusDiv.style.color = '#065f46';
+                }
+                if (btn) btn.disabled = false;
+            },
+            function(error) {
+                var errorMsg = '❌ فشل الحصول على الموقع';
+                if (error.code === error.PERMISSION_DENIED) {
+                    errorMsg = '❌ تم رفض الصلاحية. يرجى السماح بالوصول إلى الموقع في إعدادات المتصفح';
+                } else if (error.code === error.POSITION_UNAVAILABLE) {
+                    errorMsg = '❌ الموقع غير متاح';
+                } else if (error.code === error.TIMEOUT) {
+                    errorMsg = '❌ انتهت مهلة الطلب';
+                }
+                if (locationText) locationText.textContent = errorMsg;
+                if (statusDiv) {
+                    statusDiv.style.background = '#fef2f2';
+                    statusDiv.style.color = '#991b1b';
+                }
+                if (btn) btn.disabled = false;
+            },
+            { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+        );
+    }
+    
+    function openMapSelector() {
+        var modal = document.getElementById('mapModal');
+        if (!modal) return;
+        
+        modal.classList.add('show');
+        document.body.style.overflow = 'hidden';
+        
+        // تهيئة الخريطة
+        setTimeout(function() {
+            if (!map) {
+                map = L.map('mapDiv').setView([33.3152, 44.3661], 13); // بغداد افتراضياً
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenStreetMap',
+                    maxZoom: 19
+                }).addTo(map);
+                
+                // محاولة الحصول على الموقع الحالي
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        function(position) {
+                            var lat = position.coords.latitude;
+                            var lng = position.coords.longitude;
+                            map.setView([lat, lng], 15);
+                            if (mapMarker) map.removeLayer(mapMarker);
+                            mapMarker = L.marker([lat, lng]).addTo(map);
+                            selectedLocation = { lat: lat, lng: lng };
+                        },
+                        function() {
+                            // إذا فشل، نستخدم موقع افتراضي
+                        }
+                    );
+                }
+                
+                // عند النقر على الخريطة
+                map.on('click', function(e) {
+                    var lat = e.latlng.lat;
+                    var lng = e.latlng.lng;
+                    if (mapMarker) map.removeLayer(mapMarker);
+                    mapMarker = L.marker([lat, lng]).addTo(map);
+                    selectedLocation = { lat: lat, lng: lng };
+                });
+            }
+        }, 100);
+    }
+    
+    function closeMapSelector() {
+        var modal = document.getElementById('mapModal');
+        if (modal) modal.classList.remove('show');
+        document.body.style.overflow = '';
+    }
+    
+    function confirmMapLocation() {
+        if (!selectedLocation) {
+            alert('يرجى اختيار موقع من الخريطة أولاً');
+            return;
+        }
+        var lat = selectedLocation.lat;
+        var lng = selectedLocation.lng;
+        var link = 'https://www.google.com/maps?q=' + lat + ',' + lng;
+        document.getElementById('locationLink').value = link;
+        
+        var statusDiv = document.getElementById('locationStatus');
+        var locationText = document.getElementById('locationText');
+        if (locationText) locationText.textContent = '✅ تم تحديد الموقع: ' + lat.toFixed(6) + ', ' + lng.toFixed(6);
+        if (statusDiv) {
+            statusDiv.style.display = 'block';
+            statusDiv.style.background = '#ecfdf5';
+            statusDiv.style.color = '#065f46';
+        }
+        
+        closeMapSelector();
+    }
+    
+    // عند الضغط على الصورة، إذا كان الموقع مرفوض، اطلب الصلاحية مرة أخرى
+    // عند الضغط على الصورة، اطلب صلاحية الكاميرا/الصورة في كل مرة
+    document.getElementById('photoInput').addEventListener('click', function(e) {
+        // في كل مرة يضغط، نطلب صلاحية الكاميرا/الصورة
+        // هذا يعمل على الأجهزة المحمولة والكمبيوتر
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            // طلب صلاحية الكاميرا
+            navigator.mediaDevices.getUserMedia({ 
+                video: { facingMode: 'environment' }, // الكاميرا الخلفية على الموبايل
+                audio: false 
+            })
+            .then(function(stream) {
+                // إذا تم منح الصلاحية، أوقف الكاميرا فوراً (نحن لا نحتاجها الآن، فقط نريد الصلاحية)
+                stream.getTracks().forEach(function(track) {
+                    track.stop();
+                });
+            })
+            .catch(function(error) {
+                // إذا رُفضت الصلاحية، لا نفعل شيء - المتصفح سيطلب الصلاحية عند اختيار الملف
+                // لكن على بعض المتصفحات، قد نحتاج لإعادة المحاولة
+            });
+        }
+    });
+
     // ===== اختيار فوري من القوائم المنسدلة (بدون الضغط على "تم") =====
     function initInstantSelects() {
         document.addEventListener('change', function(e) {
