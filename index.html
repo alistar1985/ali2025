@@ -2,33 +2,12 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5, user-scalable=yes">
     <meta name="theme-color" content="#0a0f1e">
-    <!-- منع الـ cache لضمان ظهور التحديثات على GitHub Pages -->
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
     <title>منظومة جرد حي القائم الأول - المختار أحمد هاني</title>
-    <!-- تحديث الخريطة - الإصدار 2.0 - 2026-02-19 -->
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="anonymous" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="anonymous"></script>
-    <script>
-        // علامة مميزة للتأكد من تحديث الكود - الإصدار 2.0
-        console.log('🚀 تم تحميل الكود المحدث - الإصدار 2.0 - ' + new Date().toISOString());
-        
-        // التحقق من تحميل Leaflet.js
-        window.addEventListener('load', function() {
-            setTimeout(function() {
-                if (typeof L !== 'undefined' && L.map) {
-                    console.log('✅ Leaflet.js محمّل بنجاح - جاهز للاستخدام');
-                } else {
-                    console.error('❌ Leaflet.js لم يتم تحميله بشكل صحيح!');
-                }
-            }, 500);
-        });
-    </script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
         :root {
             --primary: #0a0f1e;
@@ -83,22 +62,15 @@
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
         html {
-            scroll-behavior: smooth;
-            scroll-padding-top: 0;
+            scroll-behavior: auto;
         }
         html, body {
             overflow-x: hidden;
-            scroll-behavior: auto;  /* منع التمرير التلقائي */
+            scroll-behavior: auto;
         }
         body {
             font-family: 'Cairo', sans-serif;
-            /* خلفية جديدة احترافية ومميزة */
-            background: 
-                radial-gradient(circle at 20% 50%, rgba(10, 15, 30, 0.05) 0%, transparent 50%),
-                radial-gradient(circle at 80% 80%, rgba(230, 57, 70, 0.04) 0%, transparent 50%),
-                radial-gradient(circle at 40% 20%, rgba(212, 168, 83, 0.03) 0%, transparent 50%),
-                linear-gradient(160deg, #f8fafc 0%, #f1f5f9 25%, #e8f0f5 50%, #f0f4f8 75%, #fafbfc 100%);
-            background-attachment: fixed;  /* تثبيت الخلفية عند التمرير */
+            background: linear-gradient(160deg, #e8ecf1 0%, #f0f2f5 30%, #f5f3ef 100%);
             -webkit-user-select: none;
             user-select: none;
             -webkit-tap-highlight-color: transparent;
@@ -106,30 +78,12 @@
             color: var(--text);
             position: relative;
         }
-        
-        /* إضافة نمط إضافي للخلفية */
-        body::before {
-            content: "";
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: 
-                repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(10, 15, 30, 0.02) 35px, rgba(10, 15, 30, 0.02) 70px);
-            pointer-events: none;
-            z-index: 0;
-        }
-        
         input, select, textarea { -webkit-user-select: text; user-select: text; }
 
-        /* التأكد من أن المحتوى يظهر فوق الخلفية */
         .page-wrap {
             min-height: 100vh;
             padding: 0;
             padding-bottom: 0;
-            position: relative;
-            z-index: 1;
         }
         @media (min-width: 600px) {
             .page-wrap { padding: 20px; max-width: 720px; margin: 0 auto; }
@@ -141,33 +95,22 @@
             box-shadow: none;
             overflow: hidden;
             animation: fadeInUp 0.5s ease-out;
-            position: relative;
-            z-index: 1;
-            /* إضافة ظل خفيف للتمييز عن الخلفية */
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
         }
         @media (min-width: 600px) {
             .app-container {
                 border-radius: var(--radius-xl);
                 box-shadow: var(--shadow-xl);
-                /* ظل أقوى على الشاشات الكبيرة */
-                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
             }
         }
 
         /* ===== HEADER ===== */
         .header {
-            /* خلفية Header جديدة احترافية */
-            background: 
-                radial-gradient(ellipse at top, rgba(212, 168, 83, 0.15) 0%, transparent 50%),
-                linear-gradient(135deg, #0a0f1e 0%, #0f172a 20%, #111d35 40%, #162544 60%, #1a2d50 80%, #1e3a5f 100%);
+            background: linear-gradient(135deg, #0a0f1e 0%, #111d35 35%, #162544 65%, #1a2d50 100%);
             color: white;
             padding: 36px 20px 28px;
             text-align: center;
             position: relative;
             overflow: hidden;
-            /* إضافة تأثير لامع */
-            box-shadow: inset 0 -2px 20px rgba(0, 0, 0, 0.2);
         }
         .header::before {
             content: "";
@@ -390,8 +333,6 @@
             background: white;
             border-radius: 20px;
             width: 100%;
-            max-width: 100%;
-            overflow: hidden;  /* منع التمرير غير المرغوب */
             max-width: 600px;
             max-height: 90vh;
             overflow: hidden;
@@ -424,104 +365,6 @@
         #mapDiv {
             width: 100%;
             height: 400px;
-            position: relative;
-            -webkit-tap-highlight-color: transparent;  /* إزالة التأثير الأزرق عند اللمس على الهاتف */
-            touch-action: pan-x pan-y;  /* تحسين اللمس على الهاتف */
-        }
-        
-        /* تحسينات للأداء على الهاتف */
-        @media (max-width: 768px) {
-            #mapDiv {
-                height: 450px;  /* زيادة الارتفاع على الهاتف */
-            }
-            
-            /* تحسين عناصر التحكم على الهاتف */
-            .leaflet-control-layers {
-                font-size: 14px !important;
-                padding: 8px !important;
-            }
-            
-            .leaflet-control-layers label {
-                font-size: 13px !important;
-                padding: 4px 0 !important;
-            }
-        }
-        
-        /* ضبط موضع عناصر التحكم في الطبقات */
-        .leaflet-control-layers {
-            margin: 10px !important;
-            background: rgba(255, 255, 255, 0.95) !important;
-            border-radius: 8px !important;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15) !important;
-            padding: 8px !important;
-        }
-        .leaflet-control-layers-toggle {
-            width: 36px !important;
-            height: 36px !important;
-            background-size: 24px 24px !important;
-        }
-        .leaflet-control-layers-expanded {
-            padding: 10px !important;
-            min-width: 180px !important;
-        }
-        .leaflet-control-layers label {
-            font-family: Cairo !important;
-            font-size: 14px !important;
-            font-weight: 600 !important;
-            margin-bottom: 6px !important;
-            display: block !important;
-            cursor: pointer !important;
-        }
-        .leaflet-control-layers input[type="radio"] {
-            margin-left: 8px !important;
-        }
-        
-        /* زر الحصول على الموقع الحالي في الخريطة */
-        #mapCurrentLocationBtn {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            z-index: 1000;
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            color: white;
-            border: 3px solid white;
-            border-radius: 50%;
-            width: 56px;
-            height: 56px;
-            font-size: 28px;
-            cursor: pointer;
-            box-shadow: 0 4px 16px rgba(16,185,129,0.5), 0 2px 8px rgba(0,0,0,0.15);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            backdrop-filter: blur(10px);
-        }
-        #mapCurrentLocationBtn:hover {
-            transform: scale(1.15) rotate(5deg);
-            box-shadow: 0 6px 20px rgba(16,185,129,0.6), 0 4px 12px rgba(0,0,0,0.2);
-            background: linear-gradient(135deg, #059669 0%, #047857 100%);
-        }
-        #mapCurrentLocationBtn:active {
-            transform: scale(1.05) rotate(0deg);
-        }
-        #mapCurrentLocationBtn:disabled {
-            opacity: 0.7;
-            cursor: not-allowed;
-            transform: scale(1);
-        }
-        #mapCurrentLocationBtn.loading {
-            animation: pulse-location 1.5s infinite;
-        }
-        @keyframes pulse-location {
-            0%, 100% { 
-                opacity: 1; 
-                transform: scale(1);
-            }
-            50% { 
-                opacity: 0.7; 
-                transform: scale(1.1);
-            }
         }
         #mapActions {
             padding: 20px;
@@ -873,37 +716,6 @@
     </style>
 </head>
 <body oncontextmenu="return false;">
-<script>
-    // منع التمرير التلقائي عند فتح الصفحة
-    (function() {
-        // التأكد من أن الصفحة في الأعلى فوراً
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', function() {
-                window.scrollTo(0, 0);
-                document.documentElement.scrollTop = 0;
-                document.body.scrollTop = 0;
-            });
-        } else {
-            window.scrollTo(0, 0);
-            document.documentElement.scrollTop = 0;
-            document.body.scrollTop = 0;
-        }
-        
-        // منع التمرير التلقائي عند تحميل الصفحة
-        window.addEventListener('load', function() {
-            setTimeout(function() {
-                window.scrollTo(0, 0);
-                document.documentElement.scrollTop = 0;
-                document.body.scrollTop = 0;
-            }, 0);
-        });
-        
-        // منع التمرير التلقائي عند تغيير hash
-        window.addEventListener('hashchange', function() {
-            window.scrollTo(0, 0);
-        });
-    })();
-</script>
 
 <div id="reviewModal">
     <div class="modal-content">
@@ -998,53 +810,20 @@
                 <input type="text" id="taboo" placeholder="رقم الطابو">
                 <input type="text" id="homeNum" placeholder="رقم المقاطة" value="818">
                 <input type="text" id="housingCard" placeholder="بطاقة السكن مكتب معلومات" aria-label="بطاقة السكن مكتب معلومات">
-            </div>
-            
-            <div class="input-wrap" style="margin-top: 20px; padding: 20px; background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #dbeafe 100%); border-radius: 16px; border: 2px solid #0ea5e9; box-shadow: 0 4px 16px rgba(14, 165, 233, 0.15); position: relative; overflow: hidden;">
-                <div style="position: absolute; top: -50%; right: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(14, 165, 233, 0.1) 0%, transparent 70%); pointer-events: none;"></div>
-                <label for="locationLink" class="sr-only">موقع السكن</label>
-                <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-                    <button type="button" id="getCurrentLocationBtn" onclick="getCurrentLocation()" style="flex: 1; min-width: 160px; padding: 16px 20px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: 2px solid rgba(255,255,255,0.3); border-radius: 16px; font-family: Cairo; font-size: 1.05rem; font-weight: 800; cursor: pointer; box-shadow: 0 6px 20px rgba(16,185,129,0.4), 0 2px 8px rgba(0,0,0,0.1); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden;">
-                        <span style="display: inline-block; margin-left: 8px; font-size: 1.3em; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));">📍</span>
-                        <span>الموقع الحالي</span>
-                    </button>
-                    <button type="button" id="selectFromMapBtn" onclick="openMapSelector()" style="flex: 1; min-width: 160px; padding: 16px 20px; background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; border: 2px solid rgba(255,255,255,0.3); border-radius: 16px; font-family: Cairo; font-size: 1.05rem; font-weight: 800; cursor: pointer; box-shadow: 0 6px 20px rgba(59,130,246,0.4), 0 2px 8px rgba(0,0,0,0.1); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden;">
-                        <span style="display: inline-block; margin-left: 8px; font-size: 1.3em; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));">🗺️</span>
-                        <span>اختر من الخريطة</span>
-                    </button>
-                </div>
-                <style>
-                    #getCurrentLocationBtn:hover, #selectFromMapBtn:hover {
-                        transform: translateY(-2px);
-                        box-shadow: 0 8px 24px rgba(16,185,129,0.5), 0 4px 12px rgba(0,0,0,0.15) !important;
-                    }
-                    #getCurrentLocationBtn:active, #selectFromMapBtn:active {
-                        transform: translateY(0);
-                    }
-                    #getCurrentLocationBtn:disabled {
-                        opacity: 0.6;
-                        cursor: not-allowed;
-                        transform: none !important;
-                    }
-                    #getCurrentLocationBtn.loading::after {
-                        content: '';
-                        position: absolute;
-                        top: 0;
-                        left: -100%;
-                        width: 100%;
-                        height: 100%;
-                        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-                        animation: shimmer 1.5s infinite;
-                    }
-                    @keyframes shimmer {
-                        0% { left: -100%; }
-                        100% { left: 100%; }
-                    }
-                </style>
-                <input type="hidden" id="locationLink" placeholder="رابط الموقع">
-                <div id="locationStatus" style="margin-top: 12px; padding: 12px 16px; background: #ffffff; border-radius: 12px; font-size: 0.95rem; color: #6b7280; display: none; border: 1px solid #e5e7eb; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
-                    <span id="locationText">لم يتم تحديد الموقع</span>
-                </div>
+                <div class="input-wrap" style="grid-column: 1 / -1;">
+                    <label for="locationLink" class="sr-only">موقع السكن</label>
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        <button type="button" id="getCurrentLocationBtn" onclick="getCurrentLocation()" style="flex: 1; min-width: 150px; padding: 14px 16px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; border-radius: 14px; font-family: Cairo; font-size: 1rem; font-weight: 700; cursor: pointer; box-shadow: 0 4px 14px rgba(16,185,129,0.3);">
+                            📍 الموقع الحالي
+                        </button>
+                        <button type="button" id="selectFromMapBtn" onclick="openMapSelector()" style="flex: 1; min-width: 150px; padding: 14px 16px; background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; border: none; border-radius: 14px; font-family: Cairo; font-size: 1rem; font-weight: 700; cursor: pointer; box-shadow: 0 4px 14px rgba(59,130,246,0.3);">
+                            🗺️ اختر من الخريطة
+                        </button>
+                    </div>
+                    <input type="hidden" id="locationLink" placeholder="رابط الموقع">
+                    <div id="locationStatus" style="margin-top: 8px; padding: 10px 14px; background: #f3f4f6; border-radius: 10px; font-size: 0.9rem; color: #6b7280; display: none; visibility: hidden;">
+                        <span id="locationText">لم يتم تحديد الموقع</span>
+                    </div>
                 </div>
             </div>
 
@@ -1090,14 +869,10 @@
 <div id="mapModal">
     <div id="mapContainer">
         <div id="mapHeader">
-            <span>🗺️ اختر موقع البيت من الخريطة - حي القائم - البصرة [v2.0]</span>
+            <span>اختر الموقع من الخريطة</span>
             <button id="mapCloseBtn" onclick="closeMapSelector()">×</button>
         </div>
-        <div id="mapDiv">
-            <button id="mapCurrentLocationBtn" onclick="getCurrentLocationFromMap()" title="الحصول على موقعي الحالي">
-                📍
-            </button>
-        </div>
+        <div id="mapDiv"></div>
         <div id="mapActions">
             <button id="confirmLocationBtn" onclick="confirmMapLocation()">✓ تأكيد الموقع</button>
             <button id="cancelMapBtn" onclick="closeMapSelector()">إلغاء</button>
@@ -1357,13 +1132,8 @@
                 <input type="text" class="m-social-custom" placeholder="اكتب الحالة الاجتماعية يدوياً" style="display:none;">
             </div>`;
         container.appendChild(div);
-        // التمرير إلى العنصر المضاف فقط إذا كان المستخدم أضافه يدوياً (وليس عند التحميل)
-        // التحقق من أن الصفحة محملة بالكامل قبل التمرير
-        if (document.readyState === 'complete' && !window._isInitialLoad) {
-            setTimeout(function() {
-                div.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-            }, 100);
-        }
+        // التمرير إلى العنصر المضاف
+        div.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         // تحديث التلوين بعد إضافة العضو
         setTimeout(highlightEmptyFields, 50);
     }
@@ -1639,17 +1409,22 @@
         if (!locationLink || !locationLink.value || !locationLink.value.trim()) {
             if (getCurrentLocationBtn) getCurrentLocationBtn.style.border = '2px solid var(--error)';
             if (selectFromMapBtn) selectFromMapBtn.style.border = '2px solid var(--error)';
-            if (locationStatus) {
-                locationStatus.style.display = 'block';
-                locationStatus.style.background = '#fef2f2';
-                locationStatus.style.color = '#991b1b';
-                if (locationStatus.querySelector('#locationText')) {
-                    locationStatus.querySelector('#locationText').textContent = '⚠️ يجب تحديد الموقع (الموقع الحالي أو من الخريطة)';
-                }
+            // لا نعرض locationStatus عند التحميل الأولي لتجنب التمرير التلقائي
+            // سيتم عرضه فقط عند محاولة الإرسال أو التفاعل مع الحقل
+            if (locationStatus && !locationStatus.dataset.initialized) {
+                // عند التحميل الأولي، لا نعرض الرسالة لتجنب التمرير
+                locationStatus.style.display = 'none';
+                locationStatus.style.visibility = 'hidden';
             }
         } else {
             if (getCurrentLocationBtn) getCurrentLocationBtn.style.border = '';
             if (selectFromMapBtn) selectFromMapBtn.style.border = '';
+            if (locationStatus && locationStatus.dataset && locationStatus.dataset.initialized === 'true') {
+                locationStatus.style.display = 'block';
+                locationStatus.style.visibility = 'visible';
+                locationStatus.style.background = '#ecfdf5';
+                locationStatus.style.color = '#065f46';
+            }
         }
         
         // فحص حقل "أخرى" للمهنة
@@ -2022,16 +1797,15 @@
             var locationText = document.getElementById('locationText');
             if (statusDiv) {
                 statusDiv.style.display = 'block';
+                statusDiv.style.visibility = 'visible';
                 statusDiv.style.background = '#fef2f2';
                 statusDiv.style.color = '#991b1b';
+                statusDiv.dataset.initialized = 'true'; // علامة أن المستخدم تفاعل مع الحقل
             }
             if (locationText) locationText.textContent = '❌ يجب تحديد الموقع قبل الإرسال';
-            // التمرير إلى حقل الموقع (فقط إذا كان المستخدم يحاول الإرسال)
+            // التمرير إلى حقل الموقع فقط عند محاولة الإرسال
             setTimeout(function() {
-                var btn = document.getElementById('getCurrentLocationBtn');
-                if (btn) {
-                    btn.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }
+                document.getElementById('getCurrentLocationBtn').scrollIntoView({ behavior: 'smooth', block: 'center' });
             }, 100);
             return;
         }
@@ -2171,15 +1945,14 @@
         var statusDiv = document.getElementById('locationStatus');
         var locationText = document.getElementById('locationText');
         
-        if (btn) {
-            btn.disabled = true;
-            btn.classList.add('loading');
-        }
-        if (statusDiv) {
-            statusDiv.style.display = 'block';
-            statusDiv.style.background = '#fef3c7';
-            statusDiv.style.color = '#92400e';
-        }
+        if (btn) btn.disabled = true;
+            if (statusDiv) {
+                statusDiv.style.display = 'block';
+                statusDiv.style.visibility = 'visible';
+                statusDiv.style.background = '#fef3c7';
+                statusDiv.style.color = '#92400e';
+                statusDiv.dataset.initialized = 'true'; // علامة أن المستخدم تفاعل مع الحقل
+            }
         if (locationText) locationText.textContent = '⏳ جاري الحصول على الموقع...';
         
         if (!navigator.geolocation) {
@@ -2228,10 +2001,7 @@
                         statusDiv.style.background = '#ecfdf5';
                         statusDiv.style.color = '#065f46';
                     }
-                    if (btn) {
-                        btn.disabled = false;
-                        btn.classList.remove('loading');
-                    }
+                    if (btn) btn.disabled = false;
                 },
                 function(error) {
                     var errorMsg = '❌ فشل الحصول على الموقع';
@@ -2249,10 +2019,7 @@
                         statusDiv.style.background = '#fef2f2';
                         statusDiv.style.color = '#991b1b';
                     }
-                    if (btn) {
-                        btn.disabled = false;
-                        btn.classList.remove('loading');
-                    }
+                    if (btn) btn.disabled = false;
                 },
                 { 
                     enableHighAccuracy: true,  // يطلب صلاحية دقيقة (قد يجبر المتصفح على طلب الصلاحية)
@@ -2267,462 +2034,49 @@
         var modal = document.getElementById('mapModal');
         if (!modal) return;
         
-        // ===== تحديث جديد - الإصدار 2.0 - 2026-02-19 =====
-        console.log('🗺️ فتح الخريطة - الإصدار المحدث v2.0');
-        
-        // إحداثيات حي القائم في البصرة - القبلة (إحداثيات دقيقة)
-        var qaimLat = 30.5200;  // خط العرض لحي القائم - البصرة
-        var qaimLng = 47.8200;  // خط الطول لحي القائم - البصرة
+        // علامة أن المستخدم تفاعل مع حقل الموقع
+        var statusDiv = document.getElementById('locationStatus');
+        if (statusDiv) statusDiv.dataset.initialized = 'true';
         
         modal.classList.add('show');
         document.body.style.overflow = 'hidden';
         
-        // التأكد من أن الـ modal ظهر بشكل صحيح
-        var checkModalVisible = setInterval(function() {
-            var modalVisible = window.getComputedStyle(modal).display !== 'none';
-            if (modalVisible) {
-                clearInterval(checkModalVisible);
-                console.log('✅ الـ modal ظهر بنجاح');
-                initMap();
-            }
-        }, 50);
-        
-        // timeout احتياطي - تهيئة الخريطة بعد 500ms حتى لو لم يظهر الـ modal
+        // تهيئة الخريطة
         setTimeout(function() {
-            clearInterval(checkModalVisible);
             if (!map) {
-                console.log('⚠️ تهيئة الخريطة بعد timeout');
-                initMap();
-            }
-        }, 500);
-        
-        function initMap() {
-            // التحقق من أن initMap لم يتم استدعاؤه مسبقاً
-            if (window._mapInitializing) {
-                console.log('⚠️ الخريطة قيد التهيئة بالفعل');
-                return;
-            }
-            window._mapInitializing = true;
-            
-            console.log('🗺️ بدء تهيئة الخريطة - initMap()');
-            
-            // تهيئة الخريطة بعد إظهار الـ modal
-            // استخدام setTimeout لضمان أن الـ modal ظهر بالكامل قبل تهيئة الخريطة
-            setTimeout(function() {
-            // التحقق من تحميل Leaflet.js
-            if (typeof L === 'undefined' || !L.map) {
-                console.error('❌ Leaflet.js لم يتم تحميله!');
-                alert('خطأ: لم يتم تحميل مكتبة الخرائط. يرجى تحديث الصفحة.');
-                return;
-            }
-            
-            // التحقق من وجود عنصر الخريطة
-            var mapDiv = document.getElementById('mapDiv');
-            if (!mapDiv) {
-                console.error('❌ عنصر الخريطة غير موجود!');
-                return;
-            }
-            
-            console.log('✅ Leaflet.js محمّل بنجاح');
-            console.log('✅ عنصر الخريطة موجود');
-            
-            if (!map) {
-                console.log('🗺️ إنشاء خريطة جديدة - CartoDB Positron كافتراضي');
-                // إنشاء الخريطة ووضعها مباشرة على حي القائم - البصرة
-                // تحسينات للأداء والدقة على الهاتف
-                try {
-                    map = L.map('mapDiv', {
-                    zoomControl: true,
-                    doubleClickZoom: true,
-                    scrollWheelZoom: true,
-                    tap: true,  // تفعيل اللمس على الهاتف
-                    touchZoom: true,  // تفعيل التكبير باللمس
-                    dragging: true,  // تفعيل السحب
-                    zoomSnap: 0.5,  // دقة التكبير
-                    zoomDelta: 1,  // مقدار التكبير
-                    preferCanvas: false,  // استخدام Canvas للأداء الأفضل
-                    attributionControl: true
-                }).setView([qaimLat, qaimLng], 16);  // زيادة التكبير للدقة
-                
-                console.log('✅ تم إنشاء الخريطة بنجاح');
-                } catch(e) {
-                    console.error('❌ خطأ في إنشاء الخريطة:', e);
-                    alert('خطأ في إنشاء الخريطة: ' + e.message);
-                    return;
-                }
-                
-                // طبقة Google Maps عالية الجودة (واضحة ودقيقة)
-                // استخدام طريقة موثوقة تعمل على جميع الأجهزة
-                var googleMapsLayer = L.tileLayer('https://mt{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
-                    attribution: '© Google Maps',
-                    maxZoom: 20,
-                    minZoom: 3,
-                    subdomains: ['0', '1', '2', '3'],
-                    tileSize: 256,
-                    zoomOffset: 0,
-                    detectRetina: true,  // دعم الشاشات عالية الدقة
-                    crossOrigin: true,  // السماح بـ CORS
-                    errorTileUrl: 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'  // صورة فارغة عند الخطأ
-                });
-                
-                // طبقة بديلة عالية الجودة (CartoDB Positron) - تعمل على GitHub Pages
-                var cartoPositronLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-                    attribution: '© OpenStreetMap © CartoDB',
-                    maxZoom: 20,
-                    minZoom: 3,
-                    subdomains: 'abcd',
-                    tileSize: 256,
-                    zoomOffset: 0,
-                    detectRetina: true
-                });
-                
-                // طبقة CartoDB Dark Matter (بديل عالي الجودة)
-                var cartoDarkLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-                    attribution: '© OpenStreetMap © CartoDB',
-                    maxZoom: 20,
-                    minZoom: 3,
-                    subdomains: 'abcd',
-                    tileSize: 256,
-                    zoomOffset: 0,
-                    detectRetina: true
-                });
-                
-                // طبقة Google Satellite (قمر صناعي عالي الجودة)
-                var googleSatelliteLayer = L.tileLayer('https://mt{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
-                    attribution: '© Google Satellite',
-                    maxZoom: 20,
-                    minZoom: 3,
-                    subdomains: ['0', '1', '2', '3'],
-                    tileSize: 256,
-                    zoomOffset: 0,
-                    detectRetina: true,
-                    crossOrigin: true,
-                    errorTileUrl: 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
-                });
-                
-                // طبقة Google Hybrid (قمر صناعي مع أسماء الشوارع)
-                var googleHybridLayer = L.tileLayer('https://mt{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
-                    attribution: '© Google Hybrid',
-                    maxZoom: 20,
-                    minZoom: 3,
-                    subdomains: ['0', '1', '2', '3'],
-                    tileSize: 256,
-                    zoomOffset: 0,
-                    detectRetina: true,
-                    crossOrigin: true,
-                    errorTileUrl: 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
-                });
-                
-                // طبقة Esri World Imagery (قمر صناعي بديل موثوق)
-                var esriSatelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-                    attribution: '© Esri & Maxar, GeoEye',
-                    maxZoom: 19,
-                    minZoom: 3,
-                    tileSize: 256,
-                    zoomOffset: 0,
-                    detectRetina: true
-                });
-                
-                // ===== طريقة عرض جديدة تماماً - الإصدار 2.0 =====
-                // استخدام CartoDB Positron كافتراضي (يعمل دائماً على GitHub Pages)
-                // ثم محاولة التبديل إلى Google Maps إذا كان متاحاً
-                var currentLayer = cartoPositronLayer;
-                var errorCount = 0;
-                var maxErrors = 3;
-                var layerSwitched = false;
-                
-                console.log('🗺️ إضافة CartoDB Positron كطبقة افتراضية');
-                
-                // إضافة CartoDB Positron كطبقة افتراضية (تعمل دائماً على GitHub Pages)
-                // هذه الطريقة تعمل دائماً على GitHub Pages
-                try {
-                    if (!map) {
-                        console.error('❌ الخريطة غير موجودة!');
-                        return;
-                    }
-                    
-                    cartoPositronLayer.addTo(map);
-                    console.log('✅ تم إضافة CartoDB Positron بنجاح');
-                    
-                    // التأكد من أن الخريطة تعرض بشكل صحيح - مهم جداً على GitHub Pages
-                    setTimeout(function() {
-                        if (map) {
-                            map.invalidateSize(true);
-                            map.setView([qaimLat, qaimLng], 16);
-                            console.log('✅ تم إعادة حساب حجم الخريطة وإعادة تعيين العرض');
-                        }
-                    }, 150);
-                    
-                    // إعادة حساب الحجم مرة أخرى بعد التأكد من تحميل الـ modal
-                    setTimeout(function() {
-                        if (map) {
-                            map.invalidateSize(true);
-                            map.setView([qaimLat, qaimLng], 16);
-                            console.log('✅ تم إعادة تهيئة الخريطة مرة أخرى');
-                        }
-                    }, 400);
-                } catch(e) {
-                    console.error('❌ خطأ في إضافة CartoDB Positron:', e);
-                    alert('خطأ في تحميل الخريطة: ' + e.message);
-                }
-                
-                // محاولة التبديل إلى Google Maps بعد تحميل الخريطة
-                setTimeout(function() {
-                    if (!layerSwitched) {
-                        // اختبار Google Maps
-                        var testImg = new Image();
-                        testImg.crossOrigin = 'anonymous';
-                        var testTimeout = setTimeout(function() {
-                            // إذا انتهت المهلة، ابق على CartoDB
-                            testImg.onerror();
-                        }, 2000);
-                        
-                        testImg.onload = function() {
-                            clearTimeout(testTimeout);
-                            // Google Maps يعمل - استبدل الطبقة
-                            try {
-                                if (map && currentLayer === cartoPositronLayer) {
-                                    map.removeLayer(cartoPositronLayer);
-                                    googleMapsLayer.addTo(map);
-                                    currentLayer = googleMapsLayer;
-                                    layerSwitched = true;
-                                    console.log('✅ تم التبديل إلى Google Maps');
-                                }
-                            } catch(e) {
-                                console.log('⚠️ خطأ في التبديل إلى Google Maps:', e);
-                            }
-                        };
-                        
-                        testImg.onerror = function() {
-                            clearTimeout(testTimeout);
-                            // Google Maps لا يعمل - ابق على CartoDB
-                            console.log('ℹ️ Google Maps غير متاح، استخدام CartoDB Positron');
-                        };
-                        
-                        // اختبار تحميل tile واحد من Google Maps
-                        var testZoom = 10;
-                        var testX = Math.floor(Math.pow(2, testZoom) / 2);
-                        var testY = Math.floor(Math.pow(2, testZoom) / 2);
-                        testImg.src = 'https://mt0.google.com/vt/lyrs=m&x=' + testX + '&y=' + testY + '&z=' + testZoom;
-                    }
-                }, 500);
-                
-                // معالجة أخطاء تحميل الـ tiles للطبقة الحالية
-                map.on('tileerror', function(error, tile) {
-                    if (!layerSwitched && currentLayer === googleMapsLayer) {
-                        errorCount++;
-                        // إذا فشل تحميل Google Maps عدة مرات، ارجع إلى CartoDB
-                        if (errorCount >= maxErrors) {
-                            try {
-                                map.removeLayer(googleMapsLayer);
-                                cartoPositronLayer.addTo(map);
-                                currentLayer = cartoPositronLayer;
-                                layerSwitched = true;
-                                errorCount = 0;
-                                console.log('🔄 تم التبديل إلى CartoDB Positron بسبب أخطاء متعددة في Google Maps');
-                            } catch(e) {
-                                console.log('❌ خطأ في التبديل:', e);
-                            }
-                        }
-                    }
-                });
-                
-                // إضافة طبقات للتبديل بينها
-                var baseMaps = {
-                    "🗺️ Google Maps (واضحة)": googleMapsLayer,
-                    "🗺️ CartoDB Positron": cartoPositronLayer,
-                    "🌙 CartoDB Dark": cartoDarkLayer,
-                    "🛰️ Google Satellite": googleSatelliteLayer,
-                    "🛰️ Esri Satellite": esriSatelliteLayer,
-                    "🛰️ Hybrid (قمر + أسماء)": googleHybridLayer
-                };
-                
-                // إضافة عنصر التحكم في الطبقات في الزاوية اليمنى السفلية
-                // مع تحسينات للعرض على الهاتف - الإصدار المحدث v2.0
-                console.log('🗺️ إضافة عنصر التحكم في الطبقات');
-                var layersControl = L.control.layers(baseMaps, null, {
-                    position: 'bottomright',
-                    collapsed: true,  // إظهار القائمة مطوية لتوفير المساحة
-                    autoZIndex: true  // ترتيب تلقائي للطبقات
+                map = L.map('mapDiv').setView([33.3152, 44.3661], 13); // بغداد افتراضياً
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenStreetMap',
+                    maxZoom: 19
                 }).addTo(map);
-                console.log('✅ تم إضافة عنصر التحكم بنجاح - الإصدار v2.0');
                 
-                // تحسين عرض عنصر التحكم على الهاتف
-                setTimeout(function() {
-                    var control = document.querySelector('.leaflet-control-layers');
-                    if (control) {
-                        control.style.maxHeight = '60vh';
-                        control.style.overflowY = 'auto';
-                        control.style.fontSize = '13px';
-                    }
-                }, 100);
+                // محاولة الحصول على الموقع الحالي
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        function(position) {
+                            var lat = position.coords.latitude;
+                            var lng = position.coords.longitude;
+                            map.setView([lat, lng], 15);
+                            if (mapMarker) map.removeLayer(mapMarker);
+                            mapMarker = L.marker([lat, lng]).addTo(map);
+                            selectedLocation = { lat: lat, lng: lng };
+                        },
+                        function() {
+                            // إذا فشل، نستخدم موقع افتراضي
+                        }
+                    );
+                }
                 
-                // ===== تحديث جديد - الإصدار 2.0 - 2026-02-19 =====
-                // التأكد من أن الخريطة تعرض بشكل صحيح مع إعادة حساب الحجم
-                // هذا مهم جداً لضمان عمل الخريطة بشكل صحيح على GitHub Pages
-                console.log('🗺️ تهيئة الخريطة - الإصدار المحدث v2.0');
-                setTimeout(function() {
-                    if (map) {
-                        console.log('🗺️ إعادة حساب حجم الخريطة - v2.0');
-                        // إعادة حساب الحجم بقوة - مهم جداً عند فتح المودال
-                        map.invalidateSize(true);
-                        map.setView([qaimLat, qaimLng], 16);  // تكبير أعلى للدقة
-                        console.log('✅ تم تعيين الخريطة على حي القائم - v2.0');
-                        
-                        // إعادة حساب الحجم مرة أخرى بعد التأكد من تحميل الـ modal بالكامل
-                        // هذا يضمن عمل الخريطة بشكل صحيح على جميع المنصات
-                        setTimeout(function() {
-                            if (map) {
-                                map.invalidateSize(true);
-                                // إعادة تعيين العرض للتأكد من أن الخريطة تعمل بشكل صحيح
-                                map.setView([qaimLat, qaimLng], 16);
-                                console.log('✅ تم إعادة تهيئة الخريطة - الإصدار v2.0');
-                            }
-                        }, 300);
-                    }
-                }, 200);
-                
-                // عند النقر على الخريطة - المستخدم يختار موقعه
+                // عند النقر على الخريطة
                 map.on('click', function(e) {
                     var lat = e.latlng.lat;
                     var lng = e.latlng.lng;
-                    // إزالة المسمار السابق إن وجد
                     if (mapMarker) map.removeLayer(mapMarker);
-                    // إضافة مسمار جديد على الموقع المختار
-                    mapMarker = L.marker([lat, lng], {
-                        draggable: true,  // يمكن سحب المسمار
-                        icon: L.icon({
-                            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
-                            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-                            iconSize: [25, 41],
-                            iconAnchor: [12, 41],
-                            popupAnchor: [1, -34],
-                            shadowSize: [41, 41]
-                        })
-                    }).addTo(map);
-                    
-                    // عند سحب المسمار، تحديث الموقع
-                    mapMarker.on('dragend', function(e) {
-                        var pos = mapMarker.getLatLng();
-                        selectedLocation = { lat: pos.lat, lng: pos.lng };
-                        mapMarker.setPopupContent('📍 الموقع المختار<br>' + pos.lat.toFixed(6) + ', ' + pos.lng.toFixed(6));
-                    });
-                    
+                    mapMarker = L.marker([lat, lng]).addTo(map);
                     selectedLocation = { lat: lat, lng: lng };
-                    
-                    // إظهار الإحداثيات في popup
-                    mapMarker.bindPopup('📍 الموقع المختار<br>' + lat.toFixed(6) + ', ' + lng.toFixed(6)).openPopup();
                 });
-            } else {
-                // ===== تحديث جديد - الإصدار 2.0 =====
-                // إذا كانت الخريطة موجودة مسبقاً، نعيد التركيز على حي القائم
-                console.log('🔄 إعادة فتح الخريطة - الإصدار v2.0');
-                // إعادة حساب الحجم بقوة - مهم جداً عند إعادة فتح المودال
-                setTimeout(function() {
-                    if (map) {
-                        map.invalidateSize(true);
-                        map.setView([qaimLat, qaimLng], 16);  // تكبير أعلى للدقة
-                        console.log('✅ تم إعادة تعيين الخريطة - v2.0');
-                        
-                        // إعادة حساب الحجم مرة أخرى للتأكد
-                        setTimeout(function() {
-                            if (map) {
-                                map.invalidateSize(true);
-                                console.log('✅ تم إعادة حساب الحجم - v2.0');
-                            }
-                        }, 200);
-                    }
-                }, 100);
-                
-                // إزالة أي مسمار سابق
-                if (mapMarker) {
-                    map.removeLayer(mapMarker);
-                    mapMarker = null;
-                }
-                selectedLocation = null;
             }
-        }, 200);
-        
-        // إعادة تعيين العلامة بعد التهيئة
-        setTimeout(function() {
-            window._mapInitializing = false;
-        }, 1000);
-        } // نهاية initMap
-    }
-    
-    // الحصول على الموقع الحالي من داخل الخريطة
-    function getCurrentLocationFromMap() {
-        var btn = document.getElementById('mapCurrentLocationBtn');
-        if (!btn || !map) return;
-        
-        btn.classList.add('loading');
-        btn.disabled = true;
-        
-        if (!navigator.geolocation) {
-            alert('المتصفح لا يدعم تحديد الموقع');
-            btn.classList.remove('loading');
-            btn.disabled = false;
-            return;
-        }
-        
-        // في كل مرة نطلب الصلاحية من جديد
-        navigator.geolocation.getCurrentPosition(
-            function(position) {
-                var lat = position.coords.latitude;
-                var lng = position.coords.longitude;
-                
-                // نقل الخريطة إلى الموقع الحالي
-                map.setView([lat, lng], 16);
-                
-                // إزالة المسمار السابق إن وجد
-                if (mapMarker) map.removeLayer(mapMarker);
-                
-                // إضافة مسمار على الموقع الحالي
-                mapMarker = L.marker([lat, lng], {
-                    draggable: true,
-                    icon: L.icon({
-                        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
-                        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-                        iconSize: [25, 41],
-                        iconAnchor: [12, 41],
-                        popupAnchor: [1, -34],
-                        shadowSize: [41, 41]
-                    })
-                }).addTo(map);
-                
-                // عند سحب المسمار، تحديث الموقع
-                mapMarker.on('dragend', function(e) {
-                    var pos = mapMarker.getLatLng();
-                    selectedLocation = { lat: pos.lat, lng: pos.lng };
-                });
-                
-                selectedLocation = { lat: lat, lng: lng };
-                
-                // إظهار الإحداثيات
-                mapMarker.bindPopup('📍 موقعك الحالي<br>' + lat.toFixed(6) + ', ' + lng.toFixed(6)).openPopup();
-                
-                btn.classList.remove('loading');
-                btn.disabled = false;
-            },
-            function(error) {
-                var errorMsg = '❌ فشل الحصول على الموقع';
-                if (error.code === error.PERMISSION_DENIED) {
-                    errorMsg = '❌ تم رفض الصلاحية. يرجى السماح بالوصول إلى الموقع في إعدادات المتصفح';
-                } else if (error.code === error.POSITION_UNAVAILABLE) {
-                    errorMsg = '❌ الموقع غير متاح';
-                } else if (error.code === error.TIMEOUT) {
-                    errorMsg = '❌ انتهت مهلة الطلب';
-                }
-                alert(errorMsg);
-                btn.classList.remove('loading');
-                btn.disabled = false;
-            },
-            { 
-                enableHighAccuracy: true,
-                timeout: 15000,
-                maximumAge: 0  // لا يستخدم cache، يطلب الموقع من جديد في كل مرة
-            }
-        );
+        }, 100);
     }
     
     function closeMapSelector() {
@@ -2731,11 +2085,9 @@
         document.body.style.overflow = '';
     }
     
-    // ===== تحديث جديد - الإصدار 2.0 - 2026-02-19 =====
     function confirmMapLocation() {
-        console.log('✅ تأكيد الموقع - الإصدار v2.0');
         if (!selectedLocation) {
-            alert('⚠️ يرجى اختيار موقع من الخريطة أولاً\n\nيمكنك:\n• النقر على الخريطة لاختيار الموقع\n• أو الضغط على زر 📍 للحصول على موقعك الحالي');
+            alert('يرجى اختيار موقع من الخريطة أولاً');
             return;
         }
         var lat = selectedLocation.lat;
@@ -2746,11 +2098,13 @@
         var statusDiv = document.getElementById('locationStatus');
         var locationText = document.getElementById('locationText');
         if (locationText) locationText.textContent = '✅ تم تحديد الموقع: ' + lat.toFixed(6) + ', ' + lng.toFixed(6);
-        if (statusDiv) {
-            statusDiv.style.display = 'block';
-            statusDiv.style.background = '#ecfdf5';
-            statusDiv.style.color = '#065f46';
-        }
+            if (statusDiv) {
+                statusDiv.style.display = 'block';
+                statusDiv.style.visibility = 'visible';
+                statusDiv.style.background = '#ecfdf5';
+                statusDiv.style.color = '#065f46';
+                statusDiv.dataset.initialized = 'true'; // علامة أن المستخدم تفاعل مع الحقل
+            }
         
         closeMapSelector();
     }
@@ -2788,14 +2142,57 @@
         });
     }
 
+    // منع أي تمرير تلقائي عند التحميل
+    (function() {
+        var scrollPosition = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop;
+        if (scrollPosition > 0) {
+            window.scrollTo(0, 0);
+            document.documentElement.scrollTop = 0;
+            document.body.scrollTop = 0;
+        }
+    })();
+    
+    // التأكد من فتح الصفحة من البداية عند التحميل
+    window.addEventListener('load', function() {
+        // إزالة أي hash من الرابط
+        if (window.location.hash) {
+            window.history.replaceState(null, null, window.location.pathname + window.location.search);
+        }
+        // التمرير إلى أعلى الصفحة
+        setTimeout(function() {
+            window.scrollTo(0, 0);
+            document.documentElement.scrollTop = 0;
+            document.body.scrollTop = 0;
+        }, 0);
+    });
+    
+    // التأكد من فتح الصفحة من البداية عند فتح الرابط مباشرة
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                window.scrollTo(0, 0);
+                document.documentElement.scrollTop = 0;
+                document.body.scrollTop = 0;
+            }, 0);
+        });
+    } else {
+        setTimeout(function() {
+            window.scrollTo(0, 0);
+            document.documentElement.scrollTop = 0;
+            document.body.scrollTop = 0;
+        }, 0);
+    }
+
     window.onload = function() {
-        // منع التمرير التلقائي عند التحميل
-        window._isInitialLoad = true;
-        
-        // التأكد من أن الصفحة في الأعلى عند التحميل
+        // التأكد من فتح الصفحة من البداية
         window.scrollTo(0, 0);
         document.documentElement.scrollTop = 0;
         document.body.scrollTop = 0;
+        
+        // إزالة أي hash من الرابط
+        if (window.location.hash) {
+            window.history.replaceState(null, null, window.location.pathname + window.location.search);
+        }
         
         addMember();
         initNameCheck();
@@ -2805,8 +2202,14 @@
             var status = document.getElementById('loadingStatus');
             if (status) { status.innerText = 'تم استعادة مسودة سابقة. يمكنك تعديلها أو إرسالها.'; status.style.color = 'var(--primary)'; }
         }
-        // تلوين الحقول الفارغة عند التحميل
-        setTimeout(highlightEmptyFields, 100);
+        // تلوين الحقول الفارغة عند التحميل (بعد التأكد من فتح الصفحة من البداية)
+        setTimeout(function() {
+            highlightEmptyFields();
+            // التأكد مرة أخرى من فتح الصفحة من البداية بعد التلوين
+            window.scrollTo(0, 0);
+            document.documentElement.scrollTop = 0;
+            document.body.scrollTop = 0;
+        }, 200);
         
         // تحديث الألوان عند التغيير
         document.getElementById('censusForm').addEventListener('input', function() {
@@ -2817,37 +2220,7 @@
             scheduleDraftSave();
             highlightEmptyFields();
         });
-        
-        // بعد التحميل، إزالة علامة التحميل الأولي
-        setTimeout(function() {
-            window._isInitialLoad = false;
-        }, 1000);
-        
-        // التأكد مرة أخرى من أن الصفحة في الأعلى
-        setTimeout(function() {
-            window.scrollTo(0, 0);
-            document.documentElement.scrollTop = 0;
-            document.body.scrollTop = 0;
-        }, 100);
     };
-    
-    // منع التمرير التلقائي عند فتح الصفحة
-    window.addEventListener('beforeunload', function() {
-        window.scrollTo(0, 0);
-    });
-    
-    // التأكد من أن الصفحة تبدأ من الأعلى
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', function() {
-            window.scrollTo(0, 0);
-            document.documentElement.scrollTop = 0;
-            document.body.scrollTop = 0;
-        });
-    } else {
-        window.scrollTo(0, 0);
-        document.documentElement.scrollTop = 0;
-        document.body.scrollTop = 0;
-    }
 </script>
 </body>
 </html>
