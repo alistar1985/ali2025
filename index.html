@@ -2193,7 +2193,31 @@
                     subdomains: ['0', '1', '2', '3'],
                     tileSize: 256,
                     zoomOffset: 0,
-                    detectRetina: true  // دعم الشاشات عالية الدقة
+                    detectRetina: true,  // دعم الشاشات عالية الدقة
+                    crossOrigin: true,  // السماح بـ CORS
+                    errorTileUrl: 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'  // صورة فارغة عند الخطأ
+                });
+                
+                // طبقة بديلة عالية الجودة (CartoDB Positron) - تعمل على GitHub Pages
+                var cartoPositronLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+                    attribution: '© OpenStreetMap © CartoDB',
+                    maxZoom: 20,
+                    minZoom: 3,
+                    subdomains: 'abcd',
+                    tileSize: 256,
+                    zoomOffset: 0,
+                    detectRetina: true
+                });
+                
+                // طبقة CartoDB Dark Matter (بديل عالي الجودة)
+                var cartoDarkLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                    attribution: '© OpenStreetMap © CartoDB',
+                    maxZoom: 20,
+                    minZoom: 3,
+                    subdomains: 'abcd',
+                    tileSize: 256,
+                    zoomOffset: 0,
+                    detectRetina: true
                 });
                 
                 // طبقة Google Satellite (قمر صناعي عالي الجودة)
@@ -2204,7 +2228,9 @@
                     subdomains: ['0', '1', '2', '3'],
                     tileSize: 256,
                     zoomOffset: 0,
-                    detectRetina: true
+                    detectRetina: true,
+                    crossOrigin: true,
+                    errorTileUrl: 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
                 });
                 
                 // طبقة Google Hybrid (قمر صناعي مع أسماء الشوارع)
@@ -2215,29 +2241,79 @@
                     subdomains: ['0', '1', '2', '3'],
                     tileSize: 256,
                     zoomOffset: 0,
-                    detectRetina: true
+                    detectRetina: true,
+                    crossOrigin: true,
+                    errorTileUrl: 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
                 });
                 
-                // طبقة Google Terrain (تضاريس Google)
-                var googleTerrainLayer = L.tileLayer('https://mt{s}.google.com/vt/lyrs=t&x={x}&y={y}&z={z}', {
-                    attribution: '© Google Terrain',
-                    maxZoom: 20,
+                // طبقة Esri World Imagery (قمر صناعي بديل موثوق)
+                var esriSatelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                    attribution: '© Esri & Maxar, GeoEye',
+                    maxZoom: 19,
                     minZoom: 3,
-                    subdomains: ['0', '1', '2', '3'],
                     tileSize: 256,
                     zoomOffset: 0,
                     detectRetina: true
                 });
                 
-                // إضافة طبقة Google Maps كطبقة أساسية (تظهر تلقائياً - واضحة ودقيقة)
-                googleMapsLayer.addTo(map);
+                // إضافة طبقة افتراضية موثوقة (CartoDB Positron) - تعمل دائماً على GitHub Pages
+                // ثم محاولة التبديل إلى Google Maps إذا كان متاحاً
+                var currentLayer = cartoPositronLayer;
+                var errorCount = 0;
+                var maxErrors = 3;  // عدد الأخطاء المسموح قبل التبديل
+                
+                // إضافة CartoDB Positron كطبقة افتراضية (تعمل دائماً)
+                cartoPositronLayer.addTo(map);
+                
+                // محاولة إضافة Google Maps بعد تحميل الخريطة
+                setTimeout(function() {
+                    // اختبار Google Maps
+                    var testImg = new Image();
+                    testImg.crossOrigin = 'anonymous';
+                    testImg.onload = function() {
+                        // Google Maps يعمل - استبدل الطبقة
+                        try {
+                            map.removeLayer(cartoPositronLayer);
+                            googleMapsLayer.addTo(map);
+                            currentLayer = googleMapsLayer;
+                            console.log('تم التبديل إلى Google Maps');
+                        } catch(e) {
+                            console.log('خطأ في التبديل إلى Google Maps:', e);
+                        }
+                    };
+                    testImg.onerror = function() {
+                        // Google Maps لا يعمل - ابق على CartoDB
+                        console.log('Google Maps غير متاح، استخدام CartoDB Positron');
+                    };
+                    // اختبار تحميل tile واحد من Google Maps
+                    testImg.src = 'https://mt0.google.com/vt/lyrs=m&x=' + Math.floor(Math.pow(2, 10) / 2) + '&y=' + Math.floor(Math.pow(2, 10) / 2) + '&z=10';
+                }, 500);
+                
+                // معالجة أخطاء تحميل الـ tiles للطبقة الحالية
+                map.on('tileerror', function(error, tile) {
+                    errorCount++;
+                    // إذا فشل تحميل Google Maps عدة مرات، ارجع إلى CartoDB
+                    if (currentLayer === googleMapsLayer && errorCount >= maxErrors) {
+                        try {
+                            map.removeLayer(googleMapsLayer);
+                            cartoPositronLayer.addTo(map);
+                            currentLayer = cartoPositronLayer;
+                            errorCount = 0;
+                            console.log('تم التبديل إلى CartoDB Positron بسبب أخطاء متعددة في Google Maps');
+                        } catch(e) {
+                            console.log('خطأ في التبديل:', e);
+                        }
+                    }
+                });
                 
                 // إضافة طبقات للتبديل بينها
                 var baseMaps = {
-                    "🗺️ Google Maps (واضحة)": googleMapsLayer,
-                    "🛰️ القمر الصناعي": googleSatelliteLayer,
-                    "🛰️ Hybrid (قمر + أسماء)": googleHybridLayer,
-                    "🗻 التضاريس": googleTerrainLayer
+                    "🗺️ Google Maps": googleMapsLayer,
+                    "🗺️ CartoDB Positron": cartoPositronLayer,
+                    "🌙 CartoDB Dark": cartoDarkLayer,
+                    "🛰️ Google Satellite": googleSatelliteLayer,
+                    "🛰️ Esri Satellite": esriSatelliteLayer,
+                    "🛰️ Hybrid (قمر + أسماء)": googleHybridLayer
                 };
                 
                 // إضافة عنصر التحكم في الطبقات في الزاوية اليمنى السفلية
