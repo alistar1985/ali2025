@@ -1946,39 +1946,69 @@
             return;
         }
         
-        navigator.geolocation.getCurrentPosition(
-            function(position) {
-                var lat = position.coords.latitude;
-                var lng = position.coords.longitude;
-                var link = 'https://www.google.com/maps?q=' + lat + ',' + lng;
-                document.getElementById('locationLink').value = link;
-                selectedLocation = { lat: lat, lng: lng };
-                
-                if (locationText) locationText.textContent = '✅ تم تحديد الموقع: ' + lat.toFixed(6) + ', ' + lng.toFixed(6);
-                if (statusDiv) {
-                    statusDiv.style.background = '#ecfdf5';
-                    statusDiv.style.color = '#065f46';
+        // محاولة استخدام Permissions API للتحقق من حالة الصلاحية
+        // وإذا كانت مرفوضة، نحاول طلبها مرة أخرى
+        if (navigator.permissions && navigator.permissions.query) {
+            navigator.permissions.query({ name: 'geolocation' }).then(function(result) {
+                // إذا كانت الصلاحية مرفوضة، نحاول طلبها مرة أخرى
+                if (result.state === 'denied') {
+                    if (locationText) locationText.textContent = '⏳ جاري طلب الصلاحية مرة أخرى...';
                 }
-                if (btn) btn.disabled = false;
-            },
-            function(error) {
-                var errorMsg = '❌ فشل الحصول على الموقع';
-                if (error.code === error.PERMISSION_DENIED) {
-                    errorMsg = '❌ تم رفض الصلاحية. يرجى السماح بالوصول إلى الموقع في إعدادات المتصفح';
-                } else if (error.code === error.POSITION_UNAVAILABLE) {
-                    errorMsg = '❌ الموقع غير متاح';
-                } else if (error.code === error.TIMEOUT) {
-                    errorMsg = '❌ انتهت مهلة الطلب';
+                // المتابعة بطلب الموقع
+                _requestLocation();
+            }).catch(function() {
+                // إذا فشل Permissions API، نتابع بطلب الموقع مباشرة
+                _requestLocation();
+            });
+        } else {
+            // إذا لم يكن Permissions API متاحاً، نطلب الموقع مباشرة
+            _requestLocation();
+        }
+        
+        function _requestLocation() {
+            // في كل مرة نطلب الصلاحية من جديد
+            // maximumAge: 0 يضمن عدم استخدام cache
+            // enableHighAccuracy: true قد يجبر المتصفح على طلب الصلاحية مرة أخرى
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    var lat = position.coords.latitude;
+                    var lng = position.coords.longitude;
+                    var link = 'https://www.google.com/maps?q=' + lat + ',' + lng;
+                    document.getElementById('locationLink').value = link;
+                    selectedLocation = { lat: lat, lng: lng };
+                    
+                    if (locationText) locationText.textContent = '✅ تم تحديد الموقع: ' + lat.toFixed(6) + ', ' + lng.toFixed(6);
+                    if (statusDiv) {
+                        statusDiv.style.background = '#ecfdf5';
+                        statusDiv.style.color = '#065f46';
+                    }
+                    if (btn) btn.disabled = false;
+                },
+                function(error) {
+                    var errorMsg = '❌ فشل الحصول على الموقع';
+                    if (error.code === error.PERMISSION_DENIED) {
+                        errorMsg = '❌ تم رفض الصلاحية. اضغط مرة أخرى لطلب الصلاحية من جديد';
+                        // في كل مرة يتم الضغط، سيحاول المتصفح طلب الصلاحية مرة أخرى
+                        // إذا استمر الرفض، يجب السماح بالموقع من إعدادات المتصفح
+                    } else if (error.code === error.POSITION_UNAVAILABLE) {
+                        errorMsg = '❌ الموقع غير متاح. اضغط مرة أخرى';
+                    } else if (error.code === error.TIMEOUT) {
+                        errorMsg = '❌ انتهت مهلة الطلب. اضغط مرة أخرى';
+                    }
+                    if (locationText) locationText.textContent = errorMsg;
+                    if (statusDiv) {
+                        statusDiv.style.background = '#fef2f2';
+                        statusDiv.style.color = '#991b1b';
+                    }
+                    if (btn) btn.disabled = false;
+                },
+                { 
+                    enableHighAccuracy: true,  // يطلب صلاحية دقيقة (قد يجبر المتصفح على طلب الصلاحية)
+                    timeout: 15000,  // زيادة المهلة
+                    maximumAge: 0  // لا يستخدم cache، يطلب الموقع من جديد في كل مرة
                 }
-                if (locationText) locationText.textContent = errorMsg;
-                if (statusDiv) {
-                    statusDiv.style.background = '#fef2f2';
-                    statusDiv.style.color = '#991b1b';
-                }
-                if (btn) btn.disabled = false;
-            },
-            { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-        );
+            );
+        }
     }
     
     function openMapSelector() {
@@ -1991,25 +2021,39 @@
         // تهيئة الخريطة
         setTimeout(function() {
             if (!map) {
-                map = L.map('mapDiv').setView([33.3152, 44.3661], 13); // بغداد افتراضياً
+                // إحداثيات حي القائم في البصرة - القبلة
+                var qaimLat = 30.5200;  // خط العرض لحي القائم
+                var qaimLng = 47.8200;  // خط الطول لحي القائم
+                
+                map = L.map('mapDiv').setView([qaimLat, qaimLng], 15); // حي القائم - البصرة مباشرة
                 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                     attribution: '© OpenStreetMap',
                     maxZoom: 19
                 }).addTo(map);
                 
-                // محاولة الحصول على الموقع الحالي
+                // إضافة علامة على حي القائم
+                var qaimMarker = L.marker([qaimLat, qaimLng]).addTo(map);
+                qaimMarker.bindPopup('📍 حي القائم - البصرة').openPopup();
+                selectedLocation = { lat: qaimLat, lng: qaimLng };
+                
+                // محاولة الحصول على الموقع الحالي (اختياري)
                 if (navigator.geolocation) {
                     navigator.geolocation.getCurrentPosition(
                         function(position) {
                             var lat = position.coords.latitude;
                             var lng = position.coords.longitude;
-                            map.setView([lat, lng], 15);
-                            if (mapMarker) map.removeLayer(mapMarker);
-                            mapMarker = L.marker([lat, lng]).addTo(map);
-                            selectedLocation = { lat: lat, lng: lng };
+                            // إذا كان المستخدم قريب من حي القائم (في نطاق 5 كم)، نركز على موقعه
+                            var distance = Math.sqrt(Math.pow(lat - qaimLat, 2) + Math.pow(lng - qaimLng, 2)) * 111; // تقريب المسافة بالكيلومتر
+                            if (distance < 5) {
+                                map.setView([lat, lng], 16);
+                                if (mapMarker) map.removeLayer(mapMarker);
+                                mapMarker = L.marker([lat, lng]).addTo(map);
+                                selectedLocation = { lat: lat, lng: lng };
+                                if (qaimMarker) map.removeLayer(qaimMarker);
+                            }
                         },
                         function() {
-                            // إذا فشل، نستخدم موقع افتراضي
+                            // إذا فشل، نبقى على حي القائم
                         }
                     );
                 }
