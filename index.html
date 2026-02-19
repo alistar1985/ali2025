@@ -10,9 +10,25 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <title>منظومة جرد حي القائم الأول - المختار أحمد هاني</title>
+    <!-- تحديث الخريطة - الإصدار 2.0 - 2026-02-19 -->
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="anonymous" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="anonymous"></script>
+    <script>
+        // علامة مميزة للتأكد من تحديث الكود - الإصدار 2.0
+        console.log('🚀 تم تحميل الكود المحدث - الإصدار 2.0 - ' + new Date().toISOString());
+        
+        // التحقق من تحميل Leaflet.js
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                if (typeof L !== 'undefined' && L.map) {
+                    console.log('✅ Leaflet.js محمّل بنجاح - جاهز للاستخدام');
+                } else {
+                    console.error('❌ Leaflet.js لم يتم تحميله بشكل صحيح!');
+                }
+            }, 500);
+        });
+    </script>
     <style>
         :root {
             --primary: #0a0f1e;
@@ -1074,7 +1090,7 @@
 <div id="mapModal">
     <div id="mapContainer">
         <div id="mapHeader">
-            <span>🗺️ اختر موقع البيت من الخريطة - حي القائم - البصرة</span>
+            <span>🗺️ اختر موقع البيت من الخريطة - حي القائم - البصرة [v2.0]</span>
             <button id="mapCloseBtn" onclick="closeMapSelector()">×</button>
         </div>
         <div id="mapDiv">
@@ -2251,6 +2267,9 @@
         var modal = document.getElementById('mapModal');
         if (!modal) return;
         
+        // ===== تحديث جديد - الإصدار 2.0 - 2026-02-19 =====
+        console.log('🗺️ فتح الخريطة - الإصدار المحدث v2.0');
+        
         // إحداثيات حي القائم في البصرة - القبلة (إحداثيات دقيقة)
         var qaimLat = 30.5200;  // خط العرض لحي القائم - البصرة
         var qaimLng = 47.8200;  // خط الطول لحي القائم - البصرة
@@ -2258,13 +2277,61 @@
         modal.classList.add('show');
         document.body.style.overflow = 'hidden';
         
-        // تهيئة الخريطة بعد إظهار الـ modal
-        // استخدام setTimeout لضمان أن الـ modal ظهر بالكامل قبل تهيئة الخريطة
+        // التأكد من أن الـ modal ظهر بشكل صحيح
+        var checkModalVisible = setInterval(function() {
+            var modalVisible = window.getComputedStyle(modal).display !== 'none';
+            if (modalVisible) {
+                clearInterval(checkModalVisible);
+                console.log('✅ الـ modal ظهر بنجاح');
+                initMap();
+            }
+        }, 50);
+        
+        // timeout احتياطي - تهيئة الخريطة بعد 500ms حتى لو لم يظهر الـ modal
         setTimeout(function() {
+            clearInterval(checkModalVisible);
             if (!map) {
+                console.log('⚠️ تهيئة الخريطة بعد timeout');
+                initMap();
+            }
+        }, 500);
+        
+        function initMap() {
+            // التحقق من أن initMap لم يتم استدعاؤه مسبقاً
+            if (window._mapInitializing) {
+                console.log('⚠️ الخريطة قيد التهيئة بالفعل');
+                return;
+            }
+            window._mapInitializing = true;
+            
+            console.log('🗺️ بدء تهيئة الخريطة - initMap()');
+            
+            // تهيئة الخريطة بعد إظهار الـ modal
+            // استخدام setTimeout لضمان أن الـ modal ظهر بالكامل قبل تهيئة الخريطة
+            setTimeout(function() {
+            // التحقق من تحميل Leaflet.js
+            if (typeof L === 'undefined' || !L.map) {
+                console.error('❌ Leaflet.js لم يتم تحميله!');
+                alert('خطأ: لم يتم تحميل مكتبة الخرائط. يرجى تحديث الصفحة.');
+                return;
+            }
+            
+            // التحقق من وجود عنصر الخريطة
+            var mapDiv = document.getElementById('mapDiv');
+            if (!mapDiv) {
+                console.error('❌ عنصر الخريطة غير موجود!');
+                return;
+            }
+            
+            console.log('✅ Leaflet.js محمّل بنجاح');
+            console.log('✅ عنصر الخريطة موجود');
+            
+            if (!map) {
+                console.log('🗺️ إنشاء خريطة جديدة - CartoDB Positron كافتراضي');
                 // إنشاء الخريطة ووضعها مباشرة على حي القائم - البصرة
                 // تحسينات للأداء والدقة على الهاتف
-                map = L.map('mapDiv', {
+                try {
+                    map = L.map('mapDiv', {
                     zoomControl: true,
                     doubleClickZoom: true,
                     scrollWheelZoom: true,
@@ -2276,6 +2343,13 @@
                     preferCanvas: false,  // استخدام Canvas للأداء الأفضل
                     attributionControl: true
                 }).setView([qaimLat, qaimLng], 16);  // زيادة التكبير للدقة
+                
+                console.log('✅ تم إنشاء الخريطة بنجاح');
+                } catch(e) {
+                    console.error('❌ خطأ في إنشاء الخريطة:', e);
+                    alert('خطأ في إنشاء الخريطة: ' + e.message);
+                    return;
+                }
                 
                 // طبقة Google Maps عالية الجودة (واضحة ودقيقة)
                 // استخدام طريقة موثوقة تعمل على جميع الأجهزة
@@ -2349,15 +2423,48 @@
                     detectRetina: true
                 });
                 
-                // طريقة عرض محسّنة: استخدام CartoDB Positron كافتراضي (يعمل دائماً على GitHub Pages)
+                // ===== طريقة عرض جديدة تماماً - الإصدار 2.0 =====
+                // استخدام CartoDB Positron كافتراضي (يعمل دائماً على GitHub Pages)
                 // ثم محاولة التبديل إلى Google Maps إذا كان متاحاً
                 var currentLayer = cartoPositronLayer;
                 var errorCount = 0;
                 var maxErrors = 3;
                 var layerSwitched = false;
                 
+                console.log('🗺️ إضافة CartoDB Positron كطبقة افتراضية');
+                
                 // إضافة CartoDB Positron كطبقة افتراضية (تعمل دائماً على GitHub Pages)
-                cartoPositronLayer.addTo(map);
+                // هذه الطريقة تعمل دائماً على GitHub Pages
+                try {
+                    if (!map) {
+                        console.error('❌ الخريطة غير موجودة!');
+                        return;
+                    }
+                    
+                    cartoPositronLayer.addTo(map);
+                    console.log('✅ تم إضافة CartoDB Positron بنجاح');
+                    
+                    // التأكد من أن الخريطة تعرض بشكل صحيح - مهم جداً على GitHub Pages
+                    setTimeout(function() {
+                        if (map) {
+                            map.invalidateSize(true);
+                            map.setView([qaimLat, qaimLng], 16);
+                            console.log('✅ تم إعادة حساب حجم الخريطة وإعادة تعيين العرض');
+                        }
+                    }, 150);
+                    
+                    // إعادة حساب الحجم مرة أخرى بعد التأكد من تحميل الـ modal
+                    setTimeout(function() {
+                        if (map) {
+                            map.invalidateSize(true);
+                            map.setView([qaimLat, qaimLng], 16);
+                            console.log('✅ تم إعادة تهيئة الخريطة مرة أخرى');
+                        }
+                    }, 400);
+                } catch(e) {
+                    console.error('❌ خطأ في إضافة CartoDB Positron:', e);
+                    alert('خطأ في تحميل الخريطة: ' + e.message);
+                }
                 
                 // محاولة التبديل إلى Google Maps بعد تحميل الخريطة
                 setTimeout(function() {
@@ -2431,12 +2538,14 @@
                 };
                 
                 // إضافة عنصر التحكم في الطبقات في الزاوية اليمنى السفلية
-                // مع تحسينات للعرض على الهاتف
+                // مع تحسينات للعرض على الهاتف - الإصدار المحدث v2.0
+                console.log('🗺️ إضافة عنصر التحكم في الطبقات');
                 var layersControl = L.control.layers(baseMaps, null, {
                     position: 'bottomright',
                     collapsed: true,  // إظهار القائمة مطوية لتوفير المساحة
                     autoZIndex: true  // ترتيب تلقائي للطبقات
                 }).addTo(map);
+                console.log('✅ تم إضافة عنصر التحكم بنجاح - الإصدار v2.0');
                 
                 // تحسين عرض عنصر التحكم على الهاتف
                 setTimeout(function() {
@@ -2448,13 +2557,17 @@
                     }
                 }, 100);
                 
+                // ===== تحديث جديد - الإصدار 2.0 - 2026-02-19 =====
                 // التأكد من أن الخريطة تعرض بشكل صحيح مع إعادة حساب الحجم
                 // هذا مهم جداً لضمان عمل الخريطة بشكل صحيح على GitHub Pages
+                console.log('🗺️ تهيئة الخريطة - الإصدار المحدث v2.0');
                 setTimeout(function() {
                     if (map) {
+                        console.log('🗺️ إعادة حساب حجم الخريطة - v2.0');
                         // إعادة حساب الحجم بقوة - مهم جداً عند فتح المودال
                         map.invalidateSize(true);
                         map.setView([qaimLat, qaimLng], 16);  // تكبير أعلى للدقة
+                        console.log('✅ تم تعيين الخريطة على حي القائم - v2.0');
                         
                         // إعادة حساب الحجم مرة أخرى بعد التأكد من تحميل الـ modal بالكامل
                         // هذا يضمن عمل الخريطة بشكل صحيح على جميع المنصات
@@ -2463,6 +2576,7 @@
                                 map.invalidateSize(true);
                                 // إعادة تعيين العرض للتأكد من أن الخريطة تعمل بشكل صحيح
                                 map.setView([qaimLat, qaimLng], 16);
+                                console.log('✅ تم إعادة تهيئة الخريطة - الإصدار v2.0');
                             }
                         }, 300);
                     }
@@ -2500,17 +2614,21 @@
                     mapMarker.bindPopup('📍 الموقع المختار<br>' + lat.toFixed(6) + ', ' + lng.toFixed(6)).openPopup();
                 });
             } else {
+                // ===== تحديث جديد - الإصدار 2.0 =====
                 // إذا كانت الخريطة موجودة مسبقاً، نعيد التركيز على حي القائم
+                console.log('🔄 إعادة فتح الخريطة - الإصدار v2.0');
                 // إعادة حساب الحجم بقوة - مهم جداً عند إعادة فتح المودال
                 setTimeout(function() {
                     if (map) {
                         map.invalidateSize(true);
                         map.setView([qaimLat, qaimLng], 16);  // تكبير أعلى للدقة
+                        console.log('✅ تم إعادة تعيين الخريطة - v2.0');
                         
                         // إعادة حساب الحجم مرة أخرى للتأكد
                         setTimeout(function() {
                             if (map) {
                                 map.invalidateSize(true);
+                                console.log('✅ تم إعادة حساب الحجم - v2.0');
                             }
                         }, 200);
                     }
@@ -2524,6 +2642,12 @@
                 selectedLocation = null;
             }
         }, 200);
+        
+        // إعادة تعيين العلامة بعد التهيئة
+        setTimeout(function() {
+            window._mapInitializing = false;
+        }, 1000);
+        } // نهاية initMap
     }
     
     // الحصول على الموقع الحالي من داخل الخريطة
@@ -2607,7 +2731,9 @@
         document.body.style.overflow = '';
     }
     
+    // ===== تحديث جديد - الإصدار 2.0 - 2026-02-19 =====
     function confirmMapLocation() {
+        console.log('✅ تأكيد الموقع - الإصدار v2.0');
         if (!selectedLocation) {
             alert('⚠️ يرجى اختيار موقع من الخريطة أولاً\n\nيمكنك:\n• النقر على الخريطة لاختيار الموقع\n• أو الضغط على زر 📍 للحصول على موقعك الحالي');
             return;
