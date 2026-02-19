@@ -2349,22 +2349,62 @@
                     detectRetina: true
                 });
                 
-                // طريقة عرض جديدة: استخدام Google Maps مباشرة كافتراضي
-                // مع fallback تلقائي إلى CartoDB إذا فشل Google Maps
-                var currentLayer = null;
+                // طريقة عرض محسّنة: استخدام CartoDB Positron كافتراضي (يعمل دائماً على GitHub Pages)
+                // ثم محاولة التبديل إلى Google Maps إذا كان متاحاً
+                var currentLayer = cartoPositronLayer;
                 var errorCount = 0;
-                var maxErrors = 5;  // عدد الأخطاء المسموح قبل التبديل
+                var maxErrors = 3;
                 var layerSwitched = false;
                 
-                // محاولة استخدام Google Maps مباشرة كطبقة افتراضية
-                googleMapsLayer.addTo(map);
-                currentLayer = googleMapsLayer;
+                // إضافة CartoDB Positron كطبقة افتراضية (تعمل دائماً على GitHub Pages)
+                cartoPositronLayer.addTo(map);
                 
-                // معالجة أخطاء تحميل الـ tiles - التبديل التلقائي عند الفشل
-                googleMapsLayer.on('tileerror', function(error, tile) {
+                // محاولة التبديل إلى Google Maps بعد تحميل الخريطة
+                setTimeout(function() {
                     if (!layerSwitched) {
+                        // اختبار Google Maps
+                        var testImg = new Image();
+                        testImg.crossOrigin = 'anonymous';
+                        var testTimeout = setTimeout(function() {
+                            // إذا انتهت المهلة، ابق على CartoDB
+                            testImg.onerror();
+                        }, 2000);
+                        
+                        testImg.onload = function() {
+                            clearTimeout(testTimeout);
+                            // Google Maps يعمل - استبدل الطبقة
+                            try {
+                                if (map && currentLayer === cartoPositronLayer) {
+                                    map.removeLayer(cartoPositronLayer);
+                                    googleMapsLayer.addTo(map);
+                                    currentLayer = googleMapsLayer;
+                                    layerSwitched = true;
+                                    console.log('✅ تم التبديل إلى Google Maps');
+                                }
+                            } catch(e) {
+                                console.log('⚠️ خطأ في التبديل إلى Google Maps:', e);
+                            }
+                        };
+                        
+                        testImg.onerror = function() {
+                            clearTimeout(testTimeout);
+                            // Google Maps لا يعمل - ابق على CartoDB
+                            console.log('ℹ️ Google Maps غير متاح، استخدام CartoDB Positron');
+                        };
+                        
+                        // اختبار تحميل tile واحد من Google Maps
+                        var testZoom = 10;
+                        var testX = Math.floor(Math.pow(2, testZoom) / 2);
+                        var testY = Math.floor(Math.pow(2, testZoom) / 2);
+                        testImg.src = 'https://mt0.google.com/vt/lyrs=m&x=' + testX + '&y=' + testY + '&z=' + testZoom;
+                    }
+                }, 500);
+                
+                // معالجة أخطاء تحميل الـ tiles للطبقة الحالية
+                map.on('tileerror', function(error, tile) {
+                    if (!layerSwitched && currentLayer === googleMapsLayer) {
                         errorCount++;
-                        // إذا فشل تحميل Google Maps عدة مرات، استخدم CartoDB
+                        // إذا فشل تحميل Google Maps عدة مرات، ارجع إلى CartoDB
                         if (errorCount >= maxErrors) {
                             try {
                                 map.removeLayer(googleMapsLayer);
@@ -2372,38 +2412,13 @@
                                 currentLayer = cartoPositronLayer;
                                 layerSwitched = true;
                                 errorCount = 0;
-                                console.log('تم التبديل إلى CartoDB Positron بسبب أخطاء في Google Maps');
+                                console.log('🔄 تم التبديل إلى CartoDB Positron بسبب أخطاء متعددة في Google Maps');
                             } catch(e) {
-                                console.log('خطأ في التبديل:', e);
+                                console.log('❌ خطأ في التبديل:', e);
                             }
                         }
                     }
                 });
-                
-                // إذا لم تظهر أي tiles خلال ثانيتين، استخدم CartoDB مباشرة
-                setTimeout(function() {
-                    if (!layerSwitched && currentLayer === googleMapsLayer) {
-                        // التحقق من وجود tiles محملة
-                        var tilesLoaded = false;
-                        map.eachLayer(function(layer) {
-                            if (layer instanceof L.TileLayer && layer._tiles && Object.keys(layer._tiles).length > 0) {
-                                tilesLoaded = true;
-                            }
-                        });
-                        
-                        if (!tilesLoaded) {
-                            try {
-                                map.removeLayer(googleMapsLayer);
-                                cartoPositronLayer.addTo(map);
-                                currentLayer = cartoPositronLayer;
-                                layerSwitched = true;
-                                console.log('تم التبديل إلى CartoDB Positron - لم يتم تحميل Google Maps');
-                            } catch(e) {
-                                console.log('خطأ في التبديل:', e);
-                            }
-                        }
-                    }
-                }, 2000);
                 
                 // إضافة طبقات للتبديل بينها
                 var baseMaps = {
