@@ -1167,7 +1167,7 @@
         container.appendChild(div);
         // التمرير إلى العنصر المضاف فقط إذا لم يكن التحميل الأولي
         // (عند استعادة المسودة، لا نريد التمرير التلقائي)
-        if (!window._isInitialLoad) {
+        if (typeof window._isInitialLoad === 'undefined' || !window._isInitialLoad) {
             setTimeout(function() {
                 div.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             }, 100);
@@ -2076,17 +2076,31 @@
         var statusDiv = document.getElementById('locationStatus');
         if (statusDiv) statusDiv.dataset.initialized = 'true';
         
+        // إظهار الـ modal أولاً
         modal.classList.add('show');
         document.body.style.overflow = 'hidden';
         
-        // تهيئة الخريطة
+        // تهيئة الخريطة بعد إظهار الـ modal (لضمان حساب الحجم بشكل صحيح)
         setTimeout(function() {
             if (!map) {
-                map = L.map('mapDiv').setView([33.3152, 44.3661], 13); // بغداد افتراضياً
+                // تهيئة الخريطة بعد أن تصبح الـ modal مرئية
+                map = L.map('mapDiv', {
+                    preferCanvas: false
+                }).setView([33.3152, 44.3661], 13); // بغداد افتراضياً
+                
+                // استخدام HTTPS لجميع الأصول
                 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                     attribution: '© OpenStreetMap',
-                    maxZoom: 19
+                    maxZoom: 19,
+                    crossOrigin: true
                 }).addTo(map);
+                
+                // إعادة حساب حجم الخريطة بعد أن تصبح مرئية
+                setTimeout(function() {
+                    if (map) {
+                        map.invalidateSize();
+                    }
+                }, 150);
                 
                 // محاولة الحصول على الموقع الحالي
                 if (navigator.geolocation) {
@@ -2094,15 +2108,31 @@
                         function(position) {
                             var lat = position.coords.latitude;
                             var lng = position.coords.longitude;
-                            map.setView([lat, lng], 15);
-                            if (mapMarker) map.removeLayer(mapMarker);
-                            mapMarker = L.marker([lat, lng]).addTo(map);
-                            selectedLocation = { lat: lat, lng: lng };
+                            if (map) {
+                                map.setView([lat, lng], 15);
+                                map.invalidateSize(); // إعادة حساب الحجم بعد تغيير العرض
+                                if (mapMarker) map.removeLayer(mapMarker);
+                                mapMarker = L.marker([lat, lng]).addTo(map);
+                                selectedLocation = { lat: lat, lng: lng };
+                            }
                         },
                         function() {
                             // إذا فشل، نستخدم موقع افتراضي
+                            // إعادة حساب الحجم حتى مع الموقع الافتراضي
+                            if (map) {
+                                setTimeout(function() {
+                                    map.invalidateSize();
+                                }, 200);
+                            }
                         }
                     );
+                } else {
+                    // إذا لم يكن geolocation متاحاً، نعيد حساب الحجم بعد تهيئة الخريطة
+                    if (map) {
+                        setTimeout(function() {
+                            map.invalidateSize();
+                        }, 200);
+                    }
                 }
                 
                 // عند النقر على الخريطة
@@ -2113,8 +2143,15 @@
                     mapMarker = L.marker([lat, lng]).addTo(map);
                     selectedLocation = { lat: lat, lng: lng };
                 });
+            } else {
+                // إذا كانت الخريطة موجودة مسبقاً، نعيد حساب الحجم عند فتح الـ modal
+                setTimeout(function() {
+                    if (map) {
+                        map.invalidateSize();
+                    }
+                }, 150);
             }
-        }, 100);
+        }, 200); // زيادة التأخير لضمان أن الـ modal أصبح مرئياً بالكامل
     }
     
     function closeMapSelector() {
@@ -2180,6 +2217,9 @@
         });
     }
 
+    // تعريف علامة التحميل الأولي قبل أي شيء آخر
+    window._isInitialLoad = true;
+    
     // منع أي تمرير تلقائي عند التحميل - تنفيذ فوري قبل أي شيء آخر
     (function() {
         // إزالة hash من URL فوراً
