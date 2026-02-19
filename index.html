@@ -982,7 +982,7 @@
             <button id="mapCloseBtn" onclick="closeMapSelector()">×</button>
         </div>
         <div id="mapDiv">
-            <button id="mapCurrentLocationBtn" onclick="getCurrentLocationFromMap()" title="الحصول على موقعي الحالي">
+            <button id="mapCurrentLocationBtn" onclick="getCurrentLocationFromMap()" title="الحصول على موقعي الحالي" style="display: block; z-index: 1000;">
                 📍
             </button>
         </div>
@@ -2154,26 +2154,48 @@
         
         // تهيئة الخريطة بعد إظهار الـ modal
         setTimeout(function() {
+            // التحقق من وجود Leaflet
+            if (typeof L === 'undefined') {
+                console.error('Leaflet library not loaded!');
+                alert('خطأ: مكتبة الخريطة لم يتم تحميلها. يرجى تحديث الصفحة.');
+                return;
+            }
+            
+            // التحقق من وجود عنصر الخريطة
+            var mapDiv = document.getElementById('mapDiv');
+            if (!mapDiv) {
+                console.error('Map div not found!');
+                return;
+            }
+            
             if (!map) {
-                // إنشاء الخريطة ووضعها مباشرة على حي القائم - البصرة
-                // إعدادات محسّنة للهاتف مع تفاصيل كاملة
-                map = L.map('mapDiv', {
-                    zoomControl: true,
-                    doubleClickZoom: true,
-                    scrollWheelZoom: true,
-                    touchZoom: true,
-                    boxZoom: true,
-                    keyboard: true,
-                    dragging: true,
-                    zoomAnimation: true,
-                    fadeAnimation: true,
-                    markerZoomAnimation: true,
-                    preferCanvas: false,  // استخدام canvas لتحسين الأداء
-                    maxBoundsViscosity: 1.0,
-                    worldCopyJump: false,
-                    maxZoom: 22,  // تكبير عالي للحصول على تفاصيل أكثر
-                    minZoom: 10
-                }).setView([qaimLat, qaimLng], 17);  // تكبير أكثر للحصول على تفاصيل أفضل
+                try {
+                    // إنشاء الخريطة ووضعها مباشرة على حي القائم - البصرة
+                    // إعدادات محسّنة للهاتف مع تفاصيل كاملة
+                    map = L.map('mapDiv', {
+                        zoomControl: true,
+                        doubleClickZoom: true,
+                        scrollWheelZoom: true,
+                        touchZoom: true,
+                        boxZoom: true,
+                        keyboard: true,
+                        dragging: true,
+                        zoomAnimation: true,
+                        fadeAnimation: true,
+                        markerZoomAnimation: true,
+                        preferCanvas: false,
+                        maxBoundsViscosity: 1.0,
+                        worldCopyJump: false,
+                        maxZoom: 22,
+                        minZoom: 10
+                    }).setView([qaimLat, qaimLng], 17);
+                    
+                    console.log('Map created successfully');
+                } catch(e) {
+                    console.error('Error creating map:', e);
+                    alert('خطأ في إنشاء الخريطة: ' + e.message);
+                    return;
+                }
                 
                 // طبقة Google Maps مع تفاصيل كاملة (واضحة ودقيقة مثل Google Maps)
                 var googleMapsLayer = L.tileLayer('https://mt{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
@@ -2209,6 +2231,13 @@
                     subdomains: ['a', 'b', 'c', 'd']
                 });
                 
+                // طبقة OpenStreetMap (مضمونة العمل - كبديل أساسي)
+                var osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenStreetMap',
+                    maxZoom: 19,
+                    subdomains: ['a', 'b', 'c']
+                });
+                
                 // طبقة التضاريس (OpenTopoMap) - كبديل
                 var terrainLayer = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
                     attribution: '© OpenTopoMap & OpenStreetMap',
@@ -2216,33 +2245,61 @@
                     subdomains: ['a', 'b', 'c']
                 });
                 
-                // إضافة Google Maps كطبقة افتراضية مع معالجة الأخطاء
-                googleMapsLayer.addTo(map);
-                
-                // إضافة معالج للأخطاء - إذا فشل Google Maps، استخدم CartoDB تلقائياً
-                googleMapsLayer.on('tileerror', function(error, tile) {
-                    console.log('Google Maps tile error, switching to CartoDB');
-                    if (map.hasLayer(googleMapsLayer)) {
-                        map.removeLayer(googleMapsLayer);
-                        if (!map.hasLayer(cartoPositronLayer)) {
-                            cartoPositronLayer.addTo(map);
+                try {
+                    // إضافة CartoDB كطبقة افتراضية (تعمل بشكل صحيح ومضمونة)
+                    // CartoDB واضحة وتحتوي على تفاصيل كاملة مثل Google Maps
+                    cartoPositronLayer.addTo(map);
+                    console.log('CartoDB layer added');
+                    
+                    // معالج احتياطي: إذا فشلت CartoDB، استخدم OpenStreetMap
+                    cartoPositronLayer.on('tileerror', function(error, tile) {
+                        console.log('CartoDB tile error, switching to OpenStreetMap');
+                        if (map && !map.hasLayer(osmLayer)) {
+                            osmLayer.addTo(map);
                         }
+                    });
+                    
+                    // إضافة طبقات للتبديل بينها
+                    // ترتيب الطبقات: الأفضل أولاً
+                    var baseMaps = {
+                        "🗺️ CartoDB (واضحة - افتراضي)": cartoPositronLayer,
+                        "🗺️ OpenStreetMap (مضمونة)": osmLayer,
+                        "🗺️ Google Maps": googleMapsLayer,
+                        "🛰️ القمر الصناعي": googleSatelliteLayer,
+                        "🛰️ Hybrid (قمر + أسماء)": googleHybridLayer,
+                        "🗻 التضاريس": terrainLayer
+                    };
+                    
+                    // إضافة عنصر التحكم في الطبقات في الزاوية اليمنى السفلية
+                    var layersControl = L.control.layers(baseMaps, null, {
+                        position: 'bottomright',
+                        collapsed: true  // إظهار عناصر التحكم بشكل مطوي (يمكن فتحه)
+                    });
+                    layersControl.addTo(map);
+                    console.log('Layers control added');
+                    
+                    // التأكد من ظهور عنصر التحكم
+                    setTimeout(function() {
+                        var layersControlEl = document.querySelector('.leaflet-control-layers');
+                        if (layersControlEl) {
+                            layersControlEl.style.display = 'block';
+                            layersControlEl.style.zIndex = '1000';
+                            console.log('Layers control is visible');
+                        } else {
+                            console.error('Layers control not found!');
+                        }
+                    }, 200);
+                    
+                } catch(e) {
+                    console.error('Error adding layers:', e);
+                    // محاولة إضافة OpenStreetMap كبديل أساسي
+                    try {
+                        osmLayer.addTo(map);
+                        console.log('OpenStreetMap layer added as fallback');
+                    } catch(e2) {
+                        console.error('Error adding OpenStreetMap:', e2);
                     }
-                });
-                
-                // إضافة طبقات للتبديل بينها
-                var baseMaps = {
-                    "🗺️ Google Maps (واضحة)": googleMapsLayer,
-                    "🗺️ CartoDB (واضحة)": cartoPositronLayer,
-                    "🛰️ القمر الصناعي": googleSatelliteLayer,
-                    "🛰️ Hybrid (قمر + أسماء)": googleHybridLayer,
-                    "🗻 التضاريس": terrainLayer
-                };
-                
-                // إضافة عنصر التحكم في الطبقات في الزاوية اليمنى السفلية
-                L.control.layers(baseMaps, null, {
-                    position: 'bottomright'  // نقل عنصر التحكم إلى الأسفل اليمين
-                }).addTo(map);
+                }
                 
                 // التأكد من أن الخريطة تعرض بشكل صحيح مع تفاصيل كاملة
                 setTimeout(function() {
@@ -2264,6 +2321,18 @@
                         }, 300);
                     }
                 }, 200);
+                
+                // التأكد من ظهور زر الموقع الحالي
+                setTimeout(function() {
+                    var locationBtn = document.getElementById('mapCurrentLocationBtn');
+                    if (locationBtn) {
+                        locationBtn.style.display = 'block';
+                        locationBtn.style.zIndex = '1000';
+                        console.log('Location button is visible');
+                    } else {
+                        console.error('Location button not found!');
+                    }
+                }, 100);
                 
                 // عند النقر على الخريطة - المستخدم يختار موقعه
                 map.on('click', function(e) {
