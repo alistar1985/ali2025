@@ -1920,9 +1920,10 @@
         }
         
         function _requestLocation() {
-            // في كل مرة نطلب الصلاحية من جديد
-            // maximumAge: 0 يضمن عدم استخدام cache
-            // enableHighAccuracy: true قد يجبر المتصفح على طلب الصلاحية مرة أخرى
+            // استراتيجية لتقليل انتهاء المهلة:
+            // - enableHighAccuracy: false = استخدام الشبكة (WiFi/خلوي) أسرع بكثير من GPS
+            // - timeout: 60000 = 60 ثانية كافية حتى على الأجهزة البطيئة
+            // - maximumAge: 60000 = السماح بموقع مخزن حتى دقيقة (أسرع إذا كان المتصفح حصل عليه مؤخراً)
             navigator.geolocation.getCurrentPosition(
                 function(position) {
                     var lat = position.coords.latitude;
@@ -1941,12 +1942,10 @@
                     var errorMsg = '❌ فشل الحصول على الموقع';
                     if (error.code === error.PERMISSION_DENIED) {
                         errorMsg = '❌ تم رفض الصلاحية. اضغط مرة أخرى لطلب الصلاحية من جديد';
-                        // في كل مرة يتم الضغط، سيحاول المتصفح طلب الصلاحية مرة أخرى
-                        // إذا استمر الرفض، يجب السماح بالموقع من إعدادات المتصفح
                     } else if (error.code === error.POSITION_UNAVAILABLE) {
                         errorMsg = '❌ الموقع غير متاح. اضغط مرة أخرى';
                     } else if (error.code === error.TIMEOUT) {
-                        errorMsg = '❌ انتهت مهلة الطلب. اضغط مرة أخرى';
+                        errorMsg = '❌ انتهت مهلة الطلب. تأكد من تفعيل الموقع (GPS/الشبكة) واضغط مرة أخرى';
                     }
                     if (locationText) locationText.textContent = errorMsg;
                     if (statusDiv) {
@@ -1956,9 +1955,9 @@
                     if (btn) btn.disabled = false;
                 },
                 { 
-                    enableHighAccuracy: true,  // يطلب صلاحية دقيقة (قد يجبر المتصفح على طلب الصلاحية)
-                    timeout: 15000,  // زيادة المهلة
-                    maximumAge: 0  // لا يستخدم cache، يطلب الموقع من جديد في كل مرة
+                    enableHighAccuracy: false,  // أسرع: شبكة WiFi/خلوي بدل GPS (كافٍ لتحديد الحي)
+                    timeout: 60000,            // 60 ثانية - كافية للأجهزة البطيئة
+                    maximumAge: 60000          // السماح بموقع مخزن حتى دقيقة (أسرع)
                 }
             );
         }
